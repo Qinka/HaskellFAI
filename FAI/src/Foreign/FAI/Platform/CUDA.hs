@@ -48,6 +48,7 @@ import Foreign.Ptr
 import Foreign.ForeignPtr
 import Foreign.C.Types
 import Control.Monad
+import Foreign.FAI.Platform.Host (Host)
 
 C.include "<cuda_runtime.h>"
 C.include "<stdio.h>"
@@ -77,8 +78,65 @@ cudaMemRelease n' = [C.exp| void { cudaFree($(void *n)) }|]
 cudaMemReleaseP :: IO (FinalizerPtr a)
 cudaMemReleaseP = castPtrToFunPtr <$> [C.exp| void* {*cudaFree}|]
 
+cudaMemCopy :: (Ptr () -> Ptr () -> CInt -> IO CInt)
+            -> ForeignPtr a -> ForeignPtr b -> CInt -> IO ()
+cudaMemCopy doCopy fdst fsrc size = 
+  withForeignPtr fdst $ \dst' ->
+    withForeignPtr fsrc $ \src' ->
+  let dst = castPtr dst'
+      src = castPtr src'
+  in do
+    rt <- doCopy dst src size
+    when (rt /= 0) $ error "Fail to copy."
+
+doCopyHC dst src size =
+  [C.block| int {
+      cudaError_t err = cudaMemcpy($(void *dst), $(void *src),
+                                    $(int size), cudaMemcpyHostToDevice);
+      if(err != cudaSuccess) {
+        printf("Failed to copy memory(HC), %d", err);
+        return -1;
+      }
+      return 0;}|]
+
+doCopyCH dst src size =
+  [C.block| int {
+      cudaError_t err = cudaMemcpy($(void *dst), $(void *src),
+                                    $(int size), cudaMemcpyDeviceToHost);
+      if(err != cudaSuccess) {
+        printf("Failed to copy memory(HC), %d", err);
+        return -1;
+      }
+      return 0;}|]
+
+doCopyCC dst src size =
+  [C.block| int {
+      cudaError_t err = cudaMemcpy($(void *dst), $(void *src),
+                                    $(int size), cudaMemcpyDeviceToDevice);
+      if(err != cudaSuccess) {
+        printf("Failed to copy memory(HC), %d", err);
+        return -1;
+      }
+      return 0;}|]
+
+
 instance FAI CUDA where
   faiMemAllocate n = liftIO $ cudaMemAllocate $ fromIntegral n
   faiMemRelease  p = liftIO $ cudaMemRelease p
   faiMemReleaseP   = liftIO   cudaMemReleaseP
+
+instance FAICopy Host CUDA where
+  faiMemCopy dst src = do
+    when (bufSize dst /= bufSize src) $ error "Different size."
+    liftIO $ cudaMemCopy doCopyHC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
+
+instance FAICopy CUDA Host where
+  faiMemCopy dst src = do
+    when (bufSize dst /= bufSize src) $ error "Different size."
+    liftIO $ cudaMemCopy doCopyCH (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
+
+instance FAICopy CUDA CUDA where
+  faiMemCopy dst src = do
+    when (bufSize dst /= bufSize src) $ error "Different size."
+    liftIO $ cudaMemCopy doCopyCC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
 

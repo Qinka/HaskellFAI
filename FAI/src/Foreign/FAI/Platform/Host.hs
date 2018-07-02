@@ -40,6 +40,8 @@ The host platform instance.
 module Foreign.FAI.Platform.Host
   ( Host(..)
   , Pf(..)
+  , bufFromList
+  , bufToList
   ) where
 
 import qualified Language.C.Inline as C
@@ -48,7 +50,12 @@ import Foreign.Ptr
 import Foreign.ForeignPtr
 import Foreign.C.Types
 import Control.Monad
+import GHC.Exts
+import System.IO.Unsafe
+import Foreign.Marshal.Array
+import Foreign.Storable
 
+C.include "<string.h>"
 C.include "<stdlib.h>"
 
 data Host = Host
@@ -68,8 +75,38 @@ hostMemRelease n' = [C.exp| void { free($(void *n)) }|]
 hostMemReleaseP :: IO (FinalizerPtr a)
 hostMemReleaseP = castPtrToFunPtr <$> [C.exp| void* {*free}|]
 
+hostMemCopy :: ForeignPtr a -> ForeignPtr a -> CInt -> IO ()
+hostMemCopy fdst fsrc size =
+  withForeignPtr fdst $ \dst' ->
+    withForeignPtr fsrc $ \src' ->
+  let dst = castPtr dst'
+      src = castPtr src'
+  in void $ [C.exp| void* {memcpy($(void *dst), $(void *src), $(int size))} |]
+    
 instance FAI Host where
   faiMemAllocate n = liftIO $ hostMemAllocate $ fromIntegral n
   faiMemRelease  p = liftIO $ hostMemRelease p
   faiMemReleaseP   = liftIO hostMemReleaseP
 
+instance FAICopy Host Host where
+  faiMemCopy dst src = do
+    when (bufSize dst /= bufSize src) $ error "Different size."
+    liftIO $ hostMemCopy (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
+
+
+hostAccReturn :: a -> Accelerate Host a
+hostAccReturn = return
+
+bufFromList :: (Storable b, Pf Host a ~ b) => [b] -> Buffer Host a
+bufFromList ls = unsafePerformIO $ do
+    bf <- fst <$> doAccelerate  (hostAccReturn () >> newBuffer (length ls)) undefined
+    withForeignPtr (bufPtr bf) $ \ptr -> 
+      pokeArray ptr ls
+    return bf
+
+bufToList :: (Storable b, Pf Host a ~ b) => Buffer Host a -> [b]
+bufToList bf = unsafePerformIO $
+    withForeignPtr (bufPtr bf) $ \ptr -> 
+    peekBuf undefined ptr
+    where peekBuf :: Storable a => a -> Ptr a -> IO [a]
+          peekBuf u ptr = peekArray (bufSize bf `div` sizeOf u) ptr

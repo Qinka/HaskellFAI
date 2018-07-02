@@ -43,6 +43,7 @@ module Foreign.FAI.Types
   , FAI(..)
   , FAICopy(..)
   , newBuffer
+  , dupBuffer
   , liftIO
   ) where
 
@@ -55,7 +56,7 @@ import Control.Monad
 type family Pf p t :: *
 
 data Buffer p a = Buffer
-  { buffPtr :: ForeignPtr (Pf p a) -- ^ pointer
+  { bufPtr  :: ForeignPtr (Pf p a) -- ^ pointer
   , bufSize :: Int                 -- ^ number of size
   }
   deriving (Show, Eq)
@@ -80,8 +81,8 @@ class FAI p where
 
 class (FAI p1, FAI p2) =>  FAICopy p1 p2 where
   faiMemCopy :: (Storable b, (Pf p1 a) ~ b, Storable c, (Pf p2 a) ~ c)
-             => Buffer p1 a       -- ^ Destination
-             -> Buffer p2 a       -- ^ Source
+             => Buffer p2 a       -- ^ Destination
+             -> Buffer p1 a       -- ^ Source
              -> Accelerate p2 ()
 
 instance Functor (Accelerate p) where
@@ -110,10 +111,24 @@ newBuffer :: (FAI p, Storable b, (Pf p a) ~ b)
           -> Accelerate p (Buffer p a)
 newBuffer n = do
   fin <- faiMemReleaseP
-  ptr <- alloc undefined
+  (ptr, size) <- alloc undefined
   when (nullPtr == ptr) $ error "Can not allocate memory."
   fptr <- liftIO $ newForeignPtr_ ptr
   liftIO $ addForeignPtrFinalizer fin fptr
-  return $ Buffer fptr n
-  where alloc :: (FAI p, Storable b) => b -> Accelerate p (Ptr b)
-        alloc u = faiMemAllocate (n * sizeOf u)
+  return $ Buffer fptr size
+  where alloc :: (FAI p, Storable b) => b -> Accelerate p (Ptr b, Int)
+        alloc u =
+          let size = n * sizeOf u
+          in (\p -> (p, size)) <$> faiMemAllocate (n * sizeOf u)
+
+-- | without copy things
+dupBuffer :: (FAI p1, FAI p2, Storable b, Pf p2 a ~ b)
+          => Buffer p1 a
+          -> Accelerate p2 (Buffer p2 a)
+dupBuffer buf = do
+  fin <- faiMemReleaseP
+  let size = bufSize buf
+  ptr <- faiMemAllocate size
+  fptr <- liftIO $ newForeignPtr_ ptr
+  liftIO $ addForeignPtrFinalizer fin fptr
+  return $ Buffer fptr size
