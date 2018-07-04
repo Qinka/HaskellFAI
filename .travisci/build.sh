@@ -31,7 +31,7 @@ fi
 ## THREADED
 if [ -n "$THREADED" ]; then
     echo Enable -threaded
-    export THREADED_FLAG=" --ghc-options -threaded -with-rtsopts=-N "
+    export THREADED_FLAG=" --ghc-options -threaded --ghc-options -with-rtsopts=-N "
 fi 
 
 ## 
@@ -39,7 +39,7 @@ if [ -n "$DEBUG" ]; then
     echo Enable debug
     export XDEBUGFLAG=" --ghc-options -rtsopts=all -g"
 else
-    export XDEBUGFLAG=" --ghc-options -rtsopts=some  --ghc-options -O3"
+    export XDEBUGFLAG=" --ghc-options -rtsopts=some --ghc-options --ghc-options --ghc-options -O3"
 fi
 
 cd $TRAVIS_BUILD_DIR
