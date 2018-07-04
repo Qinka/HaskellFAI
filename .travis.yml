@@ -17,13 +17,14 @@
 #
 
 ## Traivs-Ci configure
-sudo: received
+sudo: required
 dist: trusty
 
 ## Matrix of building
-- env: GHC_VER=8.2.2 THREADED=t LLVM=3.9
-- env: GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t
-- env: GHC_VER=8.2.2
+env:
+  - GHC_VER=8.2.2 THREADED=t LLVM=3.9
+  - GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t
+  - GHC_VER=8.2.2
 
 addons:
   apt:
