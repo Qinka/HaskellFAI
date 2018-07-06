@@ -37,7 +37,7 @@ fi
 ## 
 if [ -n "$DEBUG" ]; then
     echo Enable debug
-    export X_DEBUG_FLAGS=" --ghc-options -rtsopts=all -g"
+    export X_DEBUG_FLAGS=" --ghc-options -rtsopts=all --ghc-options -g"
 else
     export X_DEBUG_FLAGS=" --ghc-options -rtsopts=some --ghc-options --ghc-options --ghc-options -O3"
 fi
