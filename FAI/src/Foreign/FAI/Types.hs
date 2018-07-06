@@ -43,8 +43,10 @@ module Foreign.FAI.Types
   , FAI(..)
   , FAICopy(..)
   , newBuffer
-  , dupBuffer
+  , dupBufferW
+  , dupBufferC
   , liftIO
+  , accelerate
   ) where
 
 import           Control.Monad.IO.Class (MonadIO (..))
@@ -62,13 +64,16 @@ data Buffer p a = Buffer
   deriving (Show, Eq)
 
 data Context p = Context
-  { unContextPtr :: ForeignPtr (Context p)
+  { unContextPtr :: Ptr (Context p)
   }
   deriving (Show, Eq)
 
 newtype Accelerate p a = Accelerate
   { doAccelerate :: Context p -> IO (a, Context p)
   }
+
+accelerate :: Context p -> Accelerate p a -> IO a
+accelerate cc = (fst <$>) . flip doAccelerate cc
 
 type PfPtr p a = Ptr (Pf p a)
 
@@ -122,13 +127,21 @@ newBuffer n = do
           in (\p -> (p, size)) <$> faiMemAllocate (n * sizeOf u)
 
 -- | without copy things
-dupBuffer :: (FAI p1, FAI p2, Storable b, Pf p2 a ~ b)
+dupBufferW :: (FAI p1, FAI p2, Storable b, Pf p2 a ~ b)
           => Buffer p1 a
           -> Accelerate p2 (Buffer p2 a)
-dupBuffer buf = do
+dupBufferW buf = do
   fin <- faiMemReleaseP
   let size = bufSize buf
   ptr <- faiMemAllocate size
   fptr <- liftIO $ newForeignPtr_ ptr
   liftIO $ addForeignPtrFinalizer fin fptr
   return $ Buffer fptr size
+
+dupBufferC :: (FAICopy p1 p2, FAI p1, FAI p2, Storable b, Storable c, Pf p2 a ~ b, Pf p1 a ~ c)
+           => Buffer p1 a
+           -> Accelerate p2 (Buffer p2 a)
+dupBufferC bSrc = do
+  bDst <- dupBufferW bSrc
+  faiMemCopy bDst bSrc
+  return bDst
