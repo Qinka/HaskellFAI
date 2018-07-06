@@ -35,11 +35,20 @@ sudo $APT update
 
 sudo $APT install -y ghc-$GHC_VER 
 
-if [ -n "$LLVM"]; then
-   echo
-   echo Using llvm-$LLVM
-   echo
-   sudo $APT install -y lldb-$LLVM llvm-$LLVM llvm-$LLVM-dev llvm-$LLVM-runtime
+if [ -n "$LLVM" ]; then
+    echo
+    echo Using llvm-$LLVM
+    echo
+    sudo $APT install -y lldb-$LLVM llvm-$LLVM llvm-$LLVM-dev llvm-$LLVM-runtime
+fi
+
+#
+# I was planning enable the CUDA test, but the Travis-CI do not support such things.
+# So it's abandoned now.
+#
+if [ -n "$CUDA" ]; then
+    echo CUDA should be disable.
+    exit 3
 fi
 
 echo Setting up ghc-$GHC_VER

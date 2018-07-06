@@ -25,24 +25,33 @@ echo
 ## LLVM
 if [ -n "$LLVM" ]; then
     echo Enable LLVM
-    export LLVM_FLAG=" --ghc-options -fllvm --ghc-options -pgmlo --ghc-options opt-$LLVM --ghc-options -pgmlc --ghc-options llc-$LLVM "
+    export X_LLVM_FLAGS=" --ghc-options -fllvm --ghc-options -pgmlo --ghc-options opt-$LLVM --ghc-options -pgmlc --ghc-options llc-$LLVM "
 fi
 
 ## THREADED
 if [ -n "$THREADED" ]; then
     echo Enable -threaded
-    export THREADED_FLAG=" --ghc-options -threaded --ghc-options -with-rtsopts=-N "
+    export X_THREADED_FLAGS=" --ghc-options -threaded --ghc-options -with-rtsopts=-N "
 fi 
 
 ## 
 if [ -n "$DEBUG" ]; then
     echo Enable debug
-    export XDEBUGFLAG=" --ghc-options -rtsopts=all -g"
+    export X_DEBUG_FLAGS=" --ghc-options -rtsopts=all -g"
 else
-    export XDEBUGFLAG=" --ghc-options -rtsopts=some --ghc-options --ghc-options --ghc-options -O3"
+    export X_DEBUG_FLAGS=" --ghc-options -rtsopts=some --ghc-options --ghc-options --ghc-options -O3"
+fi
+
+if [ -n "$CUDA" ]; then
+    echo Enable CUDA
+    export X_CUDA_FLAGS=" "
+else
+    echo Disable CUDA
+    export X_CUDA_FLAGS=" --flag FAI:-enable-cuda "
 fi
 
 cd $TRAVIS_BUILD_DIR
-export FLAGS="$THREADED_FLAG $LLVM_FLAG $xDEBUGFLAG"
+local FLAGS
+FLAGS="$X_THREADED_FLAGS $X_LLVM_FLAGS $X_DEBUG_FLAGS $X_CUDA_FLAGS"
 echo Using flags: $FLAGS
 stack build $FLAGS
