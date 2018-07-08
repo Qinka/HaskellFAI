@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeFamilies #-}
 
-module FAI.Host
+module Foreign.FAI.Platform.HostSpec
   ( spec
   ) where
 
@@ -14,7 +14,9 @@ import Foreign.Marshal.Array
 import Foreign.Storable
 
 peekBuffer :: (Storable b, Pf Host a ~ b) => Buffer Host a -> IO [b]
-peekBuffer (Buffer fp len) = withForeignPtr fp $ \p -> peekArray len p
+peekBuffer (Buffer fp len) = withForeignPtr fp $ \p -> peek undefined p len
+  where peek :: (Storable b) => b -> Ptr b-> Int -> IO [b]
+        peek u ptr i = peekArray (i `div` sizeOf u) ptr
 
 peekBufferA :: (Storable b, Pf Host a ~ b) => Buffer Host a -> Accelerate Host [b]
 peekBufferA b = liftIO $ peekBuffer b
@@ -26,6 +28,7 @@ spec = do
     it "newBuffer" $ do
       let acc = accelerate cc $ do
             b <- newBuffer 20 :: Accelerate Host (Buffer Host Float)
+            liftIO $ print b
             peekBufferA b >>= liftIO. print
             return ()
       acc `shouldReturn` ()
@@ -33,7 +36,7 @@ spec = do
       let acc = accelerate cc $ do
             b1 <- newBuffer 20 :: Accelerate Host (Buffer Host Float)
             peekBufferA b1 >>= liftIO . print
-            b2 <- dupBufferW b1
+            b2 <- dupBuffer False b1
             peekBufferA b2 >>= liftIO . print
             return ()
       acc `shouldReturn` ()
@@ -42,7 +45,7 @@ spec = do
       let acc = accelerate cc $ do
             let arr1 = [1..100] :: [Float]
                 b1  = bufFromList arr1 :: Buffer Host Float
-            b2 <- dupBufferC b1
+            b2 <- dupBuffer True b1 :: Accelerate Host (Buffer Host Float)
             let arr2 = bufToList b2
             return (arr1, arr2)
       (arr1, arr2) <- acc 

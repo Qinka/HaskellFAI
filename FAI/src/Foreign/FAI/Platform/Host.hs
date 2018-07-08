@@ -84,14 +84,14 @@ hostMemCopy fdst fsrc size =
   in void $ [C.exp| void* {memcpy($(void *dst), $(void *src), $(int size))} |]
     
 instance FAI Host where
-  faiMemAllocate n = liftIO $ hostMemAllocate $ fromIntegral n
-  faiMemRelease  p = liftIO $ hostMemRelease p
-  faiMemReleaseP   = liftIO hostMemReleaseP
+  faiMemAllocate cc n = hostMemAllocate $ fromIntegral n
+  faiMemRelease  cc p = hostMemRelease p
+  faiMemReleaseP cc   = Right <$>hostMemReleaseP
 
 instance FAICopy Host Host where
   faiMemCopy dst src = do
     when (bufSize dst /= bufSize src) $ error "Different size."
-    liftIO $ hostMemCopy (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
+    hostMemCopy (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
 
 
 hostAccReturn :: a -> Accelerate Host a

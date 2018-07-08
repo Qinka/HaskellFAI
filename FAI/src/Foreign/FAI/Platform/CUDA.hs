@@ -121,22 +121,22 @@ doCopyCC dst src size =
 
 
 instance FAI CUDA where
-  faiMemAllocate n = liftIO $ cudaMemAllocate $ fromIntegral n
-  faiMemRelease  p = liftIO $ cudaMemRelease p
-  faiMemReleaseP   = liftIO   cudaMemReleaseP
+  faiMemAllocate cc n = cudaMemAllocate $ fromIntegral n
+  faiMemRelease  cc p = cudaMemRelease p
+  faiMemReleaseP cc   = Right <$> cudaMemReleaseP
 
 instance FAICopy Host CUDA where
   faiMemCopy dst src = do
     when (bufSize dst /= bufSize src) $ error "Different size."
-    liftIO $ cudaMemCopy doCopyHC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
+    cudaMemCopy doCopyHC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
 
 instance FAICopy CUDA Host where
   faiMemCopy dst src = do
     when (bufSize dst /= bufSize src) $ error "Different size."
-    liftIO $ cudaMemCopy doCopyCH (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
+    cudaMemCopy doCopyCH (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
 
 instance FAICopy CUDA CUDA where
   faiMemCopy dst src = do
     when (bufSize dst /= bufSize src) $ error "Different size."
-    liftIO $ cudaMemCopy doCopyCC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
+    cudaMemCopy doCopyCC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
 
