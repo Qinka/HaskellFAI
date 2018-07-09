@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                FAI
-version:             0.1.0.0
+version:             0.1.0.10
 synopsis:            Haskell Foreign Accelerate Interface
 -- description:         
 homepage:            https://github.com/Qinka/HaskellFAI

@@ -32,9 +32,9 @@ The host platform instance.
 -}
 
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE QuasiQuotes           #-}
+{-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeFamilies          #-}
-{-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 
 module Foreign.FAI.Platform.Host
@@ -44,16 +44,15 @@ module Foreign.FAI.Platform.Host
   , bufToList
   ) where
 
-import qualified Language.C.Inline as C
-import Foreign.FAI.Types
-import Foreign.Ptr
-import Foreign.ForeignPtr
-import Foreign.C.Types
-import Control.Monad
-import GHC.Exts
-import System.IO.Unsafe
-import Foreign.Marshal.Array
-import Foreign.Storable
+import           Control.Monad
+import           Foreign.C.Types
+import           Foreign.FAI.Types
+import           Foreign.ForeignPtr
+import           Foreign.Marshal.Array
+import           Foreign.Ptr
+import           Foreign.Storable
+import qualified Language.C.Inline     as C
+import           System.IO.Unsafe
 
 C.include "<string.h>"
 C.include "<stdlib.h>"
@@ -82,11 +81,11 @@ hostMemCopy fdst fsrc size =
   let dst = castPtr dst'
       src = castPtr src'
   in void $ [C.exp| void* {memcpy($(void *dst), $(void *src), $(int size))} |]
-    
+
 instance FAI Host where
-  faiMemAllocate cc n = hostMemAllocate $ fromIntegral n
-  faiMemRelease  cc p = hostMemRelease p
-  faiMemReleaseP cc   = Right <$>hostMemReleaseP
+  faiMemAllocate _ = hostMemAllocate . fromIntegral
+  faiMemRelease  _ = hostMemRelease
+  faiMemReleaseP _ = Right <$> hostMemReleaseP
 
 instance FAICopy Host Host where
   faiMemCopy dst src = do
@@ -100,13 +99,13 @@ hostAccReturn = return
 bufFromList :: (Storable b, Pf Host a ~ b) => [b] -> Buffer Host a
 bufFromList ls = unsafePerformIO $ do
     bf <- fst <$> doAccelerate  (hostAccReturn () >> newBuffer (length ls)) undefined
-    withForeignPtr (bufPtr bf) $ \ptr -> 
+    withForeignPtr (bufPtr bf) $ \ptr ->
       pokeArray ptr ls
     return bf
 
 bufToList :: (Storable b, Pf Host a ~ b) => Buffer Host a -> [b]
 bufToList bf = unsafePerformIO $
-    withForeignPtr (bufPtr bf) $ \ptr -> 
+    withForeignPtr (bufPtr bf) $ \ptr ->
     peekBuf undefined ptr
     where peekBuf :: Storable a => a -> Ptr a -> IO [a]
-          peekBuf u ptr = peekArray (bufSize bf `div` sizeOf u) ptr
+          peekBuf = peekArray . (bufSize bf `div`) . sizeOf

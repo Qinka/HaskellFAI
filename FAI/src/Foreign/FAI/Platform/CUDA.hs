@@ -32,9 +32,9 @@ The CUDA platform instance.
 -}
 
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE QuasiQuotes           #-}
+{-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeFamilies          #-}
-{-# LANGUAGE QuasiQuotes #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 
 module Foreign.FAI.Platform.CUDA
@@ -42,13 +42,13 @@ module Foreign.FAI.Platform.CUDA
   , Pf(..)
   ) where
 
-import qualified Language.C.Inline as C
-import Foreign.FAI.Types
-import Foreign.Ptr
-import Foreign.ForeignPtr
-import Foreign.C.Types
-import Control.Monad
-import Foreign.FAI.Platform.Host (Host)
+import           Control.Monad
+import           Foreign.C.Types
+import           Foreign.FAI.Platform.Host (Host)
+import           Foreign.FAI.Types
+import           Foreign.ForeignPtr
+import           Foreign.Ptr
+import qualified Language.C.Inline         as C
 
 C.include "<cuda_runtime.h>"
 C.include "<stdio.h>"
@@ -80,7 +80,7 @@ cudaMemReleaseP = castPtrToFunPtr <$> [C.exp| void* {*cudaFree}|]
 
 cudaMemCopy :: (Ptr () -> Ptr () -> CInt -> IO CInt)
             -> ForeignPtr a -> ForeignPtr b -> CInt -> IO ()
-cudaMemCopy doCopy fdst fsrc size = 
+cudaMemCopy doCopy fdst fsrc size =
   withForeignPtr fdst $ \dst' ->
     withForeignPtr fsrc $ \src' ->
   let dst = castPtr dst'
@@ -89,6 +89,7 @@ cudaMemCopy doCopy fdst fsrc size =
     rt <- doCopy dst src size
     when (rt /= 0) $ error "Fail to copy."
 
+doCopyHC :: Ptr () -> Ptr () -> CInt -> IO CInt
 doCopyHC dst src size =
   [C.block| int {
       cudaError_t err = cudaMemcpy($(void *dst), $(void *src),
@@ -99,6 +100,7 @@ doCopyHC dst src size =
       }
       return 0;}|]
 
+doCopyCH :: Ptr () -> Ptr () -> CInt -> IO CInt
 doCopyCH dst src size =
   [C.block| int {
       cudaError_t err = cudaMemcpy($(void *dst), $(void *src),
@@ -109,6 +111,7 @@ doCopyCH dst src size =
       }
       return 0;}|]
 
+doCopyCC :: Ptr () -> Ptr () -> CInt -> IO CInt
 doCopyCC dst src size =
   [C.block| int {
       cudaError_t err = cudaMemcpy($(void *dst), $(void *src),
@@ -121,9 +124,9 @@ doCopyCC dst src size =
 
 
 instance FAI CUDA where
-  faiMemAllocate cc n = cudaMemAllocate $ fromIntegral n
-  faiMemRelease  cc p = cudaMemRelease p
-  faiMemReleaseP cc   = Right <$> cudaMemReleaseP
+  faiMemAllocate _ = cudaMemAllocate . fromIntegral
+  faiMemRelease  _ = cudaMemRelease
+  faiMemReleaseP _ = Right <$> cudaMemReleaseP
 
 instance FAICopy Host CUDA where
   faiMemCopy dst src = do

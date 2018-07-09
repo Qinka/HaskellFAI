@@ -49,11 +49,11 @@ module Foreign.FAI.Types
   , accelerate
   ) where
 
+import           Control.Monad
 import           Control.Monad.IO.Class (MonadIO (..))
 import           Foreign.ForeignPtr
 import           Foreign.Ptr
 import           Foreign.Storable
-import Control.Monad
 
 type family Pf p t :: *
 
@@ -63,7 +63,7 @@ data Buffer p a = Buffer
   }
   deriving (Show, Eq)
 
-data Context p = Context
+newtype Context p = Context
   { unContextPtr :: Ptr (Context p)
   }
   deriving (Show, Eq)
@@ -74,8 +74,6 @@ newtype Accelerate p a = Accelerate
 
 accelerate :: Context p -> Accelerate p a -> IO a
 accelerate cc = (fst <$>) . flip doAccelerate cc
-
-type PfPtr p a = Ptr (Pf p a)
 
 class FAI p where
   faiMemAllocate :: Context p
@@ -88,8 +86,8 @@ class FAI p where
                  -> IO (Either
                          (FinalizerEnvPtr (Context p) a)
                          (FinalizerPtr                a))
-                       -- ^ pointer of the function
-                                                       --   of release the pointer
+                      -- ^ pointer of the function
+                      --   of release the pointer
 
 class (FAI p1, FAI p2) =>  FAICopy p1 p2 where
   faiMemCopy :: (Storable b, (Pf p1 a) ~ b, Storable c, (Pf p2 a) ~ c)
@@ -118,13 +116,14 @@ instance Monad (Accelerate p) where
 instance MonadIO (Accelerate p) where
   liftIO m = Accelerate $ \c -> (\r -> (r,c)) <$> m
 
-autoNewForeignPtr :: (Either
-                         (FinalizerEnvPtr (Context p) a)
-                         (FinalizerPtr                a))
+autoNewForeignPtr :: Either
+                        (FinalizerEnvPtr (Context p) (Pf p a))
+                        (FinalizerPtr                (Pf p a))
                   -> Context p
-                  -> Ptr a
-                  -> IO (ForeignPtr a)
-autoNewForeignPtr fin cc ptr = case fin of
+                  -> Ptr (Pf p a)
+                  -> Int
+                  -> IO (Buffer p a)
+autoNewForeignPtr fin cc ptr size = fmap (`Buffer` size) $ case fin of
   Left  f -> newForeignPtrEnv f (unContextPtr cc) ptr
   Right f -> newForeignPtr    f                   ptr
 
@@ -135,8 +134,8 @@ newBuffer n = Accelerate $ \cc -> do
   fin <- faiMemReleaseP cc
   (ptr, size) <- alloc cc undefined
   when (nullPtr == ptr) $ error "Can not allocate memory."
-  fptr <- autoNewForeignPtr fin cc ptr
-  return (Buffer fptr size, cc)
+  buf <- autoNewForeignPtr fin cc ptr size
+  return (buf, cc)
   where alloc :: (FAI p, Storable b) => Context p ->  b -> IO (Ptr b, Int)
         alloc cc u =
           let size = n * sizeOf u
@@ -148,33 +147,29 @@ dupBuffer :: ( FAICopy p1 p2, FAI p1, FAI p2
           => Bool
            -> Buffer p1 a
           -> Accelerate p2 (Buffer p2 a)
-dupBuffer is buf = Accelerate $ \cc -> do
-  fin <- faiMemReleaseP cc
-  let size = bufSize buf
-  ptr  <- faiMemAllocate cc size
-  fptr <- autoNewForeignPtr fin cc ptr
-  let bDst = Buffer fptr size
-  when is $ faiMemCopy bDst buf
-  return (bDst, cc)
+dupBuffer is buf = Accelerate $ \cc -> dup cc is buf
 
 dupBufferD :: ( FAICopy p2 p1, FAI p1, FAI p2
               , Storable b, Pf p2 a ~ b, Pf p1 a ~ b)
            => Bool
            -> Buffer p2 a
            -> Accelerate p2 (Buffer p1 a)
-dupBufferD is buf = dup undefined is buf
-  where dup :: ( FAICopy p2 p1, FAI p1, FAI p2
-               , Storable b, Pf p2 a ~ b, Pf p1 a ~ b)
-            => Context p1
-            -> Bool
-            -> Buffer p2 a
-            -> Accelerate p2 (Buffer p1 a)
-        dup c1 is buf =  Accelerate $ \cc -> do
-          fin <- faiMemReleaseP c1
-          let size = bufSize buf
-          ptr  <- faiMemAllocate c1 size
-          fptr <- autoNewForeignPtr fin c1 ptr
-          let bDst = Buffer fptr size
-          when is $ faiMemCopy bDst buf
-          return (bDst, cc)
+dupBufferD is buf = Accelerate $ \cc -> replaceContext cc <$>  dup undefined is buf
+
+replaceContext :: Context p2 -> (a, Context p1) -> (a, Context p2)
+replaceContext cc (a, _) = (a, cc)
+
+dup :: ( FAICopy p1 p2, FAI p1, FAI p2
+       , Storable b, Pf p2 a ~ b, Pf p1 a ~ b)
+       => Context p2
+       -> Bool
+       -> Buffer p1 a
+       -> IO (Buffer p2 a, Context p2)
+dup cc is buf = do
+  fin <- faiMemReleaseP cc
+  let size = bufSize buf
+  ptr  <- faiMemAllocate cc size
+  bDst <- autoNewForeignPtr fin cc ptr size
+  when is $ faiMemCopy bDst buf
+  return (bDst, cc)
 
