@@ -26,5 +26,5 @@ if [ -n "$RUN_TEST" ]; then
     echo Run testing
     echo
 
-    stack test
+    stack test $FLAGS
 fi
