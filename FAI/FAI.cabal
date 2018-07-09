@@ -46,5 +46,6 @@ test-suite spec
                      , inline-c
                      , hspec
   other-modules:       Foreign.FAI.Platform.HostSpec
-                     , Foreign.FAI.Platform.CUDASpec
+  if(flag(enable-cuda))
+  other-modules:       Foreign.FAI.Platform.CUDASpec
   default-language:    Haskell2010

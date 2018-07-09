@@ -22,10 +22,10 @@ dist: trusty
 
 ## Matrix of building
 env:
-  - GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t
-  - GHC_VER=8.2.2            LLVM=3.9 DEBUG=t
-  - GHC_VER=8.2.2 THREADED=t          DEBUG=t
-  - GHC_VER=8.2.2                     DEBUG=t
+  - GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
+  - GHC_VER=8.2.2            LLVM=3.9 DEBUG=t RUN_TEST=t
+  - GHC_VER=8.2.2 THREADED=t          DEBUG=t RUN_TEST=t
+  - GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
 
 addons:
   apt:
