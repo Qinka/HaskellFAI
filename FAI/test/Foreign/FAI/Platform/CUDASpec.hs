@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP          #-}
 {-# LANGUAGE TypeFamilies #-}
 
 module Foreign.FAI.Platform.CUDASpec
@@ -5,14 +6,17 @@ module Foreign.FAI.Platform.CUDASpec
   ) where
 
 
-import Foreign.FAI.Types
-import Foreign.FAI.Platform.Host
-import Foreign.FAI.Platform.CUDA
 import           Test.Hspec
-import Foreign.Ptr
-import Foreign.ForeignPtr
-import Foreign.Marshal.Array
-import Foreign.Storable
+
+#ifdef ENABLE_CUDA
+
+import           Foreign.FAI.Platform.CUDA
+import           Foreign.FAI.Platform.Host
+import           Foreign.FAI.Types
+import           Foreign.ForeignPtr
+import           Foreign.Marshal.Array
+import           Foreign.Ptr
+import           Foreign.Storable
 
 peekBuffer :: (Storable b, Pf Host a ~ b) => Buffer Host a -> IO [b]
 peekBuffer (Buffer fp len) = withForeignPtr fp $ \p -> peekArray len p
@@ -39,5 +43,10 @@ spec = do
             return (arr1, arr2)
       (arr1, arr2) <- acc
       arr1 `shouldBe` arr2
-    
+
 cc = Context nullPtr
+
+#else
+spec = describe "Skip CUDA Test" $ it "Do nothing" $ putStrLn "Skip."
+-- ENABLE_CUDA
+#endif
