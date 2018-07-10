@@ -4,17 +4,17 @@
 name:                FAI
 version:             0.1.0.10
 synopsis:            Haskell Foreign Accelerate Interface
--- description:         
+description:         The haskell interface for foreign accelerate framework.
 homepage:            https://github.com/Qinka/HaskellFAI
 license:             LGPL-3
 license-file:        LICENSE
 author:              Johann Lee
 maintainer:          me@qinka.pro
--- copyright:           
--- category:            
+copyright:           (C) 2018 Johann Lee <me@qinka.pro>
+category:            Accelerate
 build-type:          Simple
 extra-source-files:  ChangeLog.md
-cabal-version:       >=1.10
+cabal-version:       >=1.21
 
 flag enable-cuda
       default:             True
@@ -24,7 +24,11 @@ library
   exposed-modules:    Foreign.FAI.Types
                     , Foreign.FAI.Platform.Host
   -- other-modules:
-  -- other-extensions:
+  other-extensions:    MultiParamTypeClasses
+                     , GADTs
+                     , TypeFamilies
+                     , QuasiQuotes
+                     , TemplateHaskell
   reexported-modules:  Language.C.Inline
   build-depends:       base >= 4 && < 5
                      , inline-c >= 0.6 
@@ -47,6 +51,9 @@ test-suite spec
                      , hspec
   other-modules:       Foreign.FAI.Platform.HostSpec
                      , Foreign.FAI.Platform.CUDASpec
+  other-extensions:    CPP
+                     , TypeFamilies
+
   default-language:    Haskell2010
   if(flag(enable-cuda))
      cpp-options: -DENABLE_CUDA
