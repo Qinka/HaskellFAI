@@ -39,24 +39,23 @@ The host platform instance.
 
 module Foreign.FAI.Platform.Host
   ( Host(..)
-  , Pf(..)
-  , bufFromList
-  , bufToList
+  , Pf
+  , nullHostContext
   ) where
 
 import           Control.Monad
 import           Foreign.C.Types
 import           Foreign.FAI.Types
 import           Foreign.ForeignPtr
-import           Foreign.Marshal.Array
 import           Foreign.Ptr
-import           Foreign.Storable
-import qualified Language.C.Inline     as C
-import           System.IO.Unsafe
+import qualified Language.C.Inline  as C
 
 C.include "<string.h>"
 C.include "<stdlib.h>"
 
+-- | Host backend (use C runtime)
+--
+-- The @malloc@ and @free@ are used for memory management.
 data Host = Host
 
 type instance Pf Host Float  = Float
@@ -92,20 +91,6 @@ instance FAICopy Host Host where
     when (bufSize dst /= bufSize src) $ error "Different size."
     hostMemCopy (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
 
-
-hostAccReturn :: a -> Accelerate Host a
-hostAccReturn = return
-
-bufFromList :: (Storable b, Pf Host a ~ b) => [b] -> Buffer Host a
-bufFromList ls = unsafePerformIO $ do
-    bf <- fst <$> doAccelerate  (hostAccReturn () >> newBuffer (length ls)) undefined
-    withForeignPtr (bufPtr bf) $ \ptr ->
-      pokeArray ptr ls
-    return bf
-
-bufToList :: (Storable b, Pf Host a ~ b) => Buffer Host a -> [b]
-bufToList bf = unsafePerformIO $
-    withForeignPtr (bufPtr bf) $ \ptr ->
-    peekBuf undefined ptr
-    where peekBuf :: Storable a => a -> Ptr a -> IO [a]
-          peekBuf = peekArray . (bufSize bf `div`) . sizeOf
+-- | Null pointer context of Host
+nullHostContext :: Context Host
+nullHostContext = Context nullPtr

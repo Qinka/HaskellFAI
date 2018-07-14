@@ -39,7 +39,8 @@ The CUDA platform instance.
 
 module Foreign.FAI.Platform.CUDA
   ( CUDA(..)
-  , Pf(..)
+  , Pf
+  , nullCUDAContext
   ) where
 
 import           Control.Monad
@@ -53,6 +54,13 @@ import qualified Language.C.Inline         as C
 C.include "<cuda_runtime.h>"
 C.include "<stdio.h>"
 
+-- | CUDA backend (cudart required)
+--
+--  @cudaMallc@ is used to allocate memory from data.
+--
+--  @cudaFree@ is used to free pointer.
+--
+--  @cudaMemcpy@ is used to copy data between Host and CUDA.
 data CUDA = CUDA
 
 type instance Pf CUDA Float  = Float
@@ -122,7 +130,6 @@ doCopyCC dst src size =
       }
       return 0;}|]
 
-
 instance FAI CUDA where
   faiMemAllocate _ = cudaMemAllocate . fromIntegral
   faiMemRelease  _ = cudaMemRelease
@@ -143,3 +150,6 @@ instance FAICopy CUDA CUDA where
     when (bufSize dst /= bufSize src) $ error "Different size."
     cudaMemCopy doCopyCC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
 
+-- | Null pointer context of CUDA
+nullCUDAContext :: Context CUDA
+nullCUDAContext = Context nullPtr
