@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                FAI
-version:             0.1.0.16
+version:             0.1.0.17
 synopsis:            Haskell Foreign Accelerate Interface
 description:         The haskell interface for foreign accelerate framework.
 homepage:            https://github.com/Qinka/HaskellFAI
@@ -23,21 +23,11 @@ flag enable-cuda
       manual:              False
       description:         Enable the Nvidia's CUDA platform.
 
-flag internal
-      default:             False
-      manual:              True
-      description:         Enable to export the internal modules.
-
 library
   exposed-modules:    Foreign.FAI
                     , Foreign.FAI.Platform.Host
                     , Foreign.FAI.Platform.Host.Debug
-
-  if (flag(internal))
-    exposed-modules:  Foreign.FAI.Types
-                    , Foreign.FAI.Internal
-  else
-    other-modules:    Foreign.FAI.Types
+                    , Foreign.FAI.Types
                     , Foreign.FAI.Internal
 
   other-extensions:    MultiParamTypeClasses
