@@ -17,6 +17,7 @@ import           Foreign.ForeignPtr
 import           Foreign.Marshal.Array
 import           Foreign.Ptr
 import           Foreign.Storable
+import           System.IO.Unsafe
 
 peekBuffer :: (Storable b, Pf Host a ~ b) => Buffer Host a -> IO [b]
 peekBuffer (Buffer fp len) = withForeignPtr fp $ \p -> peekArray len p
@@ -44,7 +45,7 @@ spec = do
       (arr1, arr2) <- acc
       arr1 `shouldBe` arr2
 
-cc = Context nullPtr
+cc = unsafePerformIO nullCUDAContext
 
 #else
 spec = describe "Skip CUDA Test" $ it "Do nothing" $ putStrLn "Skip."

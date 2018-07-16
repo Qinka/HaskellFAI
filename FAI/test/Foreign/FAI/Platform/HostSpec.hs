@@ -9,6 +9,7 @@ import           Foreign.FAI.Platform.Host
 import           Foreign.FAI.Platform.Host.Debug
 import           Foreign.Ptr
 import           Foreign.Storable
+import           System.IO.Unsafe
 import           Test.Hspec
 
 peekBufferA :: (Storable b, Pf Host a ~ b) => Buffer Host a -> Accelerate Host [b]
@@ -55,4 +56,4 @@ spec = do
       arr1 `shouldBe` arr2
 
 cc :: Context Host
-cc = Context nullPtr
+cc = unsafePerformIO nullHostContext
