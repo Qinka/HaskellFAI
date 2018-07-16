@@ -92,5 +92,5 @@ instance FAICopy Host Host where
     hostMemCopy (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
 
 -- | Null pointer context of Host
-nullHostContext :: Context Host
-nullHostContext = Context nullPtr
+nullHostContext :: IO (Context Host)
+nullHostContext = Context <$> newForeignPtr_ nullPtr

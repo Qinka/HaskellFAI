@@ -65,8 +65,12 @@ data Buffer p a = Buffer
   deriving (Show, Eq)
 
 -- | Context of platform
+--
+-- The Haskell GC can not guarantee that @Context p@ will be released after
+-- all the @Buffer p a@ is released.
+-- So the C implement at lower level need to make sure it.
 newtype Context p = Context
-  { unContextPtr :: Ptr (Context p)
+  { unContextPtr :: ForeignPtr (Context p)
   }
   deriving (Show, Eq)
 

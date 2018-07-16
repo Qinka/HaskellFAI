@@ -52,8 +52,9 @@ autoNewForeignPtr :: FinalizerContextPtr p (Pf p a) -- ^ Context p concerned fin
                   -> Int                            -- ^ Size
                   -> IO (Buffer p a)                -- ^ buffer
 autoNewForeignPtr fin cc ptr size = fmap (`Buffer` size) $ case fin of
-  Left  f -> newForeignPtrEnv f (unContextPtr cc) ptr
-  Right f -> newForeignPtr    f                   ptr
+  Left  f -> withForeignPtr (unContextPtr cc) $ \p ->
+             newForeignPtrEnv f p ptr
+  Right f -> newForeignPtr    f   ptr
 
 replaceContext :: Context p2 -> (a, Context p1) -> (a, Context p2)
 replaceContext cc (a, _) = (a, cc)

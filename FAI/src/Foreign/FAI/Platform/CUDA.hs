@@ -151,5 +151,5 @@ instance FAICopy CUDA CUDA where
     cudaMemCopy doCopyCC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
 
 -- | Null pointer context of CUDA
-nullCUDAContext :: Context CUDA
-nullCUDAContext = Context nullPtr
+nullCUDAContext :: IO (Context CUDA)
+nullCUDAContext = Context <$> newForeignPtr_ nullPtr
