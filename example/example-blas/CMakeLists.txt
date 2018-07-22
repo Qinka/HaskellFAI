@@ -80,41 +80,19 @@ add_library(example-blas SHARED ${SRC_FILES})
 
 
 
+
 ### Testing
-enable_testing()
+set(ENABLE_TEST Off CACHE BOOL "Enable test")
 
-## GoogleTest
-
-set(DOWNLOAD_GTEST Off CACHE BOOL "Download gtest")
-if(${DOWNLOAD_GTEST})
-    configure_file(gtest.cmake.in googletest-download/CMakeLists.txt)
-    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-        RESULT_VARIABLE result
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-    if(result)
-        message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-    endif()
-    execute_process(COMMAND ${CMAKE_COMMAND} --build .
-        RESULT_VARIABLE result
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-    if(result)
-        message(FATAL_ERROR "Build step for googletest failed: ${result}")
-    endif()
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    add_subdirectory(
-        ${CMAKE_BINARY_DIR}/googletest-src
-        ${CMAKE_BINARY_DIR}/googletest-build
-        EXCLUDE_FROM_ALL
-        )
-else()
+if(${ENABLE_TEST})
+    enable_testing()
     find_package(GTest REQUIRED)
+    include_directories(${GTEST_INCLUDE_DIRS})
+    aux_source_directory("${PROJECT_SOURCE_DIR}/test" TEST_FILES)
+    add_executable(example-blas-test ${TEST_FILES})
+    target_link_libraries(example-blas-test ${GTEST_BOTH_LIBRARIES} example-blas)
+    if(NOT(CMAKE_SYSTEM_NAME MATCHES "Windows"))
+        target_link_libraries(example-blas-test pthread)
+    endif()
+    add_test(BLAS_TEST example-blas-test)
 endif()
-
-include_directories(${GTEST_INCLUDE_DIRS})
-# aux_source_directory("${PROJECT_SOURCE_DIR}/test" TEST_FILES)
-add_executable(example-blas-test ${PROJECT_SOURCE_DIR}/test/test.cc)
-target_link_libraries(example-blas-test ${GTEST_BOTH_LIBRARIES} example-blas)
-if(NOT(CMAKE_SYSTEM_NAME MATCHES "Windows"))
-    target_link_libraries(example-blas-test pthread)
-endif()
-add_test(BLAS_TEST example-blas-test)
