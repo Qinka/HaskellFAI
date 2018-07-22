@@ -8,6 +8,9 @@ void f_matrix_mul2D(float *dst, float *A, float *B, int m, int n, int s) {
     #ifdef _OMP_ENABLE_
     #pragma omp parallel for shared(dst, A, B, m, n, s) private(i, j)
     #endif
+    #ifdef _OMP_CUDA_ENABLE_
+    #pragma omp target parallel for shared(dst, A, B, m, n, s) private(i, j)
+    #endif
     for (i = 0; i < m; i++)
         for (j = 0; j < s; j++) {
             dst[i * s + j] = 0.0;

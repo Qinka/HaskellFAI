@@ -32,7 +32,8 @@ endif(${MSVC})
 
 ## Accelerate Backend
 set(ENABLE_OPENMP On CACHE BOOL "Enable OpenMP")
-set(ENABLE_OPENMP_CLANG_CUDA Off CACHE BOOL "Enabel OpenMP with Clang for Nvidia GPU")
+set(ENABLE_OPENMP_TARGET Off CACHE BOOL "Enabel OpenMP with target")
+set(OPENMP_TARGET "" CACHE STRING "The target, such as nvptx64sm_21-nvidia-linux")
 set(ENABLE_OPENACC Off CACHE BOOL "Enable OpenACC")
 
 ## Can not enable OpenMP and OpenAcc at the same time.
@@ -48,9 +49,10 @@ if(ENABLE_OPENMP)
         set(CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
         set(CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-        if(ENABLE_OPENMP_CLANG_CUDA)
+        if(ENABLE_OPENMP_TARGET)
+	    set(CMAKE_C_FLAGS      "${CMAKE_C_FLAGS} -omptargets=${OPENMP_TARGET}")
             add_definitions(-D_OMP_CUDA_ENABLE_)
-            message("Enable OpenMP with CUDA")
+            message("Enable OpenMP with target(${OPENMP_TARGET})")
         else()
             add_definitions(-D_OMP_ENABLE_)
             message("Enable OpenMP")
