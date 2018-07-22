@@ -30,16 +30,44 @@ if(${MSVC})
   set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 endif(${MSVC})
 
-## OpenMP
-set(ENBALE_OPENMP On CACHE BOOL "Enable OpenMP")
+## Accelerate Backend
+set(ENABLE_OPENMP On CACHE BOOL "Enable OpenMP")
+set(ENABLE_OPENMP_CLANG_CUDA Off CACHE BOOL "Enabel OpenMP with Clang for Nvidia GPU")
+set(ENABLE_OPENACC Off CACHE BOOL "Enable OpenACC")
 
-if(ENBALE_OPENMP)
+## Can not enable OpenMP and OpenAcc at the same time.
+if(${ENABLE_OPENMP} AND ${ENABLE_OPENACC})
+    message(FATAL_ERROR "Can not enable OpenMP and OpenAcc at the same time!")
+endif()
+
+## OpenMP
+if(ENABLE_OPENMP)
     FIND_PACKAGE(OpenMP REQUIRED)
     if(OPENMP_FOUND)
-    message("OPENMP FOUND")
+        message("OPENMP FOUND")
         set(CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
         set(CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+        if(ENABLE_OPENMP_CLANG_CUDA)
+            add_definitions(-D_OMP_CUDA_ENABLE_)
+            message("Enable OpenMP with CUDA")
+        else()
+            add_definitions(-D_OMP_ENABLE_)
+            message("Enable OpenMP")
+        endif()
+    endif()
+endif()
+
+## OpenACC
+if(ENABLE_OPENACC)
+    find_package(OpenAcc REQUIRED)
+    if(${OpenACC_C_FOUND} AND ${OpenACC_CXX_FOUND})
+        message("OpenAcc Found")
+        set(CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} ${OpenACC_C_FLAGS}")
+        set(CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS} ${OpenACC_CXX_FLAGS}")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+        add_definitions(-D_OACC_ENABLE_)
+        message("Enable OpenACC")
     endif()
 endif()
 
