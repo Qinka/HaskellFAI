@@ -43,6 +43,7 @@ TEST(matrix_multiplication, no_parallel_case0) {
     float *dst = new float[m * s];
     float *A   = new float[m * n];
     float *B   = new float[n * s];
+
     int i, j ,k;
     for (i = 0; i < m; i++)
         for (j = 0; j < s; j++) {
@@ -50,6 +51,7 @@ TEST(matrix_multiplication, no_parallel_case0) {
             for (k = 0; k < n; k++)
                 dst[i * s + j] += A[i * n + k] * B[k * s + j];
         }
+
     EXPECT_EQ(1,1);
     delete[] dst;
     delete[] A;
@@ -61,12 +63,9 @@ TEST(matrix_multiplication, parallel_case1) {
     float *dst = new float[m * s];
     float *A   = new float[m * n];
     float *B   = new float[n * s];
-    clock_t t1, t2;
-    t1 = clock();
+
     f_matrix_mul2D(dst, A, B, m, n, s);
-    t2 = clock();
-    printf("%d\n", t2 - t1);
-    std::cout << t2 - t1 << std::endl;
+
     EXPECT_EQ(1,1);
     delete[] dst;
     delete[] A;
@@ -121,13 +120,9 @@ TEST(matrix_dot_multiplication, no_parallel_case0) {
     float *matB = new float[m * n];
     float *matC = new float[m * n];
 
-    clock_t t1, t2;
-    t1 = clock();
     for (int i = 0; i < m; i++)
         for(int j = 0; j < n; j++)
             matC[i * n + j] = matA[i * n + j] * matB[i * n + j];
-    t2 = clock();
-    printf("%d\n", t2 - t1);
     
     EXPECT_EQ(1,1);
 
@@ -142,11 +137,7 @@ TEST(matrix_dot_multiplication, parallel_case1) {
     float *matB = new float[m * n];
     float *matC = new float[m * n];
 
-    clock_t t1, t2;
-    t1 = clock();
     f_matrix_dot_mul2D(matC, matA, matB, m, n);
-    t2 = clock();
-    printf("%d\n", t2 - t1);
 
     EXPECT_EQ(1,1);
 
@@ -201,13 +192,9 @@ TEST(matrix_scale_mul, no_parallel_case0) {
     float *matA = new float[m * n];
     float *matB = new float[m * n];
 
-    clock_t t1, t2;
-    t1 = clock();
     for (int i = 0; i < m; i++)
         for(int j = 0; j < n; j++)
             matB[i * n + j] = matA[i * n + j] * 2;
-    t2 = clock();
-    printf("%d\n", t2 - t1);
 
     EXPECT_EQ(1,1);
 
@@ -220,11 +207,7 @@ TEST(matrix_scale_mul, parallel_case1) {
     float *matA = new float[m * n];
     float *matB = new float[m * n];
 
-    clock_t t1, t2;
-    t1 = clock();
     f_matrix_scale_mul2D(matB,matA,2,m,n);
-    t2 = clock();
-    printf("%d\n", t2 - t1);
 
     EXPECT_EQ(1,1);
 
