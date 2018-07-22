@@ -1,6 +1,5 @@
 #include <matrix_opt.h>
-#include <omp.h>
-
+#include <config.h>
 
 void f_matrix_mul2D(float *dst, float *A, float *B, int m, int n, int s) {
     int i, j;
@@ -8,7 +7,7 @@ void f_matrix_mul2D(float *dst, float *A, float *B, int m, int n, int s) {
     #ifdef _OMP_ENABLE_
     #pragma omp parallel for shared(dst, A, B, m, n, s) private(i, j)
     #endif
-    #ifdef _OMP_CUDA_ENABLE_
+    #ifdef _OMP_TARGET_ENABLE_
     #pragma omp target parallel for shared(dst, A, B, m, n, s) private(i, j)
     #endif
     for (i = 0; i < m; i++)
@@ -25,8 +24,11 @@ void f_matrix_dot_mul2D(float *dst, float *A, float *B, int m, int n) {
     #ifdef _OMP_ENABLE_
     #pragma omp parallel for shared(dst, A, B, m, n) private(i)
     #endif
+    #ifdef _OMP_TARGET_ENABLE_
+    #pragma omp target parallel for shared(dst, A, B, m, n) private(i)
+    #endif
     for (i = 0; i < m * n; i++)
-            dst[i] = A[i] * B[i];
+        dst[i] = A[i] * B[i];
 }
 
 
@@ -36,6 +38,9 @@ void f_matrix_scale_mul2D(float *dst, float *A, float scale, int m, int n){
     #ifdef _OMP_ENABLE_
     #pragma omp parallel for shared(dst, A, m, n) private(i)
     #endif
+    #ifdef _OMP_TARGET_ENABLE_
+    #pragma omp target parallel for shared(dst, A, m, n) private(i)
+    #endif
     for (i = 0; i < m * n; i++)
-            dst[i] = A[i] * scale;    
+        dst[i] = A[i] * scale;    
 }

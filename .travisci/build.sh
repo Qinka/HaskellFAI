@@ -21,7 +21,6 @@
 echo
 echo Build
 echo
-
 ## LLVM
 if [ -n "$LLVM" ]; then
     echo Enable LLVM
@@ -54,3 +53,13 @@ cd $TRAVIS_BUILD_DIR
 export FLAGS="$X_THREADED_FLAGS $X_LLVM_FLAGS $X_DEBUG_FLAGS $X_CUDA_FLAGS"
 echo Using flags: $FLAGS
 stack build $FLAGS
+
+echo
+echo build examples
+cd $TRAVIS_BUILD_DIR/example/example-blas
+mkdir build
+cd build
+export EBLAS_BUILD_DIR=`pwd`
+cmake  -DBUILD_TESTS=On -DENABLE_OPENMP=On ..
+make
+cd $TRAVIS_BUILD_DIR

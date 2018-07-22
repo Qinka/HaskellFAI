@@ -27,4 +27,10 @@ if [ -n "$RUN_TEST" ]; then
     echo
 
     stack test $FLAGS
+
+    echo
+    echo Run testing of examples
+
+    cd $EBLAS_BUILD_DIR
+    ctest -V
 fi
