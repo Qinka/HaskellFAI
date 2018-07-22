@@ -44,16 +44,12 @@ TEST(matrix_multiplication, no_parallel_case0) {
     float *A   = new float[m * n];
     float *B   = new float[n * s];
     int i, j ,k;
-    clock_t t1, t2;
-    t1 = clock();
     for (i = 0; i < m; i++)
         for (j = 0; j < s; j++) {
             dst[i * s + j] = 0;
             for (k = 0; k < n; k++)
                 dst[i * s + j] += A[i * n + k] * B[k * s + j];
         }
-    t2 = clock();
-    printf("%d\n", t2 - t1);
     EXPECT_EQ(1,1);
     delete[] dst;
     delete[] A;
@@ -70,6 +66,7 @@ TEST(matrix_multiplication, parallel_case1) {
     f_matrix_mul2D(dst, A, B, m, n, s);
     t2 = clock();
     printf("%d\n", t2 - t1);
+    std::cout << t2 - t1 << std::endl;
     EXPECT_EQ(1,1);
     delete[] dst;
     delete[] A;

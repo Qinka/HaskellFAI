@@ -82,9 +82,10 @@ add_library(example-blas SHARED ${SRC_FILES})
 
 
 ### Testing
-set(ENABLE_TEST Off CACHE BOOL "Enable test")
+option(BUILD_TESTS "Enable test" Off)
 
-if(${ENABLE_TEST})
+if(${BUILD_TESTS})
+    message("Enable testing")
     enable_testing()
     find_package(GTest REQUIRED)
     include_directories(${GTEST_INCLUDE_DIRS})
