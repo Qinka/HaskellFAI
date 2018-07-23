@@ -93,7 +93,7 @@ function init_common() {
 
 
 init_common
-case $TASK
+case $TASK in
     FAI)
         init_FAI
     ;;

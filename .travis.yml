@@ -29,42 +29,84 @@ dist: trusty
 #   - GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
 
 matrix:
-  - name: "FAI"
-    addons:
-      apt:
-        update: true
-        sources:
-          - hvr-ghc
-        packages:
-          - wget
-          - curl
-    include:
-      - env: TASK=FAI GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
-      - env: TASK=FAI GHC_VER=8.2.2            LLVM=3.9 DEBUG=t RUN_TEST=t
-      - env: TASK=FAI GHC_VER=8.2.2 THREADED=t          DEBUG=t RUN_TEST=t
-      - env: TASK=FAI GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
-  
-  - name: "exampel of blas"
-    include:
-      env: TASK=example-blas
-    addons:
-      apt:
-        update: true
-        packages:
-          - wget
-          - curl
-          - libgtest-dev
-          - cmake
-          - gcc
-          - g++
-          - make
+  include:
+    # FAI
+    # - name: "FAI"
+    #   env: TASK=FAI GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
+    #   addons:
+    #     apt:
+    #       update: true
+    #       sources:
+    #         - hvr-ghc
+    #       packages:
+    #         - wget
+    #         - curl
+    - name: "FAI"
+      env: TASK=FAI GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
+      addons:
+        apt:
+          update: true
+          sources:
+            - hvr-ghc
+          packages:
+            - wget
+            - curl
+    - name: "FAI"
+      env: TASK=FAI GHC_VER=8.2.2            LLVM=3.9 DEBUG=t RUN_TEST=t
+      addons:
+        apt:
+          update: true
+          sources:
+            - hvr-ghc
+          packages:
+            - wget
+            - curl
+    - name: "FAI"
+      env: TASK=FAI GHC_VER=8.2.2 THREADED=t          DEBUG=t RUN_TEST=t
+      addons:
+        apt:
+          update: true
+          sources:
+            - hvr-ghc
+          packages:
+            - wget
+            - curl
+    - name: "FAI"
+      env: TASK=FAI GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
+      addons:
+        apt:
+          update: true
+          sources:
+            - hvr-ghc
+          packages:
+            - wget
+            - curl
 
-# addons:
-#   apt:
-#     update: true
-#     packages:
-#       - wget
-#       - curl
+    # example of blas
+    # - name: "Example of BLAS"
+    #   env: TASK=example-blas
+    #   addons:
+    #     apt:
+    #       update: true
+    #       packages:
+    #         - wget
+    #         - curl
+    #         - libgtest-dev
+    #         - cmake
+    #         - gcc
+    #         - g++
+    #         - make
+
+    # EMPTY
+    # - name:
+    #   env: 
+    #   addons:
+    #     apt:
+    #       update: true
+    #       packages:
+    #         - wget
+    #         - curl
+
 
 before_install:
   - source $TRAVIS_BUILD_DIR/.travisci/init.sh

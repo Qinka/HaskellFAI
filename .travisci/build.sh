@@ -71,7 +71,31 @@ function build_example_blas() {
     cd build
     export EBLAS_BUILD_DIR=`pwd`
 
-    cmake -DBUILD_TESTS=On -DENABLE_OPENMP=On -DGTEST_ROOT=/usr/src/gtest/ ..
+    local TEST_STATUS, ACC_CMAKE_FLAGS
+    # test enable
+    if [ -n "$RUN_TEST" ]; then
+        TEST_STATUS=On
+    else
+        TEST_STATUS=Off
+    fi
+
+    case $ACC_BACKEND in
+        OpenMP)
+            ACC_CMAKE_FLAGS="-DENABLE_OPENMP=On"
+            ;;
+        OpenMP-target)
+            ACC_CMAKE_FLAGS="-DENABLE_OPENMP=On -DENABLE_OPENMP_TARGET=On"
+            ;;
+        OpenACC)
+            ACC_CMAKE_FLAGS="-DENABLE_OPENMP=Off -DENBALE_OPENACC=On"
+            ;;
+        *)
+            ACC_CMAKE_FLAGS="-DENABLE_OPENMP=Off"
+            ;;
+    esac
+
+
+    cmake -DBUILD_TESTS=$TEST_STATUS $ACC_CMAKE_FLAGS -DGTEST_ROOT=/usr/src/gtest/ ..
     cmake --build .
 
     cd $TRAVIS_BUILD_DIR
@@ -83,7 +107,7 @@ echo
 
 echo Task is $TASK
 
-case $TASK
+case $TASK in
     FAI) 
     build_FAI
     ;;

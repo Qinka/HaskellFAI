@@ -47,7 +47,7 @@ if [ -n "$RUN_TEST" ]; then
     echo Run testing
     echo
 
-    case $TASK
+    case $TASK in
         FAI)
             test_FAI
         ;;
