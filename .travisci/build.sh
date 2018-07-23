@@ -71,7 +71,7 @@ function build_example_blas() {
     cd build
     export EBLAS_BUILD_DIR=`pwd`
 
-    local TEST_STATUS, ACC_CMAKE_FLAGS
+    local TEST_STATUS ACC_CMAKE_FLAGS
     # test enable
     if [ -n "$RUN_TEST" ]; then
         TEST_STATUS=On
