@@ -23,33 +23,32 @@ dist: trusty
 languaghe: c++
 
 ## Matrix of building
-env:
-  - GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
-  - GHC_VER=8.2.2            LLVM=3.9 DEBUG=t RUN_TEST=t
-  - GHC_VER=8.2.2 THREADED=t          DEBUG=t RUN_TEST=t
-  - GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
+# env:
+#   - GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
+#   - GHC_VER=8.2.2            LLVM=3.9 DEBUG=t RUN_TEST=t
+#   - GHC_VER=8.2.2 THREADED=t          DEBUG=t RUN_TEST=t
+#   - GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
 
 matrix:
   - include:
-      - env: TASK=FAI
-        - GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
-        - GHC_VER=8.2.2            LLVM=3.9 DEBUG=t RUN_TEST=t
-        - GHC_VER=8.2.2 THREADED=t          DEBUG=t RUN_TEST=t
-        - GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
-    addons:
-      apt:
-        sources:
-          - hvr-ghc
-  - include:
+      - env:
+        - TASK=FAI GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
+        - TASK=FAI GHC_VER=8.2.2            LLVM=3.9 DEBUG=t RUN_TEST=t
+        - TASK=FAI GHC_VER=8.2.2 THREADED=t          DEBUG=t RUN_TEST=t
+        - TASK=FAI GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
+        addons:
+          apt:
+            sources:
+              - hvr-ghc
       - env: TASK=example-blas
-    addons:
-      apt:
-        packages:
-          - libgtest-dev
-          - cmake
-          - gcc
-          - g++
-          - make
+        addons:
+          apt:
+            packages:
+              - libgtest-dev
+              - cmake
+              - gcc
+              - g++
+              - make
 
 addons:
   apt:
