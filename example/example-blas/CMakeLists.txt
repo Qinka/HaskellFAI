@@ -26,30 +26,30 @@ project(example-blas VERSION 0.1.0.0)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_STANDARD   11)
 
-## Enable opt
-#MSVS
-if(${MSVCS})
-    set(OPT_FLAG "/O3")
-endif()
-#CLANG
-if(${CLANG})
-    set(OPT_FLAG "-O3")
-endif()
-#PGI
-if(${PGI})
-    set(OPT_FLAG "-O3")
-endif()
-#GNU
-if(${GNU})
-    set(OPT_FLAG "-O3")
+
+# OPT FLAG
+if (${ENABLE_O3})
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        # using Clang
+        message("Use Clang")
+        set(OPT_FLAG " -O3 ")
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        # using GCC
+        message("Use GCC")
+        set(OPT_FLAG " -O3 ")
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
+        # using PGI
+        message("Use PGI")
+        set(OPT_FLAG " -O3 ")
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        # using Visual Studio C++
+        set(OPT_FLAG " /O3 ")
+    endif()
+
+    set(CMAKE_C_FLAGS          "${CMAKE_C_FLAGS}   ${OPT_FLAG}")
+    set(CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS} ${OPT_FLAG}")
 endif()
 
-#if(${})
-#    set(OPT_FLAG "")
-#endif()
-
-set(CMAKE_C_FLAGS          "${CMAKE_C_FLAGS}   ${OPT_FLAG}")
-set(CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS} ${OPT_FLAG}")
 
 if(${MSVC})
   set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
