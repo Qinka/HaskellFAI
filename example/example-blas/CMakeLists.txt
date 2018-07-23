@@ -26,6 +26,28 @@ project(example-blas VERSION 0.1.0.0)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_STANDARD   11)
 
+## Enable opt
+#MSVS
+if(${MSVCS})
+    set(OPT_FLAG "/O3")
+endif()
+#CLANG
+if(${CLANG})
+    set(OPT_FLAG "-O3")
+endif()
+#PGI
+if(${PGI})
+    set(OPT_FLAG "-O3")
+endif()
+#GNU
+if(${GNU})
+    set(OPT_FLAG "-O3")
+endif()
+
+#if(${})
+#    set(OPT_FLAG "")
+#endif()
+
 if(${MSVC})
   set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 endif(${MSVC})

@@ -18,48 +18,76 @@
 # along with Haskell-FAI. If not, see <http://www.gnu.org/licenses/>.
 #
 
+##########################################################
+##
+## Build Haskell FAI
+##
+##########################################################
+function build_FAI() {
+    echo FAI task
+    ## LLVM
+    if [ -n "$LLVM" ]; then
+        echo Enable LLVM
+        export X_LLVM_FLAGS=" --ghc-options -fllvm --ghc-options -pgmlo --ghc-options opt-$LLVM --ghc-options -pgmlc --ghc-options llc-$LLVM "
+    fi
+
+    ## THREADED
+    if [ -n "$THREADED" ]; then
+        echo Enable -threaded
+        export X_THREADED_FLAGS=" --ghc-options -threaded --ghc-options -with-rtsopts=-N "
+    fi 
+
+    ## 
+    if [ -n "$DEBUG" ]; then
+        echo Enable debug
+        export X_DEBUG_FLAGS=" --ghc-options -rtsopts=all --ghc-options -g"
+    else
+        export X_DEBUG_FLAGS=" --ghc-options -rtsopts=some --ghc-options --ghc-options --ghc-options -O3"
+    fi
+
+    if [ -n "$CUDA" ]; then
+        echo Enable CUDA
+        export X_CUDA_FLAGS=" "
+    else
+        echo Disable CUDA
+        export X_CUDA_FLAGS=" --flag FAI:-enable-cuda "
+    fi
+
+    cd $TRAVIS_BUILD_DIR
+    export FLAGS="$X_THREADED_FLAGS $X_LLVM_FLAGS $X_DEBUG_FLAGS $X_CUDA_FLAGS"
+    echo Using flags: $FLAGS
+    stack build $FLAGS
+}
+
+##########################################################
+##
+## Build example of blas
+##
+##########################################################
+function build_example_blas() {
+    echo build example of blas
+    cd $TRAVIS_BUILD_DIR/example/example-blas
+    mkdir build
+    cd build
+    export EBLAS_BUILD_DIR=`pwd`
+
+    cmake -DBUILD_TESTS=On -DENABLE_OPENMP=On -DGTEST_ROOT=/usr/src/gtest/ ..
+    cmake --build .
+
+    cd $TRAVIS_BUILD_DIR
+}
+
 echo
 echo Build
 echo
-## LLVM
-if [ -n "$LLVM" ]; then
-    echo Enable LLVM
-    export X_LLVM_FLAGS=" --ghc-options -fllvm --ghc-options -pgmlo --ghc-options opt-$LLVM --ghc-options -pgmlc --ghc-options llc-$LLVM "
-fi
 
-## THREADED
-if [ -n "$THREADED" ]; then
-    echo Enable -threaded
-    export X_THREADED_FLAGS=" --ghc-options -threaded --ghc-options -with-rtsopts=-N "
-fi 
+echo Task is $TASK
 
-## 
-if [ -n "$DEBUG" ]; then
-    echo Enable debug
-    export X_DEBUG_FLAGS=" --ghc-options -rtsopts=all --ghc-options -g"
-else
-    export X_DEBUG_FLAGS=" --ghc-options -rtsopts=some --ghc-options --ghc-options --ghc-options -O3"
-fi
-
-if [ -n "$CUDA" ]; then
-    echo Enable CUDA
-    export X_CUDA_FLAGS=" "
-else
-    echo Disable CUDA
-    export X_CUDA_FLAGS=" --flag FAI:-enable-cuda "
-fi
-
-cd $TRAVIS_BUILD_DIR
-export FLAGS="$X_THREADED_FLAGS $X_LLVM_FLAGS $X_DEBUG_FLAGS $X_CUDA_FLAGS"
-echo Using flags: $FLAGS
-stack build $FLAGS
-
-echo
-echo build examples
-cd $TRAVIS_BUILD_DIR/example/example-blas
-mkdir build
-cd build
-export EBLAS_BUILD_DIR=`pwd`
-cmake  -DBUILD_TESTS=On -DENABLE_OPENMP=On -DGTEST_ROOT=/usr/src/gtest/ ..
-make
-cd $TRAVIS_BUILD_DIR
+case $TASK
+    FAI) 
+    build_FAI
+    ;;
+    example-blas)
+    build_example_blas
+    ;;
+esac
