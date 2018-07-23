@@ -62,9 +62,9 @@ endif()
 
 ## OpenACC
 if(ENABLE_OPENACC)
-    find_package(OpenAcc REQUIRED)
+    find_package(OpenACC REQUIRED)
     if(${OpenACC_C_FOUND} AND ${OpenACC_CXX_FOUND})
-        message("OpenAcc Found")
+        message("OpenACC Found")
         set(CMAKE_C_FLAGS          "${CMAKE_C_FLAGS} ${OpenACC_C_FLAGS}")
         set(CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS} ${OpenACC_CXX_FLAGS}")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
