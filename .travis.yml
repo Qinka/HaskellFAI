@@ -96,6 +96,32 @@ matrix:
     #         - gcc
     #         - g++
     #         - make
+    - name: "Example of BLAS"
+      env: TASK=example-blas ACC_BACKEND=OpenMP
+      addons:
+        apt:
+          update: true
+          packages:
+            - wget
+            - curl
+            - libgtest-dev
+            - cmake
+            - gcc
+            - g++
+            - make
+    - name: "Example of BLAS"
+      env: TASK=example-blas
+      addons:
+        apt:
+          update: true
+          packages:
+            - wget
+            - curl
+            - libgtest-dev
+            - cmake
+            - gcc
+            - g++
+            - make
 
     # EMPTY
     # - name:
