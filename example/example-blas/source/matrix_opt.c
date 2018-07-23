@@ -47,28 +47,58 @@ void f_matrix_mul2D(float *dst, float *A, float *B, int m, int n, int s) {
 }
 
 void f_matrix_dot_mul2D(float *dst, float *A, float *B, int m, int n) {
-    int i;
 
     #ifdef _OMP_ENABLE_
-    #pragma omp parallel for shared(dst, A, B, m, n) private(i)
+    #pragma omp parallel shared(dst, A, B, m, n) //private(i, j, k)
     #endif
     #ifdef _OMP_TARGET_ENABLE_
-    #pragma omp target parallel for shared(dst, A, B, m, n) private(i)
+    #pragma omp target parallel shared(dst, A, B, m, n) //private(i, j, k)
     #endif
-    for (i = 0; i < m * n; i++)
-        dst[i] = A[i] * B[i];
+    #ifdef _OACC_ENABLE_
+    #pragma acc data copyout(dst[0:m*n]), copyin(A[0:m*n], B[0:m*n])
+    #endif
+    {
+        int i;
+
+        #ifdef _OMP_ENABLE_
+        #pragma omp for
+        #endif
+        #ifdef _OMP_TARGET_ENABLE_
+        #pragma omp for
+        #endif
+        #ifdef _OACC_ENABLE_
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < m * n; i++)
+            dst[i] = A[i] * B[i];
+    }
 }
 
 
 void f_matrix_scale_mul2D(float *dst, float *A, float scale, int m, int n){
-    int i;
-    
+
     #ifdef _OMP_ENABLE_
-    #pragma omp parallel for shared(dst, A, m, n) private(i)
+    #pragma omp parallel shared(dst, A, scale, m, n) //private(i, j, k)
     #endif
     #ifdef _OMP_TARGET_ENABLE_
-    #pragma omp target parallel for shared(dst, A, m, n) private(i)
+    #pragma omp target parallel shared(dst, A, scale, m, n) //private(i, j, k)
     #endif
-    for (i = 0; i < m * n; i++)
-        dst[i] = A[i] * scale;    
+    #ifdef _OACC_ENABLE_
+    #pragma acc data copyout(dst[0:m*n]), copyin(A[0:m*n], scale)
+    #endif
+    {
+        int i;
+
+        #ifdef _OMP_ENABLE_
+        #pragma omp for
+        #endif
+        #ifdef _OMP_TARGET_ENABLE_
+        #pragma omp for
+        #endif
+        #ifdef _OACC_ENABLE_
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < m * n; i++)
+            dst[i] = A[i] * scale;
+    }
 }
