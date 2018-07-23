@@ -67,7 +67,7 @@ echo Build gtest
 cd /usr/src/gtest/
 sudo cmake -DCMAKE_INSTALL_PREFIX=/usr/ .
 sudo make
-sudo make --help
+sudo make help
 
 
 cd $TRAVIS_BUILD_DIR
