@@ -20,6 +20,8 @@
 sudo: required
 dist: trusty
 
+languaghe: c++
+
 ## Matrix of building
 env:
   - GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
