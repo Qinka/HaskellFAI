@@ -62,3 +62,10 @@ travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wild
 
 echo Configuring
 stack config set system-ghc --global true
+
+echo Build gtest
+cd /usr/src/gtest/
+cmake .
+sudo make install
+
+cd $TRAVIS_BUILD_DIR
