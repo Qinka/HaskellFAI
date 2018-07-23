@@ -65,7 +65,7 @@ stack config set system-ghc --global true
 
 echo Build gtest
 cd /usr/src/gtest/
-cmake .
+sudo cmake .
 sudo make install
 
 cd $TRAVIS_BUILD_DIR
