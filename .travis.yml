@@ -37,6 +37,9 @@ addons:
       - curl
       - libgtest-dev
       - cmake
+      - gcc
+      - g++
+      - make
 
 before_install:
   - source $TRAVIS_BUILD_DIR/.travisci/init.sh
