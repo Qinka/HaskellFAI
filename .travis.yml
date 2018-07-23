@@ -29,25 +29,34 @@ dist: trusty
 #   - GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
 
 matrix:
-  - include:
-      - env:
+  include:
+    - name: "FAI"
+      env:
         - TASK=FAI GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
         - TASK=FAI GHC_VER=8.2.2            LLVM=3.9 DEBUG=t RUN_TEST=t
         - TASK=FAI GHC_VER=8.2.2 THREADED=t          DEBUG=t RUN_TEST=t
         - TASK=FAI GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
-        addons:
-          apt:
-            sources:
-              - hvr-ghc
-      - env: TASK=example-blas
-        addons:
-          apt:
-            packages:
-              - libgtest-dev
-              - cmake
-              - gcc
-              - g++
-              - make
+      addons:
+        apt:
+          update: true
+          sources:
+            - hvr-ghc
+          packages:
+            - wget
+            - curl
+    - name: "exampel of blas"
+      env: TASK=example-blas
+      addons:
+        apt:
+          update: true
+          packages:
+            - wget
+            - curl
+            - libgtest-dev
+            - cmake
+            - gcc
+            - g++
+            - make
 
 # addons:
 #   apt:
