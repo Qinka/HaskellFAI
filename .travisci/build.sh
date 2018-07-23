@@ -60,6 +60,6 @@ cd $TRAVIS_BUILD_DIR/example/example-blas
 mkdir build
 cd build
 export EBLAS_BUILD_DIR=`pwd`
-cmake  -DBUILD_TESTS=On -DENABLE_OPENMP=On ..
+cmake  -DBUILD_TESTS=On -DENABLE_OPENMP=On -DGTEST_ROOT=/usr/src/gtest/ ..
 make
 cd $TRAVIS_BUILD_DIR
