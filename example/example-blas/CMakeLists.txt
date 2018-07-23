@@ -48,6 +48,9 @@ endif()
 #    set(OPT_FLAG "")
 #endif()
 
+set(CMAKE_C_FLAGS          "${CMAKE_C_FLAGS}   ${OPT_FLAG}")
+set(CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS} ${OPT_FLAG}")
+
 if(${MSVC})
   set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 endif(${MSVC})
