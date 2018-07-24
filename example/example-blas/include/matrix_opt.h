@@ -7,48 +7,49 @@
 extern "C" {
 #endif // ! __cplusplus
 
-/**
- * @brief function f_matrix_mul2D
- * $dst = A \times B$
+/****************
  * 
- * @param dst The distance memory area
- * @param A input matrix 1
- * @param B input matrix 2
- * @param m A's rows
- * @param n A's cols (B's rows)
- * @param s B's cols
- */
-void f_matrix_mul2D(float *dst, float *A, float *B, int m, int n, int s);
-
-/**
- * @brief function f_matrix_dot_mul2D
- * $dst = A \cdot B$
+ * Matrix product options
  * 
- * @param dst The distance memory area
- * @param A input matrix 1
- * @param B input matrix 2
- * @param m rows
- * @param n cols
- */
-void f_matrix_dot_mul2D(float *dst, float *A, float *B, int m, int n);
-
+****************/
 /**
- * @brief matrix scale
- * $dst = scale \cdot A$
+ * @brief $ C = A \times B$
  * 
- * @param dst distance matrix
- * @param A matrix 1
- * @param scale scaler
- * @param m row
- * @param n col
+ * @param C matrix $C_{m \times s}$
+ * @param A matrix $A_{m \times n}$
+ * @param B matrix $B_{n \times s}$
+ * @param m size
+ * @param n size
+ * @param s size
  */
-void f_matrix_scale_mul2D(float *dst, float *A, float scale, int m, int n);
+void forward_matrix_mul2D(float *C, float *A, float *B, int m, int n, int s);
+/**
+ * @brief $\frac{\partial L}{\partial A} = \frac{\partial L}{\partial C} \frac{\partial C}{\partial A}=  \frac{\partial L}{\partial C} B^\intercal$
+ * 
+ * @param dA matrix $\frac{\partial L}{\partial A}_{(m \times n)}$
+ * @param dC matrix $\frac{\partial L}{\partial C}_{(m \times s)}$
+ * @param B  matrix $A_{n \times s}$
+ * @param m size
+ * @param n size
+ * @param s size
+ */
+void backward_matex_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s);
+/**
+ * @brief $\frac{\partial L}{\partial B} =  \frac{\partial C}{\partial B} \frac{\partial L}{\partial C} = A^\intercal \frac{\partial L}{\partial C}$
+ * 
+ * @param dB matrix $\frac{\partial L}{\partial B}_{(n \times s)}$
+ * @param A  matrix $A_{m \times n}$
+ * @param dC matrix $\frac{\partial L}{\partial C}_{(s \times n)}$
+ * @param m size
+ * @param n size
+ * @param s size
+ */
+void backward_matex_mul2D_B(float *dB, float *A, float *dC, int m, int n, int s);
 
-void f_matrix_add(float *sum, float *A, float *B, int n);
-void f_matrix_sub(float *sub, float *A, float *B, int n);
-void f_matrix_fill_eye(float *mat, int row_num);
-void f_matrix_fill(float *mat, float f, int n);
-void f_matrix_random(float *mat, int n);
+// Matrix fill
+void fill_matrix_eye(float *mat, int row_num);
+void fill_matrix_num(float *mat, float f, int n);
+void fill_matrix_random(float *mat, int n);
 
 #ifdef __cplusplus
 }
