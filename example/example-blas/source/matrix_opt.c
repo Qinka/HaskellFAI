@@ -3,41 +3,33 @@
 
 void f_matrix_mul2D(float *dst, float *A, float *B, int m, int n, int s) {
 
-    #ifdef _OMP_ENABLE_
-    #pragma omp parallel shared(dst, A, B, m, n, s) //private(i, j, k)
-    #endif
-    #ifdef _OMP_TARGET_ENABLE_
-    #pragma omp target parallel shared(dst, A, B, m, n, s) //private(i, j, k)
-    #endif
-    #ifdef _OACC_ENABLE_
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dst, A, B, m, n, s)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dst, A, B, m, n, s)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dst[0:m*s]), copyin(A[0:m*n], B[0:n*s])
+    #elif ACC_REGION == OACC_DRVPTR
     #pragma acc data copyout(dst[0:m*s]), copyin(A[0:m*n], B[0:n*s])
     #endif
     {
         int i, j, k;
 
-        #ifdef _OMP_ENABLE_
+        #if   ACC_LOOP == OMP_ENABLE
         #pragma omp for
-        #endif
-        #ifdef _OMP_TARGET_ENABLE_
-        #pragma omp for
-        #endif
-        #ifdef _OACC_ENABLE_
-        #pragma acc parallel
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
         #endif
         for(i = 0; i < m * s; i++)
             dst[i] = 0;
 
-        #ifdef _OMP_ENABLE_
+        #if   ACC_LOOP == OMP_ENABLE
         #pragma omp for
-        #endif
-        #ifdef _OMP_TARGET_ENABLE_
-        #pragma omp for
-        #endif
-        #ifdef _OACC_ENABLE_
+        #elif ACC_LOOP == OACC_ENABLE
         #pragma acc parallel loop
         #endif
         for (i = 0; i < m; i++)
-            #ifdef _OACC_ENABLE_
+            #if ACC_LOOP == OACC_ENABLE
             #pragma acc loop
             #endif
             for (j = 0; j < s; j++)
@@ -48,25 +40,21 @@ void f_matrix_mul2D(float *dst, float *A, float *B, int m, int n, int s) {
 
 void f_matrix_dot_mul2D(float *dst, float *A, float *B, int m, int n) {
 
-    #ifdef _OMP_ENABLE_
-    #pragma omp parallel shared(dst, A, B, m, n) //private(i, j, k)
-    #endif
-    #ifdef _OMP_TARGET_ENABLE_
-    #pragma omp target parallel shared(dst, A, B, m, n) //private(i, j, k)
-    #endif
-    #ifdef _OACC_ENABLE_
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dst, A, B, m, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dst, A, B, m, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dst[0:m*n]), copyin(A[0:m*n], B[0:m*n])
+    #elif ACC_REGION == OACC_DRVPTR
     #pragma acc data copyout(dst[0:m*n]), copyin(A[0:m*n], B[0:m*n])
     #endif
     {
         int i;
 
-        #ifdef _OMP_ENABLE_
+        #if   ACC_LOOP == OMP_ENABLE
         #pragma omp for
-        #endif
-        #ifdef _OMP_TARGET_ENABLE_
-        #pragma omp for
-        #endif
-        #ifdef _OACC_ENABLE_
+        #elif ACC_LOOP == OACC_ENABLE
         #pragma acc parallel loop
         #endif
         for (i = 0; i < m * n; i++)
@@ -77,25 +65,21 @@ void f_matrix_dot_mul2D(float *dst, float *A, float *B, int m, int n) {
 
 void f_matrix_scale_mul2D(float *dst, float *A, float scale, int m, int n){
 
-    #ifdef _OMP_ENABLE_
-    #pragma omp parallel shared(dst, A, scale, m, n) //private(i, j, k)
-    #endif
-    #ifdef _OMP_TARGET_ENABLE_
-    #pragma omp target parallel shared(dst, A, scale, m, n) //private(i, j, k)
-    #endif
-    #ifdef _OACC_ENABLE_
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dst, A, scale, m, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dst, A, scale, m, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dst[0:m*n]), copyin(A[0:m*n], scale)
+    #elif ACC_REGION == OACC_DRVPTR
     #pragma acc data copyout(dst[0:m*n]), copyin(A[0:m*n], scale)
     #endif
     {
         int i;
 
-        #ifdef _OMP_ENABLE_
+        #if   ACC_LOOP == OMP_ENABLE
         #pragma omp for
-        #endif
-        #ifdef _OMP_TARGET_ENABLE_
-        #pragma omp for
-        #endif
-        #ifdef _OACC_ENABLE_
+        #elif ACC_LOOP == OACC_ENABLE
         #pragma acc parallel loop
         #endif
         for (i = 0; i < m * n; i++)
