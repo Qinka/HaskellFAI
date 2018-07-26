@@ -83,19 +83,19 @@ matrix:
             - curl
 
     # example of blas
-    # - name: "Example of BLAS"
-    #   env: TASK=example-blas
-    #   addons:
-    #     apt:
-    #       update: true
-    #       packages:
-    #         - wget
-    #         - curl
-    #         - libgtest-dev
-    #         - cmake
-    #         - gcc
-    #         - g++
-    #         - make
+    - name: "Example of BLAS"
+      env: TASK=example-blas
+      addons:
+        apt:
+          update: true
+          packages:
+            - wget
+            - curl
+            - libgtest-dev
+            - cmake
+            - gcc
+            - g++
+            - make
     - name: "Example of BLAS"
       env: TASK=example-blas RUN_TEST=t ACC_BACKEND=OpenMP
       addons:
@@ -114,6 +114,8 @@ matrix:
       addons:
         apt:
           update: true
+          sources:
+            - ubuntu-toolchain-r-test
           packages:
             - wget
             - curl
@@ -123,19 +125,19 @@ matrix:
             - g++
             - make
     # example of blas
-    - name: "Example of BLAS"
-      env: TASK=example-blas RUN_TEST=t ACC_BACKEND=OpenACC
-      addons:
-        apt:
-          update: true
-          packages:
-            - wget
-            - curl
-            - libgtest-dev
-            - cmake
-            - gcc-7
-            - g++-7
-            - make
+    # - name: "Example of BLAS"
+    #   env: TASK=example-blas RUN_TEST=t ACC_BACKEND=OpenACC
+    #   addons:
+    #      apt:
+    #       update: true
+    #       packages:
+    #         - wget
+    #         - curl
+    #         - libgtest-dev
+    #         - cmake
+    #         - gcc-7
+    #         - g++-7
+    #         - make
 
 
     # EMPTY
