@@ -23,6 +23,7 @@ extern "C" {
  * @param s size
  */
 void forward_matrix_mul2D(float *C, float *A, float *B, int m, int n, int s);
+
 /**
  * @brief $\frac{\partial L}{\partial A} = \frac{\partial L}{\partial C} \frac{\partial C}{\partial A}=  \frac{\partial L}{\partial C} B^\intercal$
  * 
@@ -33,7 +34,8 @@ void forward_matrix_mul2D(float *C, float *A, float *B, int m, int n, int s);
  * @param n size
  * @param s size
  */
-void backward_matex_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s);
+void backward_matrix_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s);
+
 /**
  * @brief $\frac{\partial L}{\partial B} =  \frac{\partial C}{\partial B} \frac{\partial L}{\partial C} = A^\intercal \frac{\partial L}{\partial C}$
  * 
@@ -44,7 +46,7 @@ void backward_matex_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s)
  * @param n size
  * @param s size
  */
-void backward_matex_mul2D_B(float *dB, float *A, float *dC, int m, int n, int s);
+void backward_matrix_mul2D_B(float *dB, float *A, float *dC, int m, int n, int s);
 
 // Matrix fill
 void fill_matrix_eye(float *mat, int row_num);

@@ -9,7 +9,7 @@ void forward_matrix_mul2D(float *C, float *A, float *B, int m, int n, int s) {
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(C[0:m*s]), copyin(A[0:m*n], B[0:n*s])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data copyout(C[0:m*s]), copyin(A[0:m*n], B[0:n*s])
+    #pragma acc data deviceptr(C[0:m*s], A[0:m*n], B[0:n*s])
     #endif
     {
         int i, j, k;
@@ -35,7 +35,7 @@ void forward_matrix_mul2D(float *C, float *A, float *B, int m, int n, int s) {
                     C[i * s + j] += A[i * n + k] * B[k * s + j];
     }
 }
-void backward_matex_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s) {
+void backward_matrix_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s) {
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(dA, B, dC, m, n, s)
     #elif ACC_REGION == OMP_TARGET
@@ -43,7 +43,7 @@ void backward_matex_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s)
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:m*n]), copyin(B[0:n*s], dC[0:m*s])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data copyout(dA[0:m*n]), copyin(B[0:n*s], dC[0:m*s])
+    #pragma acc data deviceptr(dA[0:m*n], B[0:n*s], dC[0:m*s])
     #endif
     {
         int i, j, k;
@@ -69,7 +69,7 @@ void backward_matex_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s)
                     dA[i * n + j] += dC[i * s + k] * B[j * s + k]; // B^T
     }
 }
-void backward_matex_mul2D_B(float *dB, float *A, float *dC, int m, int n, int s){
+void backward_matrix_mul2D_B(float *dB, float *A, float *dC, int m, int n, int s){
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(dB, A, dC, m, n, s)
     #elif ACC_REGION == OMP_TARGET
@@ -77,7 +77,7 @@ void backward_matex_mul2D_B(float *dB, float *A, float *dC, int m, int n, int s)
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dB[0:n*s]), copyin(A[0:m*n], dC[0:m*s])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data copyout(dB[0:n*s]), copyin(A[0:m*n], dC[0:m*s])
+    #pragma acc data deviceptr(dB[0:n*s], A[0:m*n], dC[0:m*s])
     #endif
     {
         int i, j, k;
@@ -101,91 +101,5 @@ void backward_matex_mul2D_B(float *dB, float *A, float *dC, int m, int n, int s)
             for (j = 0; j < s; j++)
                 for (k = 0; k < m; k++)
                     dB[i * s + j] += A[k * n + i] * dC[k * s + j]; // A^T
-    }
-}
-
-void f_matrix_mul2D(float *dst, float *A, float *B, int m, int n, int s) {
-
-    #if   ACC_REGION == OMP_ONLY
-    #pragma omp parallel shared(dst, A, B, m, n, s)
-    #elif ACC_REGION == OMP_TARGET
-    #pragma omp target parallel shared(dst, A, B, m, n, s)
-    #elif ACC_REGION == OACC_ONLY
-    #pragma acc data copyout(dst[0:m*s]), copyin(A[0:m*n], B[0:n*s])
-    #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data copyout(dst[0:m*s]), copyin(A[0:m*n], B[0:n*s])
-    #endif
-    {
-        int i, j, k;
-
-        #if   ACC_LOOP == OMP_ENABLE
-        #pragma omp for
-        #elif ACC_LOOP == OACC_ENABLE
-        #pragma acc parallel loop
-        #endif
-        for(i = 0; i < m * s; i++)
-            dst[i] = 0;
-
-        #if   ACC_LOOP == OMP_ENABLE
-        #pragma omp for
-        #elif ACC_LOOP == OACC_ENABLE
-        #pragma acc parallel loop
-        #endif
-        for (i = 0; i < m; i++)
-            #if ACC_LOOP == OACC_ENABLE
-            #pragma acc loop
-            #endif
-            for (j = 0; j < s; j++)
-                for (k = 0; k < n; k++)
-                    dst[i * s + j] += A[i * n + k] * B[k * s + j];
-    }
-}
-
-void f_matrix_dot_mul2D(float *dst, float *A, float *B, int m, int n) {
-
-    #if   ACC_REGION == OMP_ONLY
-    #pragma omp parallel shared(dst, A, B, m, n)
-    #elif ACC_REGION == OMP_TARGET
-    #pragma omp target parallel shared(dst, A, B, m, n)
-    #elif ACC_REGION == OACC_ONLY
-    #pragma acc data copyout(dst[0:m*n]), copyin(A[0:m*n], B[0:m*n])
-    #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data copyout(dst[0:m*n]), copyin(A[0:m*n], B[0:m*n])
-    #endif
-    {
-        int i;
-
-        #if   ACC_LOOP == OMP_ENABLE
-        #pragma omp for
-        #elif ACC_LOOP == OACC_ENABLE
-        #pragma acc parallel loop
-        #endif
-        for (i = 0; i < m * n; i++)
-            dst[i] = A[i] * B[i];
-    }
-}
-
-
-void f_matrix_scale_mul2D(float *dst, float *A, float scale, int m, int n){
-
-    #if   ACC_REGION == OMP_ONLY
-    #pragma omp parallel shared(dst, A, scale, m, n)
-    #elif ACC_REGION == OMP_TARGET
-    #pragma omp target parallel shared(dst, A, scale, m, n)
-    #elif ACC_REGION == OACC_ONLY
-    #pragma acc data copyout(dst[0:m*n]), copyin(A[0:m*n], scale)
-    #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data copyout(dst[0:m*n]), copyin(A[0:m*n], scale)
-    #endif
-    {
-        int i;
-
-        #if   ACC_LOOP == OMP_ENABLE
-        #pragma omp for
-        #elif ACC_LOOP == OACC_ENABLE
-        #pragma acc parallel loop
-        #endif
-        for (i = 0; i < m * n; i++)
-            dst[i] = A[i] * scale;
     }
 }
