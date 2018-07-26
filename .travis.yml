@@ -122,6 +122,21 @@ matrix:
             - gcc
             - g++
             - make
+    # example of blas
+    - name: "Example of BLAS"
+      env: TASK=example-blas RUN_TEST=t ACC_BACKEND=OpenACC
+      addons:
+        apt:
+          update: true
+          packages:
+            - wget
+            - curl
+            - libgtest-dev
+            - cmake
+            - gcc-7
+            - g++-7
+            - make
+
 
     # EMPTY
     # - name:

@@ -292,7 +292,7 @@ void forward_vector_scale(float *B, float *A, float s, int n) {
     #elif ACC_REGION == OMP_TARGET
     #pragma omp target parallel shared(B, A, s, n)
     #elif ACC_REGION == OACC_ONLY
-    #pragma acc data copyout(B), copyin(A[0:n])
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
     #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
     #endif
