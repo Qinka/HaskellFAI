@@ -4,12 +4,12 @@
 #define _TEST_PRELUDE_H_
 
 #include <gtest/gtest.h>
-#include <stdint.h>
-#include <cstdlib>
-#include <ctime>
-#include <iostream>
-#include <cstdarg>
-#include <functional>
+//#include <stdint.h>
+//#include <cstdlib>
+//#include <ctime>
+//#include <iostream>
+//#include <cstdarg>
+//#include <functional>
 #include <random>
 
 void fill_eye(float * mat, int row_num);
