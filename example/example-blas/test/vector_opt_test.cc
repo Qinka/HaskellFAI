@@ -667,7 +667,7 @@ TEST(backward_vector_abs_A, random_case0) {
     backward_vector_abs_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] * signbit(A[i]));
+        EXPECT_FLOAT_EQ(dA[i], dB[i] * sign(A[i]));
     }
 
     delete[] dA;
@@ -679,7 +679,7 @@ TEST(backward_vector_abs_A, random_case0) {
 #if DO_VECTOR_SIGN == 1
 /**********************************************************************
  * 
- *  vector  forward test.
+ *  vector sign forward test.
  * 
 **********************************************************************/
 TEST(forward_vector_sign, no_parallel_case0) {
@@ -688,7 +688,7 @@ TEST(forward_vector_sign, no_parallel_case0) {
     float *B = new float[m * n];
 
     for(int i = 0; i < m * n; ++i)
-        B[i] = signbit(A[i]);
+        B[i] = sign(A[i]);
 
     EXPECT_EQ(1,1);
 
@@ -717,7 +717,7 @@ TEST(forward_vector_sign, random_case2) {
     forward_vector_sign(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], signbit(A[i]));
+        EXPECT_FLOAT_EQ(B[i], sign(A[i]));
     }
 
     delete[] A;

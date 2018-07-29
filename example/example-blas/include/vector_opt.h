@@ -184,6 +184,9 @@ void backward_vector_cos_A(float *dA, float *dB, float *A, int n);
 void forward_vector_tan(float *B, float *A, int n);
 void backward_vector_tan_A(float *dA, float *dB, float *A, int n);
 
+// sign function
+float sign(float a);
+
 #ifdef __cplusplus
 }
 #endif // ! __cplusplus
