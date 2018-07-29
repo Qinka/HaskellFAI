@@ -149,6 +149,40 @@ void backward_vector_scale_A(float *dA, float s, float *dB, int n);
  */
 void backward_vector_scale_s(float *ds, float *A, float *dB, int n);
 
+//abs
+void forward_vector_abs(float *B, float *A, int n);
+void backward_vector_abs_A(float *dA, float *dB, float *A, int n);
+//sign
+void forward_vector_sign(float *B, float *A, int n);
+void backward_vector_sign_A(float *dA, int n);
+//exp
+void forward_vector_exp(float *B, float *A, int n);
+void backward_vector_exp_A(float *dA, float *dB, float *B, int n);
+//expm1
+void forward_vector_expm1(float *B, float *A, int n);
+void backward_vector_expm1_A(float *dA, float *dB, float *B, int n);
+//log
+void forward_vector_log(float *B, float *A, int n);
+void backward_vector_log_A(float *dA, float *dB, float *A, int n);
+//logp1
+void forward_vector_log1p(float *B, float *A, int n);
+void backward_vector_log1p_A(float *dA, float *dB, float *A, int n);
+//sqrt
+void forward_vector_sqrt(float *B, float *A, int n);
+void backward_vector_sqrt_A(float *dA, float *dB, float *A, int n);
+//pow
+void forward_vector_pow(float *B, float *A, float x, int n);
+void backward_vector_pow_A(float *dA, float *dB, float *A, float *B, float x, int n);
+void backward_vector_pow_w(float *dx, float *dB, float *A, float *B, float x, int n);
+//sin
+void forward_vector_sin(float *B, float *A, int n);
+void backward_vector_sin_A(float *dA, float *dB, float *A, int n);
+//cos
+void forward_vector_cos(float *B, float *A, int n);
+void backward_vector_cos_A(float *dA, float *dB, float *A, int n);
+//tan
+void forward_vector_tan(float *B, float *A, int n);
+void backward_vector_tan_A(float *dA, float *dB, float *A, int n);
 
 #ifdef __cplusplus
 }

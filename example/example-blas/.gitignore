@@ -11,6 +11,9 @@ CTestTestfile.cmake
 *.build
 build
 
+# ignore
+*.ignore
+
 ############################################# C/C++
 # Prerequisites
 *.d

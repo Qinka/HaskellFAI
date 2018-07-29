@@ -601,3 +601,843 @@ TEST(backward_vector_scale_s, random_case1) {
     delete[] A;
 }
 #endif // DO_VECTOR_SCALE == 1
+
+
+#if DO_VECTOR_ABS == 1
+/**********************************************************************
+ * 
+ *  vector abs forward test.
+ * 
+**********************************************************************/
+TEST(forward_vector_abs, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = fabsf(A[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_abs, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    forward_vector_abs(B, A, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_abs, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    fill_random(A, m * n);
+
+    forward_vector_abs(B, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], fabsf(A[i]));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector abs backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_vector_abs_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dB = new float[m * n];
+    float  *A = new float[m * n];
+    float *dA = new float[m * n];
+
+    fill_random(dB, m * n);
+    fill_random(A, m * n);
+
+    backward_vector_abs_A(dA, dB, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], dB[i] * signbit(A[i]));
+    }
+
+    delete[] dA;
+    delete[]  A;
+    delete[] dB;
+}
+#endif // DO_VECTOR_ABS == 1
+
+#if DO_VECTOR_SIGN == 1
+/**********************************************************************
+ * 
+ *  vector  forward test.
+ * 
+**********************************************************************/
+TEST(forward_vector_sign, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = signbit(A[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_sign, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    forward_vector_sign(B, A, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_sign, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    fill_random(A, m * n);
+
+    forward_vector_sign(B, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], signbit(A[i]));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector sign backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_vector_sign_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dA = new float[m * n];
+
+    backward_vector_sign_A(dA, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], 0);
+    }
+
+    delete[] dA;
+}
+#endif // DO_VECTOR_SIGN == 1
+
+#if DO_VECTOR_EXP == 1
+/**********************************************************************
+ * 
+ *  vector exp forward test.
+ * 
+**********************************************************************/
+TEST(forward_vector_exp, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = expf(A[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_exp, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    forward_vector_exp(B, A, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_exp, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    fill_random(A, m * n);
+
+    forward_vector_exp(B, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], expf(A[i]));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector exp backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_vector_exp_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dB = new float[m * n];
+    float  *B = new float[m * n];
+    float *dA = new float[m * n];
+
+    fill_random(dB, m * n);
+    fill_random(B, m * n);
+
+    backward_vector_exp_A(dA, dB, B, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], dB[i] * B[i]);
+    }
+
+    delete[] dA;
+    delete[]  B;
+    delete[] dB;
+}
+#endif // DO_VECTOR_EXP == 1
+
+#if DO_VECTOR_EXPM1 == 1
+/**********************************************************************
+ * 
+ *  vector forward test.
+ * 
+**********************************************************************/
+TEST(forward_vector_expm1, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = expm1f(A[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_expm1, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    forward_vector_expm1(B, A, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_expm1, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    fill_random(A, m * n);
+
+    forward_vector_expm1(B, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], expm1f(A[i]));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_vector_expm1_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dB = new float[m * n];
+    float  *B = new float[m * n];
+    float *dA = new float[m * n];
+
+    fill_random(dB, m * n);
+    fill_random(B, m * n);
+
+    backward_vector_expm1_A(dA, dB, B, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], dB[i] * (B[i] + 1));
+    }
+
+    delete[] dA;
+    delete[]  B;
+    delete[] dB;
+}
+#endif // DO_VECTOR_EXPM1 == 1
+
+#if DO_VECTOR_LOG == 1
+/**********************************************************************
+ * 
+ *  vector log forward test.
+ * 
+**********************************************************************/
+TEST(forward_vector_log, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = logf(A[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_log, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    forward_vector_log(B, A, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_log, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    fill_random(A, m * n);
+
+    forward_vector_log(B, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], logf(A[i]));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector log backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_vector_log_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dB = new float[m * n];
+    float  *A = new float[m * n];
+    float *dA = new float[m * n];
+
+    fill_random(dB, m * n);
+    fill_random(A, m * n);
+
+    backward_vector_log_A(dA, dB, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], dB[i] / A[i]);
+    }
+
+    delete[] dA;
+    delete[]  A;
+    delete[] dB;
+}
+#endif // DO_VECTOR_LOG == 1
+
+#if DO_VECTOR_LOGIP == 1
+/**********************************************************************
+ * 
+ *  vector log1p forward test.
+ * 
+**********************************************************************/
+TEST(forward_vector_log1p, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = log1pf(A[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_log1p, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    forward_vector_log1p(B, A, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_log1p, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    fill_random(A, m * n);
+
+    forward_vector_log1p(B, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], log1pf(A[i]));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector log1p backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_vector_log1p_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dB = new float[m * n];
+    float  *A = new float[m * n];
+    float *dA = new float[m * n];
+
+    fill_random(dB, m * n);
+    fill_random(A, m * n);
+
+    backward_vector_log1p_A(dA, dB, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], dB[i] / (A[i] + 1));
+    }
+
+    delete[] dA;
+    delete[]  A;
+    delete[] dB;
+}
+#endif // DO_VECTOR_LOGIP == 1
+
+#if DO_VECTOR_SQRT == 1
+/**********************************************************************
+ * 
+ *  vector sqrt forward test.
+ * 
+**********************************************************************/
+TEST(forward_vector_sqrt, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = sqrtf(A[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_sqrt, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    forward_vector_sqrt(B, A, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_sqrt, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    fill_random(A, m * n);
+
+    forward_vector_sqrt(B, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], sqrtf(A[i]));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector sqrt backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_vector_sqrt_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dB = new float[m * n];
+    float  *A = new float[m * n];
+    float *dA = new float[m * n];
+
+    fill_random(dB, m * n);
+    fill_random(A, m * n);
+
+    backward_vector_sqrt_A(dA, dB, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], dB[i] / 2 /  sqrtf(A[i]));
+    }
+
+    delete[] dA;
+    delete[]  A;
+    delete[] dB;
+}
+#endif // DO_VECTOR_SQRT == 1
+
+#if DO_VECTOR_POW == 1
+/**********************************************************************
+ * 
+ *  vector pow forward test.
+ * 
+**********************************************************************/
+TEST(forward_vector_pow, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float x = 9.21924;
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = powf(A[i], x);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_pow, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float x = 9.21924;
+
+    forward_vector_pow(B, A, x, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_pow, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float x = 9.21924;
+
+    fill_random(A, m * n);
+
+    forward_vector_pow(B, A, x, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], powf(A[i],x));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector pow backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_vector_pow_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dB = new float[m * n];
+    float  *A = new float[m * n];
+    float *dA = new float[m * n];
+    float  *B = new float[m * n];
+    float x = 9.21924;
+
+    fill_random(dB,m * n);
+    fill_random(A,m * n);
+    for(int i = 0; i < m * n; ++i)
+        B[i] = powf(A[i],x);
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = powf(A[i], x);
+
+    fill_random(dB, m * n);
+
+    backward_vector_pow_A(dA, dB, A, B, x, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], dB[i] * x * powf(A[i], x - 1));
+    }
+
+    delete[] dA;
+    delete[]  A;
+    delete[] dB;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector pow backward test. (for scalar x)
+ * 
+**********************************************************************/
+TEST(backward_vector_pow_x, random_case0) {
+    const int m = 16, n = 16;
+    float *dB = new float[m * n];
+    float  *A = new float[m * n];
+    float  dx;
+    float  *B = new float[m * n];
+    float x = 9.21924;
+
+    fill_random(dB,m * n);
+    fill_random(A,m * n);
+    for(int i = 0; i < m * n; ++i)
+        B[i] = powf(A[i], x);
+
+    backward_vector_pow_w(&dx, dB, A, B, x, m * n);
+
+    float sum = 0;
+    for(int i = 0; i < m * n; ++i)
+        sum += dB[i]* powf(A[i],x) * logf(A[i]);
+    
+    EXPECT_FLOAT_EQ(dx, sum);
+
+    delete[]  B;
+    delete[]  A;
+    delete[] dB;
+}
+#endif // DO_VECTOR_POW == 1
+
+#if DO_VECTOR_SIN == 1
+/**********************************************************************
+ * 
+ *  vectorsin  forward test.
+ * 
+**********************************************************************/
+TEST(forward_vector_sin, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = sinf(A[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_sin, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    forward_vector_sin(B, A, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_sin, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    fill_random(A, m * n);
+
+    forward_vector_sin(B, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], sinf(A[i]));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector sin backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_vector_sin_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dB = new float[m * n];
+    float  *A = new float[m * n];
+    float *dA = new float[m * n];
+
+    fill_random(dB, m * n);
+    fill_random(A, m * n);
+
+    backward_vector_sin_A(dA, dB, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], dB[i] * cosf(A[i]));
+    }
+
+    delete[] dA;
+    delete[]  A;
+    delete[] dB;
+}
+#endif // DO_VECTOR_SIN == 1
+
+#if DO_VECTOR_COS == 1
+/**********************************************************************
+ * 
+ *  vector cos forward test.
+ * 
+**********************************************************************/
+TEST(forward_vector_cos, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = cosf(A[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_cos, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    forward_vector_cos(B, A, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_cos, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    fill_random(A, m * n);
+
+    forward_vector_cos(B, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], cosf(A[i]));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector cos backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_vector_cos_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dB = new float[m * n];
+    float  *A = new float[m * n];
+    float *dA = new float[m * n];
+
+    fill_random(dB, m * n);
+    fill_random(A, m * n);
+
+    backward_vector_cos_A(dA, dB, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], dB[i] * (- sinf(A[i])));
+    }
+
+    delete[] dA;
+    delete[]  A;
+    delete[] dB;
+}
+#endif // DO_VECTOR_COS == 1
+
+#if DO_VECTOR_TAN == 1
+/**********************************************************************
+ * 
+ *  vector tan forward test.
+ * 
+**********************************************************************/
+TEST(forward_vector_tan, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = tanf(A[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_tan, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    forward_vector_tan(B, A, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_vector_tan, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    fill_random(A, m * n);
+
+    forward_vector_tan(B, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], tanf(A[i]));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector tan backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_vector_tan_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dB = new float[m * n];
+    float  *A = new float[m * n];
+    float *dA = new float[m * n];
+
+    fill_random(dB, m * n);
+    fill_random(A, m * n);
+
+    backward_vector_tan_A(dA, dB, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], dB[i] / powf(cosf(A[i]),2));
+    }
+
+    delete[] dA;
+    delete[]  A;
+    delete[] dB;
+}
+#endif // DO_VECTOR_TAN == 1

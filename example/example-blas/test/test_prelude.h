@@ -11,6 +11,7 @@
 //#include <cstdarg>
 //#include <functional>
 #include <random>
+#include <cmath>
 
 void fill_eye(float * mat, int row_num);
 void fill_zero(float *mat, int num);
@@ -25,5 +26,16 @@ void fill_with(float *mat, float f, int num);
 #define DO_VECTOR_PRD       1
 #define DO_VECTOR_DIV       1
 #define DO_VECTOR_SCALE     1
+#define DO_VECTOR_ABS       1
+#define DO_VECTOR_SIGN      1
+#define DO_VECTOR_EXP       1
+#define DO_VECTOR_EXPM1     1
+#define DO_VECTOR_LOG       1
+#define DO_VECTOR_LOG1P     1
+#define DO_VECTOR_SQRT      1
+#define DO_VECTOR_POW       1
+#define DO_VECTOR_SIN       1
+#define DO_VECTOR_COS       1
+#define DO_VECTOR_TAN       1
 
 #endif // ! _TEST_PRELUDE_H_

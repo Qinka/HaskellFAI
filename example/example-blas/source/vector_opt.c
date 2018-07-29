@@ -1,5 +1,6 @@
 #include <vector_opt.h>
 #include <config.h>
+#include <math.h>
 
 void forward_vector_add(float *C, float *A, float *B, int n){
 
@@ -355,4 +356,548 @@ void backward_vector_scale_s(float *ds, float *A, float *dB, int n){
             sum += dB[i] * A[i];
     }
     *ds = sum;
+}
+
+//abs
+void forward_vector_abs(float *B, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(B, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(B, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            B[i] = fabsf(A[i]);
+    }
+}
+void backward_vector_abs_A(float *dA, float *dB, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            dA[i] = dB[i] * signbit(A[i]);
+    }
+}
+//sign
+void forward_vector_sign(float *B, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(B, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(B, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            B[i] = signbit(A[i]);
+    }
+    
+}
+void backward_vector_sign_A(float *dA, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dA, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dA, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dA[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(dA[0:n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            dA[i] = .0f;
+    }
+}
+//exp
+void forward_vector_exp(float *B, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(B, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(B, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            B[i] = expf(A[i]);
+    }
+}
+void backward_vector_exp_A(float *dA, float *dB, float *B, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dA, dB, B, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dA, dB, B, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], B[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], B[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            dA[i] = dB[i] * B[i];
+    }
+}
+//expm1
+void forward_vector_expm1(float *B, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(B, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(B, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            B[i] = expm1f(A[i]);
+    }
+}
+void backward_vector_expm1_A(float *dA, float *dB, float *B, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dA, dB, B, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dA, dB, B, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], B[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], B[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            dA[i] = dB[i] * (B[i] + 1);
+    }
+}
+//log
+void forward_vector_log(float *B, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(B, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(B, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            B[i] = logf(A[i]);
+    }
+}
+void backward_vector_log_A(float *dA, float *dB, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            dA[i] = dB[i] / A[i];
+    }
+}
+//logp1
+void forward_vector_log1p(float *B, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(B, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(B, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            B[i] = log1pf(A[i]);
+    }
+}
+void backward_vector_log1p_A(float *dA, float *dB, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            dA[i] = dB[i] / (A[i] + 1);
+    }
+}
+//sqrt
+void forward_vector_sqrt(float *B, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(B, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(B, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            B[i] = sqrtf(A[i]);
+    }
+}
+void backward_vector_sqrt_A(float *dA, float *dB, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            dA[i] = dB[i] / 2 / sqrtf(A[i]);
+    }
+}
+//pow
+void forward_vector_pow(float *B, float *A, float x, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(B, A, x, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(B, A, x,  n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            B[i] = powf(A[i], x);
+    }
+}
+void backward_vector_pow_A(float *dA, float *dB, float *A, float *B, float x, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dA, dB, A, B, x, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dA, dB, A, B, x, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n], B[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n], B[0:n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            dA[i] = dB[i] * B[i] * x / A[i];
+    }
+}
+void backward_vector_pow_w(float *dx, float *dB, float *A, float *B, float x, int n) {
+    float sum = 0;
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dx, dB, A, B, x, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dx, dB, A, B, x, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(sum), copyin(dB[0:n], A[0:n], B[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data copyout(sum), deviceptr(dB[0:m*n], A[0:m*n], B[0:n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for reduction(+:sum)
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop reduction(+:sum)
+        #endif
+        for (i = 0; i < n; i++)
+            sum += dB[i] * B[i] * logf(A[i]);
+    }
+    *dx = sum;
+}
+//sin
+void forward_vector_sin(float *B, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(B, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(B, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            B[i] = sinf(A[i]);
+    }
+}
+void backward_vector_sin_A(float *dA, float *dB, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            dA[i] = dB[i] * cos(A[i]);
+    }
+}
+//cos
+void forward_vector_cos(float *B, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(B, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(B, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            B[i] = cosf(A[i]);
+    }
+}
+void backward_vector_cos_A(float *dA, float *dB, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            dA[i] = - dB[i] * sin(A[i]);
+    }
+}
+//tan
+void forward_vector_tan(float *B, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(B, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(B, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            B[i] = tanf(A[i]);
+    }
+}
+void backward_vector_tan_A(float *dA, float *dB, float *A, int n) {
+
+    #if   ACC_REGION == OMP_ONLY
+    #pragma omp parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OMP_TARGET
+    #pragma omp target parallel shared(dA, dB, A, n)
+    #elif ACC_REGION == OACC_ONLY
+    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
+    #elif ACC_REGION == OACC_DRVPTR
+    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #endif
+    {
+        int i;
+
+        #if   ACC_LOOP == OMP_ENABLE
+        #pragma omp for
+        #elif ACC_LOOP == OACC_ENABLE
+        #pragma acc parallel loop
+        #endif
+        for (i = 0; i < n; i++)
+            dA[i] = dB[i]  / cosf(A[i]) / cosf(A[i]);;
+    }
 }
