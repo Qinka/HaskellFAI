@@ -901,11 +901,3 @@ void backward_vector_tan_A(float *dA, float *dB, float *A, int n) {
             dA[i] = dB[i]  / cosf(A[i]) / cosf(A[i]);;
     }
 }
-
-
-#if ACC_LOOP == OACC_ENABLE
-#pragma acc routine seq
-#endif
-float sign(float a) {
-    return (.0f < a) - (a < .0f);
-}

@@ -3,6 +3,8 @@
 #ifndef _ACTIVATION_FUNCTION_H_
 #define _ACTIVATION_FUNCTION_H_
 
+#include <seq_opt.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif // ! __cplusplus

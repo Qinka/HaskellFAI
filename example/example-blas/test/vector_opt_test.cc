@@ -1,5 +1,6 @@
 #include "test_prelude.h"
 #include <vector_opt.h>
+#include <seq_opt.h>
 
 #if DO_VECTOR_ADD == 1
 /**********************************************************************
