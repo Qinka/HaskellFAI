@@ -95,7 +95,7 @@ function build_example_blas() {
     esac
 
 
-    cmake -DBUILD_TESTS=$TEST_STATUS $ACC_CMAKE_FLAGS -DGTEST_ROOT=/usr/src/gtest/ ..
+    cmake -DBUILD_TESTS=$TEST_STATUS $ACC_CMAKE_FLAGS ..
     cmake --build .
 
     cd $TRAVIS_BUILD_DIR

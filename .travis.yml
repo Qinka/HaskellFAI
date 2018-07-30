@@ -84,7 +84,7 @@ matrix:
 
     # example of blas
     - name: "Example of BLAS"
-      env: TASK=example-blas
+      env: TASK=example-blas RUN_TEST=t
       addons:
         apt:
           update: true
