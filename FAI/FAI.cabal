@@ -19,7 +19,7 @@ cabal-version:       >=1.21
 stability:           experimental
 
 flag enable-cuda
-      default:             True
+      default:             False
       manual:              False
       description:         Enable the Nvidia's CUDA platform.
 
