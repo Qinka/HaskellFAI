@@ -1,6 +1,7 @@
 #include <vector_opt.h>
 #include <config.h>
 #include <math.h>
+#include <seq_opt.h>
 
 void forward_vector_add(float *C, float *A, float *B, int n){
 
