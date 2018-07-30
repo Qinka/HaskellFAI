@@ -1426,12 +1426,16 @@ TEST(backward_vector_tan_A, random_case0) {
     const int m = 16, n = 16;
     float *dB = new float[m * n];
     float  *A = new float[m * n];
+    float  *B = new float[m * n];
     float *dA = new float[m * n];
 
     fill_random(dB, m * n);
     fill_random(A, m * n);
 
-    backward_vector_tan_A(dA, dB, A, m * n);
+    for(int i = 0; i < m * n; i++)
+        B[i] = tanf(A[i]);
+
+    backward_vector_tan_A(dA, dB, B, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(dA[i], dB[i] / powf(cosf(A[i]),2));

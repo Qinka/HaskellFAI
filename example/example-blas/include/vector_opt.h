@@ -182,7 +182,7 @@ void forward_vector_cos(float *B, float *A, int n);
 void backward_vector_cos_A(float *dA, float *dB, float *A, int n);
 //tan
 void forward_vector_tan(float *B, float *A, int n);
-void backward_vector_tan_A(float *dA, float *dB, float *A, int n);
+void backward_vector_tan_A(float *dA, float *dB, float *B, int n);
 
 // sign function
 float sign(float a);
