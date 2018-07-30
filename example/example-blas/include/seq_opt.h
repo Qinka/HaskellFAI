@@ -13,7 +13,7 @@ extern "C" {
 #ifdef _OACC_ENABLE_
 #pragma acc routine seq
 #endif
-float sign(float a);
+float sign_s(float a);
 
 #ifdef __cplusplus
 }

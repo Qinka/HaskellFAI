@@ -3,6 +3,10 @@
 #include <math.h>
 #include <seq_opt.h>
 
+inline float sign(float a) {
+    return (.0f < a) - (a < .0f);
+}
+
 void forward_vector_add(float *C, float *A, float *B, int n){
 
     #if   ACC_REGION == OMP_ONLY
