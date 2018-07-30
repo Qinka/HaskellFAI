@@ -26,6 +26,7 @@ project(example-blas VERSION 0.1.0.0)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_STANDARD   11)
 
+add_definitions(-D_INNER_BLAS_)
 
 # OPT FLAG
 if (${ENABLE_O3})
@@ -55,9 +56,9 @@ if (${ENABLE_O3})
 endif()
 
 
-if(${MSVC})
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-endif(${MSVC})
+endif()
 
 ## Accelerate Backend
 # OpenMP
@@ -111,11 +112,28 @@ endif()
 
 aux_source_directory("${PROJECT_SOURCE_DIR}/source" SRC_FILES)
 
+configure_file (
+    "${PROJECT_SOURCE_DIR}/include/config_gen.h.in"
+    "${PROJECT_BINARY_DIR}/include/config_gen.h"
+    )
 include_directories("${PROJECT_SOURCE_DIR}/include")
-
+include_directories("${PROJECT_BINARY_DIR}/include")
 
 add_library(example-blas SHARED ${SRC_FILES})
 
+### install
+file (GLOB BLAS_PUB_HEADS "${PROJECT_SOURCE_DIR}/include/example-blas/*.h")
+set_target_properties(
+    example-blas PROPERTIES
+    PUBLIC_HEADER "${BLAS_PUB_HEADS}"
+    )
+
+install(TARGETS example-blas
+    ARCHIVE       DESTINATION "lib"
+    RUNTIME DESTINATION       "bin"
+    LIBRARY       DESTINATION "lib"
+    PUBLIC_HEADER DESTINATION "include/example-blas"
+)
 
 
 

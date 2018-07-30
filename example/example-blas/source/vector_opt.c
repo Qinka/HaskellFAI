@@ -1,4 +1,4 @@
-#include <vector_opt.h>
+#include <example-blas/vector_opt.h>
 #include <config.h>
 #include <math.h>
 #include <seq_opt.h>

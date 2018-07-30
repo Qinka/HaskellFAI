@@ -3,8 +3,6 @@
 #ifndef _MATRIX_OPT_H_
 #define _MATRIX_OPT_H_
 
-#include <seq_opt.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif // ! __cplusplus

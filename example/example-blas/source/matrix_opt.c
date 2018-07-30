@@ -1,4 +1,4 @@
-#include <matrix_opt.h>
+#include <example-blas/matrix_opt.h>
 #include <config.h>
 
 void forward_matrix_mul2D(float *C, float *A, float *B, int m, int n, int s) {

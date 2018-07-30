@@ -1,4 +1,9 @@
 #pragma once
+
+#ifndef _INNER_BLAS_
+#error This head file should not be included from outside.
+#endif
+
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
@@ -32,6 +37,7 @@
 #define OMP_TARGET    2
 #define OACC_ONLY     3
 #define OACC_DRVPTR   4
+// Backend
 #define OMP_ENABLE    1
 #define OACC_ENABLE   2
 

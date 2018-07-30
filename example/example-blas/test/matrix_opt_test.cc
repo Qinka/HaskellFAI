@@ -1,5 +1,5 @@
 #include "test_prelude.h"
-#include <matrix_opt.h>
+#include <example-blas/matrix_opt.h>
 
 #if DO_MATRIX_PRODUCT == 1
 /**********************************************************************
