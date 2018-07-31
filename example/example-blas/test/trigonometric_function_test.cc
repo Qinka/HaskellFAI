@@ -363,7 +363,7 @@ TEST(backward_N_asin_A, random_case0) {
     backward_N_asin_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] / sqrt(1 - A[i] * A[i]));
+        EXPECT_FLOAT_EQ(dA[i], dB[i] / sqrtf(1 - A[i] * A[i]));
     }
 
     delete[] dA;
@@ -436,7 +436,7 @@ TEST(backward_N_acos_A, random_case0) {
     backward_N_acos_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], - dB[i] / sqrt(1 - A[i] * A[i]));
+        EXPECT_FLOAT_EQ(dA[i], - dB[i] / sqrtf(1 - A[i] * A[i]));
     }
 
     delete[] dA;

@@ -142,7 +142,7 @@ TEST(backward_N_ReLU_A, random_case0) {
     backward_N_ReLU_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] * ((A[i] >= 0) * A[i]));
+        EXPECT_FLOAT_EQ(dA[i], dB[i] * (A[i] >= 0));
     }
 
     delete[] dA;
