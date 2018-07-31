@@ -2,6 +2,8 @@
 #include <example-blas/basic_function.h>
 #include <sequence_inline_function.h>
 
+#define PI 3.141592653589793
+
 #if DO_VECTOR_ADD == 1
 /**********************************************************************
  * 
@@ -1421,7 +1423,7 @@ TEST(backward_N_erf_A, random_case0) {
     backward_N_erf_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] * 2 / sqrtf((float)std::_Pi) * exp(- A[i] * A[i]));
+        EXPECT_FLOAT_EQ(dA[i], dB[i] * 2 / sqrtf((float)PI) * exp(- A[i] * A[i]));
     }
 
     delete[] dA;
@@ -1495,7 +1497,7 @@ TEST(backward_N_erfc_A, random_case0) {
     backward_N_erfc_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], - dB[i] * 2 / sqrtf((float)std::_Pi) * exp(- A[i] * A[i]));
+        EXPECT_FLOAT_EQ(dA[i], - dB[i] * 2 / sqrtf((float)PI) * exp(- A[i] * A[i]));
     }
 
     delete[] dA;
