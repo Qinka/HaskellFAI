@@ -74,6 +74,7 @@ TEST(backward_N_sigmoid_A, random_case0) {
 
     delete[] dA;
     delete[]  A;
+    delete[]  B;
     delete[] dB;
 }
 #endif // DO_VECTOR_SIGMOID == 1
