@@ -1,5 +1,5 @@
 #include "test_prelude.h"
-#include <example-blas/matrix_opt.h>
+#include <example-blas/matrix_function.h>
 
 #if DO_MATRIX_PRODUCT == 1
 /**********************************************************************
@@ -7,7 +7,7 @@
  *  matrix product forward test.
  * 
 **********************************************************************/
-TEST(forward_matrix_multiplication, no_parallel_case0) {    
+TEST(forward_HW_multiplication, no_parallel_case0) {    
     int m = 512, n = 512, s = 512;
     float *dst = new float[m * s];
     float *A   = new float[m * n];
@@ -27,13 +27,13 @@ TEST(forward_matrix_multiplication, no_parallel_case0) {
     delete[] B;
 }
 
-TEST(forward_matrix_multiplication, parallel_case1) {    
+TEST(forward_HW_multiplication, parallel_case1) {    
     int m = 512, n = 512, s = 512;
     float *dst = new float[m * s];
     float *A   = new float[m * n];
     float *B   = new float[n * s];
 
-    forward_matrix_mul2D(dst, A, B, m, n, s);
+    forward_HW_mul2D(dst, A, B, m, n, s);
 
     EXPECT_EQ(1,1);
     delete[] dst;
@@ -41,7 +41,7 @@ TEST(forward_matrix_multiplication, parallel_case1) {
     delete[] B;
 }
 
-TEST(forward_matrix_multiplication, eye_case2) {
+TEST(forward_HW_multiplication, eye_case2) {
     const int m = 4, s = 4;
     float *eye = new float[m * m];
     float *ra  = new float[m * s];
@@ -50,7 +50,7 @@ TEST(forward_matrix_multiplication, eye_case2) {
     fill_eye(eye, m);
     fill_random(ra, m * s);
 
-    forward_matrix_mul2D(rt, eye, ra, m, m, s);
+    forward_HW_mul2D(rt, eye, ra, m, m, s);
 
     for(int i = 0; i < m * s; ++i) {
         EXPECT_EQ(ra[i],rt[i]);
@@ -61,7 +61,7 @@ TEST(forward_matrix_multiplication, eye_case2) {
     delete[] eye;
 }
 
-TEST(forward_matrix_multiplication, eye_case3) {
+TEST(forward_HW_multiplication, eye_case3) {
     const int m = 4, s = 4;
     float *eye = new float[s * s];
     float *ra  = new float[m * s];
@@ -70,7 +70,7 @@ TEST(forward_matrix_multiplication, eye_case3) {
     fill_eye(eye, m);
     fill_random(ra, m * s);
 
-    forward_matrix_mul2D(rt, ra, eye, m, m, s);
+    forward_HW_mul2D(rt, ra, eye, m, m, s);
 
     for(int i = 0; i < m * s; ++i) {
         EXPECT_EQ(ra[i],rt[i]);
@@ -86,7 +86,7 @@ TEST(forward_matrix_multiplication, eye_case3) {
  *  matrix product backward test. (for matrix A)
  * 
 **********************************************************************/
-TEST(backward_matrix_multiplication_A, specific_case0){
+TEST(backward_HW_multiplication_A, specific_case0){
     const int m = 4, n = 4, s = 4;
     float *dA    =  new float[m * n];
     float  dC[]  =  {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
@@ -99,7 +99,7 @@ TEST(backward_matrix_multiplication_A, specific_case0){
                     , 4.2342, -1.3952, -2.1187 ,-0.8276
                     , 4.2342, -1.3952, -2.1187 ,-0.8276};
 
-    backward_matrix_mul2D_A(dA, dC, B, m, n, s);
+    backward_HW_mul2D_A(dA, dC, B, m, n, s);
 
     for(int i = 0; i < m * n; ++i) {
         EXPECT_NEAR(dA[i],dARt[i],0.0002);
@@ -107,7 +107,7 @@ TEST(backward_matrix_multiplication_A, specific_case0){
 
     delete[] dA;
 }
-TEST(backward_matrix_multiplication_A, specific_case1){
+TEST(backward_HW_multiplication_A, specific_case1){
     const int m = 4, n = 4, s = 4;
     float *dA    =  new float[m * n];
     float  dC[]  =  {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
@@ -120,7 +120,7 @@ TEST(backward_matrix_multiplication_A, specific_case1){
                     , 1.5811,  1.4104,  1.1010, -3.6571
                     , 1.5811,  1.4104,  1.1010, -3.6571};
 
-    backward_matrix_mul2D_A(dA, dC, B, m, n, s);
+    backward_HW_mul2D_A(dA, dC, B, m, n, s);
 
     for(int i = 0; i < m * n; ++i) {
         EXPECT_NEAR(dA[i],dARt[i],0.0002);
@@ -134,7 +134,7 @@ TEST(backward_matrix_multiplication_A, specific_case1){
  *  matrix product backward test. (for matrix B)
  * 
 **********************************************************************/
-TEST(backward_matrix_multiplication_B, specific_case0){
+TEST(backward_HW_multiplication_B, specific_case0){
     const int m = 4, n = 4, s = 4;
     float *dB    =  new float[m * n];
     float  dC[]  =  {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
@@ -144,7 +144,7 @@ TEST(backward_matrix_multiplication_B, specific_case0){
                     , 0,  0,  0,  1};
     float dBRt[] =  {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
 
-    backward_matrix_mul2D_B(dB, A, dC, m, n, s);
+    backward_HW_mul2D_B(dB, A, dC, m, n, s);
 
     for(int i = 0; i < m * n; ++i) {
         EXPECT_NEAR(dB[i],dBRt[i],0.0002);
@@ -152,7 +152,7 @@ TEST(backward_matrix_multiplication_B, specific_case0){
 
     delete[] dB;
 }
-TEST(backward_matrix_multiplication_B, specific_case1){
+TEST(backward_HW_multiplication_B, specific_case1){
     const int m = 4, n = 4, s = 4;
     float *dB    =  new float[m * n];
     float  dC[]  =  {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
@@ -165,7 +165,7 @@ TEST(backward_matrix_multiplication_B, specific_case1){
                     , -1.8335, -1.8335, -1.8335, -1.8335
                     , -2.2044, -2.2044, -2.2044, -2.2044};
 
-    backward_matrix_mul2D_B(dB, A, dC, m, n, s);
+    backward_HW_mul2D_B(dB, A, dC, m, n, s);
 
     for(int i = 0; i < m * n; ++i) {
         EXPECT_NEAR(dB[i],dBRt[i],0.0002);

@@ -1,7 +1,7 @@
-#include <example-blas/matrix_opt.h>
+#include <example-blas/matrix_function.h>
 #include <config.h>
 
-void forward_matrix_mul2D(float *C, float *A, float *B, int m, int n, int s) {
+void forward_HW_mul2D(float *C, float *A, float *B, int m, int n, int s) {
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(C, A, B, m, n, s)
     #elif ACC_REGION == OMP_TARGET
@@ -35,7 +35,7 @@ void forward_matrix_mul2D(float *C, float *A, float *B, int m, int n, int s) {
                     C[i * s + j] += A[i * n + k] * B[k * s + j];
     }
 }
-void backward_matrix_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s) {
+void backward_HW_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s) {
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(dA, B, dC, m, n, s)
     #elif ACC_REGION == OMP_TARGET
@@ -69,7 +69,7 @@ void backward_matrix_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s
                     dA[i * n + j] += dC[i * s + k] * B[j * s + k]; // B^T
     }
 }
-void backward_matrix_mul2D_B(float *dB, float *A, float *dC, int m, int n, int s){
+void backward_HW_mul2D_B(float *dB, float *A, float *dC, int m, int n, int s){
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(dB, A, dC, m, n, s)
     #elif ACC_REGION == OMP_TARGET

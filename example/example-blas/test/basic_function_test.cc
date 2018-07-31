@@ -1,6 +1,6 @@
-#include "test_prelude.h"
-#include <example-blas/vector_opt.h>
-#include <seq_opt.h>
+#include <test_prelude.h>
+#include <example-blas/basic_function.h>
+#include <sequence_inline_function.h>
 
 #if DO_VECTOR_ADD == 1
 /**********************************************************************
@@ -8,7 +8,7 @@
  *  vector add forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_add, no_parallel_case0) {
+TEST(forward_N_add, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -23,13 +23,13 @@ TEST(forward_vector_add, no_parallel_case0) {
     delete[] B;
     delete[] C;
 }
-TEST(forward_vector_add, parallel_case1) {
+TEST(forward_N_add, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
     float *C = new float[m * n];
 
-    forward_vector_add(C, A, B, m * n);
+    forward_N_add(C, A, B, m * n);
 
     EXPECT_EQ(1,1);
 
@@ -37,7 +37,7 @@ TEST(forward_vector_add, parallel_case1) {
     delete[] B;
     delete[] C;
 }
-TEST(forward_vector_add, random_case2) {
+TEST(forward_N_add, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -46,7 +46,7 @@ TEST(forward_vector_add, random_case2) {
     fill_random(A, m * n);
     fill_random(B, m * n);
 
-    forward_vector_add(C, A, B, m * n);
+    forward_N_add(C, A, B, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(C[i], A[i] + B[i]);
@@ -61,14 +61,14 @@ TEST(forward_vector_add, random_case2) {
  *  vector add backward test. (matrix A)
  * 
 **********************************************************************/
-TEST(backward_vector_add_A, random_case0) {
+TEST(backward_N_add_A, random_case0) {
     const int m = 16, n = 16;
     float *dC = new float[m * n];
     float *d = new float[m * n];
 
     fill_random(dC, m * n);
 
-    backward_vector_add_A(d, dC, m * n);
+    backward_N_add_A(d, dC, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(d[i], dC[i]);
@@ -82,14 +82,14 @@ TEST(backward_vector_add_A, random_case0) {
  *  vector add backward test. (matrix B)
  * 
 **********************************************************************/
-TEST(backward_vector_add_B, random_case0) {
+TEST(backward_N_add_B, random_case0) {
     const int m = 16, n = 16;
     float *dC = new float[m * n];
     float *d = new float[m * n];
 
     fill_random(dC, m * n);
 
-    backward_vector_add_B(d, dC, m * n);
+    backward_N_add_B(d, dC, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(d[i], dC[i]);
@@ -106,7 +106,7 @@ TEST(backward_vector_add_B, random_case0) {
  *  vector subtraction forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_sub, no_parallel_case0) {
+TEST(forward_N_sub, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -121,13 +121,13 @@ TEST(forward_vector_sub, no_parallel_case0) {
     delete[] B;
     delete[] C;
 }
-TEST(forward_vector_sub, parallel_case1) {
+TEST(forward_N_sub, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
     float *C = new float[m * n];
 
-    forward_vector_sub(C, A, B, m * n);
+    forward_N_sub(C, A, B, m * n);
 
     EXPECT_EQ(1,1);
 
@@ -135,7 +135,7 @@ TEST(forward_vector_sub, parallel_case1) {
     delete[] B;
     delete[] C;
 }
-TEST(forward_vector_sub, random_case2) {
+TEST(forward_N_sub, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -144,7 +144,7 @@ TEST(forward_vector_sub, random_case2) {
     fill_random(A, m * n);
     fill_random(B, m * n);
 
-    forward_vector_sub(C, A, B, m * n);
+    forward_N_sub(C, A, B, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(C[i], A[i] - B[i]);
@@ -159,14 +159,14 @@ TEST(forward_vector_sub, random_case2) {
  *  vector sub backward test. (matrix A)
  * 
 **********************************************************************/
-TEST(backward_vector_sub_A, random_case0) {
+TEST(backward_N_sub_A, random_case0) {
     const int m = 16, n = 16;
     float *dC = new float[m * n];
     float *d = new float[m * n];
 
     fill_random(dC, m * n);
 
-    backward_vector_sub_A(d, dC, m * n);
+    backward_N_sub_A(d, dC, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(d[i], dC[i]);
@@ -180,14 +180,14 @@ TEST(backward_vector_sub_A, random_case0) {
  *  vector sub backward test. (matrix B)
  * 
 **********************************************************************/
-TEST(backward_vector_sub_B, random_case0) {
+TEST(backward_N_sub_B, random_case0) {
     const int m = 16, n = 16;
     float *dC = new float[m * n];
     float *d = new float[m * n];
 
     fill_random(dC, m * n);
 
-    backward_vector_sub_B(d, dC, m * n);
+    backward_N_sub_B(d, dC, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(d[i], -dC[i]);
@@ -204,7 +204,7 @@ TEST(backward_vector_sub_B, random_case0) {
  *  vector dot product forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_dotprd, no_paralel_case0){
+TEST(forward_N_dotprd, no_paralel_case0){
     int m = 4096, n = 4096;
     float *matA = new float[m * n];
     float *matB = new float[m * n];
@@ -222,13 +222,13 @@ TEST(forward_vector_dotprd, no_paralel_case0){
 }
 
 
-TEST(forward_vector_dotprd, parallel_case1) {
+TEST(forward_N_dotprd, parallel_case1) {
     int m = 4096, n = 4096;
     float *matA = new float[m * n];
     float *matB = new float[m * n];
     float *matC = new float[m * n];
     
-    forward_vector_dot_prd(matC, matA, matB, m * n);
+    forward_N_dot_prd(matC, matA, matB, m * n);
 
     EXPECT_EQ(1,1);
 
@@ -238,7 +238,7 @@ TEST(forward_vector_dotprd, parallel_case1) {
 }
 
 
-TEST(forward_vector_dotprd, eye_case2) {
+TEST(forward_N_dotprd, eye_case2) {
     const int m = 4, n = 4;
     float *ones = new float[m * n];
     float *ra   = new float[m * n];
@@ -247,7 +247,7 @@ TEST(forward_vector_dotprd, eye_case2) {
     fill_with(ones, 1, m * n);
     fill_random(ra, m * n);
 
-    forward_vector_dot_prd(rt, ra, ones, m * n);
+    forward_N_dot_prd(rt, ra, ones, m * n);
 
     for(int i = 0; i < m * n; ++i) {
         EXPECT_EQ(ra[i],rt[i]);
@@ -258,7 +258,7 @@ TEST(forward_vector_dotprd, eye_case2) {
     delete[] ones;
 }
 
-TEST(forward_vector_dotprd, eye_case3) {
+TEST(forward_N_dotprd, eye_case3) {
     const int m = 4, n = 4;
     float *ones = new float[m * n];
     float *ra   = new float[m * n];
@@ -267,7 +267,7 @@ TEST(forward_vector_dotprd, eye_case3) {
     fill_with(ones, 1, m * n);
     fill_random(ra, m * n);
 
-    forward_vector_dot_prd(rt, ones, ra, m * n);
+    forward_N_dot_prd(rt, ones, ra, m * n);
 
     for(int i = 0; i < m * n; ++i) {
         EXPECT_EQ(ra[i],rt[i]);
@@ -282,7 +282,7 @@ TEST(forward_vector_dotprd, eye_case3) {
  *  vector dot product backward test. (for matrix A)
  * 
 **********************************************************************/
-TEST(backward_vector_dot_prd_A, specific_case0){
+TEST(backward_N_dot_prd_A, specific_case0){
     const int m = 4, n = 4;
     float *dA = new float[m * n];
     float  B[]    = { 0.7621, 0.6257, 0.8195, 0.4130
@@ -291,7 +291,7 @@ TEST(backward_vector_dot_prd_A, specific_case0){
                     ,-0.6626, 0.3394, -1.1363, 0.0735};
     float dC[] = {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
 
-    backward_vector_dot_prd_A(dA, B, dC, m * n);
+    backward_N_dot_prd_A(dA, B, dC, m * n);
 
     for(int i = 0; i < m * n; ++i) {
         EXPECT_NEAR(dA[i],B[i],0.0002);
@@ -308,7 +308,7 @@ TEST(backwad_vector_dot_prd_A, random_Case1) {
 
     fill_random(B, m * n);
 
-    backward_vector_dot_prd_A(dA, B, dC, m * n);
+    backward_N_dot_prd_A(dA, B, dC, m * n);
     
     for(int i = 0; i < m * n; ++i) {
         EXPECT_NEAR(dA[i],B[i],0.0002);
@@ -322,7 +322,7 @@ TEST(backwad_vector_dot_prd_A, random_Case1) {
  *  vector dot product backward test. (for matrix B)
  * 
 **********************************************************************/
-TEST(backward_vector_dot_prd_B, specific_case0){
+TEST(backward_N_dot_prd_B, specific_case0){
     const int m = 4, n = 4;
     float *dB = new float[m * n];
     float  A[]    = { 0.7621, 0.6257, 0.8195, 0.4130
@@ -331,7 +331,7 @@ TEST(backward_vector_dot_prd_B, specific_case0){
                     ,-0.6626, 0.3394, -1.1363, 0.0735};
     float dC[] = {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
 
-    backward_vector_dot_prd_B(dB, A, dC, m * n);
+    backward_N_dot_prd_B(dB, A, dC, m * n);
 
     for(int i = 0; i < m * n; ++i) {
         EXPECT_NEAR(dB[i],A[i],0.0002);
@@ -348,7 +348,7 @@ TEST(backwad_vector_dot_prd_B, random_Case1) {
 
     fill_random(A, m * n);
 
-    backward_vector_dot_prd_B(dB, A, dC, m * n);
+    backward_N_dot_prd_B(dB, A, dC, m * n);
     
     for(int i = 0; i < m * n; ++i) {
         EXPECT_NEAR(dB[i],A[i],0.0002);
@@ -365,7 +365,7 @@ TEST(backwad_vector_dot_prd_B, random_Case1) {
  *  vector dot-division forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_dot_div, no_parallel_case0) {
+TEST(forward_N_dot_div, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -380,13 +380,13 @@ TEST(forward_vector_dot_div, no_parallel_case0) {
     delete[] B;
     delete[] C;
 }
-TEST(forward_vector_dot_div, parallel_case1) {
+TEST(forward_N_dot_div, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
     float *C = new float[m * n];
 
-    forward_vector_dot_div(C, A, B, m * n);
+    forward_N_dot_div(C, A, B, m * n);
 
     EXPECT_EQ(1,1);
 
@@ -394,7 +394,7 @@ TEST(forward_vector_dot_div, parallel_case1) {
     delete[] B;
     delete[] C;
 }
-TEST(forward_vector_dot_div, random_case2) {
+TEST(forward_N_dot_div, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -403,7 +403,7 @@ TEST(forward_vector_dot_div, random_case2) {
     fill_random(A, m * n);
     fill_random(B, m * n);
 
-    forward_vector_dot_div(C, A, B, m * n);
+    forward_N_dot_div(C, A, B, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(C[i], A[i] / B[i]);
@@ -418,7 +418,7 @@ TEST(forward_vector_dot_div, random_case2) {
  *  vector dot-division backward test. (matrix A)
  * 
 **********************************************************************/
-TEST(backward_vector_dot_div_A, random_case0) {
+TEST(backward_N_dot_div_A, random_case0) {
     const int m = 16, n = 16;
     float *dC = new float[m * n];
     float *B = new float[m * n];
@@ -426,7 +426,7 @@ TEST(backward_vector_dot_div_A, random_case0) {
 
     fill_random(dC, m * n);
 
-    backward_vector_dot_div_A(d, B, dC, m * n);
+    backward_N_dot_div_A(d, B, dC, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(d[i], dC[i]/B[i]);
@@ -441,7 +441,7 @@ TEST(backward_vector_dot_div_A, random_case0) {
  *  vector dot-division backward test. (matrix B)
  * 
 **********************************************************************/
-TEST(backward_vector_dot_div_B, random_case0) {
+TEST(backward_N_dot_div_B, random_case0) {
     const int m = 16, n = 16;
     float *dC = new float[m * n];
     float *d = new float[m * n];
@@ -450,7 +450,7 @@ TEST(backward_vector_dot_div_B, random_case0) {
 
     fill_random(dC, m * n);
 
-    backward_vector_dot_div_B(d, A, B, dC, m * n);
+    backward_N_dot_div_B(d, A, B, dC, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(d[i], -dC[i] * A[i]/B[i] / B[i] );
@@ -469,7 +469,7 @@ TEST(backward_vector_dot_div_B, random_case0) {
  *  vector scale forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_scale, no_parallel_case0) {
+TEST(forward_N_scale, no_parallel_case0) {
     int m = 4096, n = 4096;
     float *matA = new float[m * n];
     float *matB = new float[m * n];
@@ -484,12 +484,12 @@ TEST(forward_vector_scale, no_parallel_case0) {
     delete[] matB;
 }
 
-TEST(forward_vector_scale, parallel_case1) {
+TEST(forward_N_scale, parallel_case1) {
     int m = 4096, n = 4096;
     float *matA = new float[m * n];
     float *matB = new float[m * n];
 
-    forward_vector_scale(matB, matA, 2, m * n);
+    forward_N_scale(matB, matA, 2, m * n);
 
     EXPECT_EQ(1,1);
 
@@ -497,13 +497,13 @@ TEST(forward_vector_scale, parallel_case1) {
     delete[] matB;
 }
 
-TEST(forward_vector_scale, s1_case2) {
+TEST(forward_N_scale, s1_case2) {
     int m = 16, n = 16;
     float *matA = new float[m * n];
     float *matB = new float[m * n];
     fill_random(matA, m * n);
 
-    forward_vector_scale(matB, matA, 1, m * n);
+    forward_N_scale(matB, matA, 1, m * n);
 
     for(int i = 0; i < m * n; i++) {
         EXPECT_EQ(matA[i], matB[i]);
@@ -513,13 +513,13 @@ TEST(forward_vector_scale, s1_case2) {
     delete[] matB;
 }
 
-TEST(forward_vector_scale, s0_case3) {
+TEST(forward_N_scale, s0_case3) {
     int m = 16, n = 16;
     float *matA = new float[m * n];
     float *matB = new float[m * n];
     fill_random(matA, m * n);
 
-    forward_vector_scale(matB, matA, 0, m * n);
+    forward_N_scale(matB, matA, 0, m * n);
 
     for(int i = 0; i < m * n; i++) {
         EXPECT_EQ(0, matB[i]);
@@ -534,13 +534,13 @@ TEST(forward_vector_scale, s0_case3) {
  *  vector scale backward test. (for matrix A)
  * 
 **********************************************************************/
-TEST(backward_vector_scale_A, specific_case0) {
+TEST(backward_N_scale_A, specific_case0) {
     const int m = 4, n = 4;
     float *dA = new float[m * n];
     float dB[] = {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
     float s = 3.1416;
 
-    backward_vector_scale_A(dA, s, dB, m * n);
+    backward_N_scale_A(dA, s, dB, m * n);
 
     for(int i = 0; i < m * n; ++i) {
         EXPECT_NEAR(dA[i],s,0.00005);
@@ -548,7 +548,7 @@ TEST(backward_vector_scale_A, specific_case0) {
 
     delete[] dA;
 }
-TEST(backward_vector_scale_A, random_case1) {
+TEST(backward_N_scale_A, random_case1) {
     const int m = 4, n = 4;
     float *dA = new float[m * n];
     float dB[] = {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
@@ -556,7 +556,7 @@ TEST(backward_vector_scale_A, random_case1) {
 
     fill_random(&s, 1);
 
-    backward_vector_scale_A(dA, s, dB, m * n);
+    backward_N_scale_A(dA, s, dB, m * n);
 
     for(int i = 0; i < m * n; ++i) {
         EXPECT_NEAR(dA[i],s,0.00005);
@@ -570,7 +570,7 @@ TEST(backward_vector_scale_A, random_case1) {
  *  vector scale backward test. (for scalar s)
  * 
 **********************************************************************/
-TEST(backward_vector_scale_s, specific_case0) {
+TEST(backward_N_scale_s, specific_case0) {
     const int m = 4, n = 4;
     float ds = 0;
     float dB[] = {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
@@ -579,11 +579,11 @@ TEST(backward_vector_scale_s, specific_case0) {
                 , 0.0973, 0.8857, 0.5930, 0.8655
                 , -0.1681, 0.6876, 0.9303, -0.1169};
 
-    backward_vector_scale_s(&ds, A, dB, m * n);
+    backward_N_scale_s(&ds, A, dB, m * n);
 
     EXPECT_NEAR(ds, 5.1248, 0.0002);
 }
-TEST(backward_vector_scale_s, random_case1) {
+TEST(backward_N_scale_s, random_case1) {
     const int m = 4, n = 4;
     float ds = 0;
     float dB[] = {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
@@ -591,7 +591,7 @@ TEST(backward_vector_scale_s, random_case1) {
 
     fill_random(A, m * n);
 
-    backward_vector_scale_s(&ds, A, dB, m * n);
+    backward_N_scale_s(&ds, A, dB, m * n);
 
     float sum = 0;
     for(int i = 0; i < m*n; ++i)
@@ -610,7 +610,7 @@ TEST(backward_vector_scale_s, random_case1) {
  *  vector abs forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_abs, no_parallel_case0) {
+TEST(forward_N_abs, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -623,26 +623,26 @@ TEST(forward_vector_abs, no_parallel_case0) {
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_abs, parallel_case1) {
+TEST(forward_N_abs, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
-    forward_vector_abs(B, A, m * n);
+    forward_N_abs(B, A, m * n);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_abs, random_case2) {
+TEST(forward_N_abs, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
     fill_random(A, m * n);
 
-    forward_vector_abs(B, A, m * n);
+    forward_N_abs(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(B[i], fabsf(A[i]));
@@ -656,7 +656,7 @@ TEST(forward_vector_abs, random_case2) {
  *  vector abs backward test. (for vector A)
  * 
 **********************************************************************/
-TEST(backward_vector_abs_A, random_case0) {
+TEST(backward_N_abs_A, random_case0) {
     const int m = 16, n = 16;
     float *dB = new float[m * n];
     float  *A = new float[m * n];
@@ -665,10 +665,10 @@ TEST(backward_vector_abs_A, random_case0) {
     fill_random(dB, m * n);
     fill_random(A, m * n);
 
-    backward_vector_abs_A(dA, dB, A, m * n);
+    backward_N_abs_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] * sign_s(A[i]));
+        EXPECT_FLOAT_EQ(dA[i], dB[i] * sign(A[i]));
     }
 
     delete[] dA;
@@ -683,42 +683,42 @@ TEST(backward_vector_abs_A, random_case0) {
  *  vector sign forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_sign, no_parallel_case0) {
+TEST(forward_N_sign, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
     for(int i = 0; i < m * n; ++i)
-        B[i] = sign_s(A[i]);
+        B[i] = sign(A[i]);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_sign, parallel_case1) {
+TEST(forward_N_sign, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
-    forward_vector_sign(B, A, m * n);
+    forward_N_sign(B, A, m * n);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_sign, random_case2) {
+TEST(forward_N_sign, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
     fill_random(A, m * n);
 
-    forward_vector_sign(B, A, m * n);
+    forward_N_sign(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], sign_s(A[i]));
+        EXPECT_FLOAT_EQ(B[i], sign(A[i]));
     }
 
     delete[] A;
@@ -729,11 +729,11 @@ TEST(forward_vector_sign, random_case2) {
  *  vector sign backward test. (for vector A)
  * 
 **********************************************************************/
-TEST(backward_vector_sign_A, random_case0) {
+TEST(backward_N_sign_A, random_case0) {
     const int m = 16, n = 16;
     float *dA = new float[m * n];
 
-    backward_vector_sign_A(dA, m * n);
+    backward_N_sign_A(dA, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(dA[i], 0);
@@ -749,7 +749,7 @@ TEST(backward_vector_sign_A, random_case0) {
  *  vector exp forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_exp, no_parallel_case0) {
+TEST(forward_N_exp, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -762,26 +762,26 @@ TEST(forward_vector_exp, no_parallel_case0) {
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_exp, parallel_case1) {
+TEST(forward_N_exp, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
-    forward_vector_exp(B, A, m * n);
+    forward_N_exp(B, A, m * n);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_exp, random_case2) {
+TEST(forward_N_exp, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
     fill_random(A, m * n);
 
-    forward_vector_exp(B, A, m * n);
+    forward_N_exp(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(B[i], expf(A[i]));
@@ -795,7 +795,7 @@ TEST(forward_vector_exp, random_case2) {
  *  vector exp backward test. (for vector A)
  * 
 **********************************************************************/
-TEST(backward_vector_exp_A, random_case0) {
+TEST(backward_N_exp_A, random_case0) {
     const int m = 16, n = 16;
     float *dB = new float[m * n];
     float  *B = new float[m * n];
@@ -804,7 +804,7 @@ TEST(backward_vector_exp_A, random_case0) {
     fill_random(dB, m * n);
     fill_random(B, m * n);
 
-    backward_vector_exp_A(dA, dB, B, m * n);
+    backward_N_exp_A(dA, dB, B, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(dA[i], dB[i] * B[i]);
@@ -822,7 +822,7 @@ TEST(backward_vector_exp_A, random_case0) {
  *  vector forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_expm1, no_parallel_case0) {
+TEST(forward_N_expm1, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -835,26 +835,26 @@ TEST(forward_vector_expm1, no_parallel_case0) {
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_expm1, parallel_case1) {
+TEST(forward_N_expm1, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
-    forward_vector_expm1(B, A, m * n);
+    forward_N_expm1(B, A, m * n);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_expm1, random_case2) {
+TEST(forward_N_expm1, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
     fill_random(A, m * n);
 
-    forward_vector_expm1(B, A, m * n);
+    forward_N_expm1(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(B[i], expm1f(A[i]));
@@ -868,7 +868,7 @@ TEST(forward_vector_expm1, random_case2) {
  *  vector backward test. (for vector A)
  * 
 **********************************************************************/
-TEST(backward_vector_expm1_A, random_case0) {
+TEST(backward_N_expm1_A, random_case0) {
     const int m = 16, n = 16;
     float *dB = new float[m * n];
     float  *B = new float[m * n];
@@ -877,7 +877,7 @@ TEST(backward_vector_expm1_A, random_case0) {
     fill_random(dB, m * n);
     fill_random(B, m * n);
 
-    backward_vector_expm1_A(dA, dB, B, m * n);
+    backward_N_expm1_A(dA, dB, B, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(dA[i], dB[i] * (B[i] + 1));
@@ -895,7 +895,7 @@ TEST(backward_vector_expm1_A, random_case0) {
  *  vector log forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_log, no_parallel_case0) {
+TEST(forward_N_log, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -908,26 +908,26 @@ TEST(forward_vector_log, no_parallel_case0) {
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_log, parallel_case1) {
+TEST(forward_N_log, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
-    forward_vector_log(B, A, m * n);
+    forward_N_log(B, A, m * n);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_log, random_case2) {
+TEST(forward_N_log, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
     fill_random(A, m * n);
 
-    forward_vector_log(B, A, m * n);
+    forward_N_log(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(B[i], logf(A[i]));
@@ -941,7 +941,7 @@ TEST(forward_vector_log, random_case2) {
  *  vector log backward test. (for vector A)
  * 
 **********************************************************************/
-TEST(backward_vector_log_A, random_case0) {
+TEST(backward_N_log_A, random_case0) {
     const int m = 16, n = 16;
     float *dB = new float[m * n];
     float  *A = new float[m * n];
@@ -950,7 +950,7 @@ TEST(backward_vector_log_A, random_case0) {
     fill_random(dB, m * n);
     fill_random(A, m * n);
 
-    backward_vector_log_A(dA, dB, A, m * n);
+    backward_N_log_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(dA[i], dB[i] / A[i]);
@@ -968,7 +968,7 @@ TEST(backward_vector_log_A, random_case0) {
  *  vector log1p forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_log1p, no_parallel_case0) {
+TEST(forward_N_log1p, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -981,26 +981,26 @@ TEST(forward_vector_log1p, no_parallel_case0) {
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_log1p, parallel_case1) {
+TEST(forward_N_log1p, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
-    forward_vector_log1p(B, A, m * n);
+    forward_N_log1p(B, A, m * n);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_log1p, random_case2) {
+TEST(forward_N_log1p, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
     fill_random(A, m * n);
 
-    forward_vector_log1p(B, A, m * n);
+    forward_N_log1p(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(B[i], log1pf(A[i]));
@@ -1014,7 +1014,7 @@ TEST(forward_vector_log1p, random_case2) {
  *  vector log1p backward test. (for vector A)
  * 
 **********************************************************************/
-TEST(backward_vector_log1p_A, random_case0) {
+TEST(backward_N_log1p_A, random_case0) {
     const int m = 16, n = 16;
     float *dB = new float[m * n];
     float  *A = new float[m * n];
@@ -1023,7 +1023,7 @@ TEST(backward_vector_log1p_A, random_case0) {
     fill_random(dB, m * n);
     fill_random(A, m * n);
 
-    backward_vector_log1p_A(dA, dB, A, m * n);
+    backward_N_log1p_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(dA[i], dB[i] / (A[i] + 1));
@@ -1041,7 +1041,7 @@ TEST(backward_vector_log1p_A, random_case0) {
  *  vector sqrt forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_sqrt, no_parallel_case0) {
+TEST(forward_N_sqrt, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -1054,26 +1054,26 @@ TEST(forward_vector_sqrt, no_parallel_case0) {
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_sqrt, parallel_case1) {
+TEST(forward_N_sqrt, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
-    forward_vector_sqrt(B, A, m * n);
+    forward_N_sqrt(B, A, m * n);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_sqrt, random_case2) {
+TEST(forward_N_sqrt, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
     fill_random(A, m * n);
 
-    forward_vector_sqrt(B, A, m * n);
+    forward_N_sqrt(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(B[i], sqrtf(A[i]));
@@ -1087,7 +1087,7 @@ TEST(forward_vector_sqrt, random_case2) {
  *  vector sqrt backward test. (for vector A)
  * 
 **********************************************************************/
-TEST(backward_vector_sqrt_A, random_case0) {
+TEST(backward_N_sqrt_A, random_case0) {
     const int m = 16, n = 16;
     float *dB = new float[m * n];
     float  *A = new float[m * n];
@@ -1096,7 +1096,7 @@ TEST(backward_vector_sqrt_A, random_case0) {
     fill_random(dB, m * n);
     fill_random(A, m * n);
 
-    backward_vector_sqrt_A(dA, dB, A, m * n);
+    backward_N_sqrt_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(dA[i], dB[i] / 2 /  sqrtf(A[i]));
@@ -1114,7 +1114,7 @@ TEST(backward_vector_sqrt_A, random_case0) {
  *  vector pow forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_pow, no_parallel_case0) {
+TEST(forward_N_pow, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -1128,20 +1128,20 @@ TEST(forward_vector_pow, no_parallel_case0) {
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_pow, parallel_case1) {
+TEST(forward_N_pow, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
     float x = 9.21924;
 
-    forward_vector_pow(B, A, x, m * n);
+    forward_N_pow(B, A, x, m * n);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_pow, random_case2) {
+TEST(forward_N_pow, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
@@ -1149,7 +1149,7 @@ TEST(forward_vector_pow, random_case2) {
 
     fill_random(A, m * n);
 
-    forward_vector_pow(B, A, x, m * n);
+    forward_N_pow(B, A, x, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(B[i], powf(A[i],x));
@@ -1163,7 +1163,7 @@ TEST(forward_vector_pow, random_case2) {
  *  vector pow backward test. (for vector A)
  * 
 **********************************************************************/
-TEST(backward_vector_pow_A, random_case0) {
+TEST(backward_N_pow_A, random_case0) {
     const int m = 16, n = 16;
     float *dB = new float[m * n];
     float  *A = new float[m * n];
@@ -1181,7 +1181,7 @@ TEST(backward_vector_pow_A, random_case0) {
 
     fill_random(dB, m * n);
 
-    backward_vector_pow_A(dA, dB, A, B, x, m * n);
+    backward_N_pow_A(dA, dB, A, B, x, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_EQ(dA[i], dB[i] * x * powf(A[i], x - 1));
@@ -1197,7 +1197,7 @@ TEST(backward_vector_pow_A, random_case0) {
  *  vector pow backward test. (for scalar x)
  * 
 **********************************************************************/
-TEST(backward_vector_pow_x, random_case0) {
+TEST(backward_N_pow_x, random_case0) {
     const int m = 16, n = 16;
     float *dB = new float[m * n];
     float  *A = new float[m * n];
@@ -1210,7 +1210,7 @@ TEST(backward_vector_pow_x, random_case0) {
     for(int i = 0; i < m * n; ++i)
         B[i] = powf(A[i], x);
 
-    backward_vector_pow_w(&dx, dB, A, B, x, m * n);
+    backward_N_pow_w(&dx, dB, A, B, x, m * n);
 
     float sum = 0;
     for(int i = 0; i < m * n; ++i)
@@ -1224,48 +1224,48 @@ TEST(backward_vector_pow_x, random_case0) {
 }
 #endif // DO_VECTOR_POW == 1
 
-#if DO_VECTOR_SIN == 1
+#if DO_VECTOR_CEIL == 1
 /**********************************************************************
  * 
- *  vectorsin  forward test.
+ *  vector ceil forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_sin, no_parallel_case0) {
+TEST(forward_N_ceil, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
     for(int i = 0; i < m * n; ++i)
-        B[i] = sinf(A[i]);
+        B[i] = ceil(A[i]);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_sin, parallel_case1) {
+TEST(forward_N_ceil, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
-    forward_vector_sin(B, A, m * n);
+    forward_N_ceil(B, A, m * n);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_sin, random_case2) {
+TEST(forward_N_ceil, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
     fill_random(A, m * n);
 
-    forward_vector_sin(B, A, m * n);
+    forward_N_ceil(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], sinf(A[i]));
+        EXPECT_FLOAT_EQ(B[i], ceil(A[i]));
     }
 
     delete[] A;
@@ -1273,10 +1273,143 @@ TEST(forward_vector_sin, random_case2) {
 }
 /**********************************************************************
  * 
- *  vector sin backward test. (for vector A)
+ *  vector ceil backward test. (for vector A)
  * 
 **********************************************************************/
-TEST(backward_vector_sin_A, random_case0) {
+TEST(backward_N_ceil_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dA = new float[m * n];
+
+    backward_N_ceil_A(dA, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], 0);
+    }
+
+    delete[] dA;
+}
+#endif // DO_VECTOR_CEIL == 1
+
+#if DO_VECTOR_FLOOR == 1
+/**********************************************************************
+ * 
+ *  vector floor forward test.
+ * 
+**********************************************************************/
+TEST(forward_N_floor, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = floor(A[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_N_floor, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    forward_N_floor(B, A, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_N_floor, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    fill_random(A, m * n);
+
+    forward_N_floor(B, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], floor(A[i]));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector floor backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_N_floor_A, random_case0) {
+    const int m = 16, n = 16;
+    float *dA = new float[m * n];
+
+    backward_N_floor_A(dA, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(dA[i], 0);
+    }
+
+    delete[] dA;
+}
+#endif // DO_VECTOR_FLOOR == 1
+
+
+#if DO_VECTOR_ERF == 1
+/**********************************************************************
+ * 
+ *  vector erf forward test.
+ * 
+**********************************************************************/
+TEST(forward_N_erf, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i)
+        B[i] = erff(A[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_N_erf, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    forward_N_erf(B, A, m * n);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+}
+TEST(forward_N_erf, random_case2) {
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+
+    fill_random(A, m * n);
+
+    forward_N_erf(B, A, m * n);
+
+    for(int i = 0; i < m * n; ++i){
+        EXPECT_FLOAT_EQ(B[i], erff(A[i]));
+    }
+
+    delete[] A;
+    delete[] B;
+}
+/**********************************************************************
+ * 
+ *  vector erf backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_N_erf_A, random_case0) {
     const int m = 16, n = 16;
     float *dB = new float[m * n];
     float  *A = new float[m * n];
@@ -1285,60 +1418,61 @@ TEST(backward_vector_sin_A, random_case0) {
     fill_random(dB, m * n);
     fill_random(A, m * n);
 
-    backward_vector_sin_A(dA, dB, A, m * n);
+    backward_N_erf_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] * cosf(A[i]));
+        EXPECT_FLOAT_EQ(dA[i], dB[i] * 2 / sqrtf((float)std::_Pi) * exp(- A[i] * A[i]));
     }
 
     delete[] dA;
     delete[]  A;
     delete[] dB;
 }
-#endif // DO_VECTOR_SIN == 1
+#endif // DO_VECTOR_ERF == 1
 
-#if DO_VECTOR_COS == 1
+
+#if DO_VECTOR_ERFC == 1
 /**********************************************************************
  * 
- *  vector cos forward test.
+ *  vector erfc forward test.
  * 
 **********************************************************************/
-TEST(forward_vector_cos, no_parallel_case0) {
+TEST(forward_N_erfc, no_parallel_case0) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
     for(int i = 0; i < m * n; ++i)
-        B[i] = cosf(A[i]);
+        B[i] = erfcf(A[i]);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_cos, parallel_case1) {
+TEST(forward_N_erfc, parallel_case1) {
     const int m = 8192, n = 8192;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
-    forward_vector_cos(B, A, m * n);
+    forward_N_erfc(B, A, m * n);
 
     EXPECT_EQ(1,1);
 
     delete[] A;
     delete[] B;
 }
-TEST(forward_vector_cos, random_case2) {
+TEST(forward_N_erfc, random_case2) {
     const int m = 16, n = 16;
     float *A = new float[m * n];
     float *B = new float[m * n];
 
     fill_random(A, m * n);
 
-    forward_vector_cos(B, A, m * n);
+    forward_N_erfc(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], cosf(A[i]));
+        EXPECT_FLOAT_EQ(B[i], erfcf(A[i]));
     }
 
     delete[] A;
@@ -1346,10 +1480,10 @@ TEST(forward_vector_cos, random_case2) {
 }
 /**********************************************************************
  * 
- *  vector cos backward test. (for vector A)
+ *  vector erfc backward test. (for vector A)
  * 
 **********************************************************************/
-TEST(backward_vector_cos_A, random_case0) {
+TEST(backward_N_erfc_A, random_case0) {
     const int m = 16, n = 16;
     float *dB = new float[m * n];
     float  *A = new float[m * n];
@@ -1358,91 +1492,14 @@ TEST(backward_vector_cos_A, random_case0) {
     fill_random(dB, m * n);
     fill_random(A, m * n);
 
-    backward_vector_cos_A(dA, dB, A, m * n);
+    backward_N_erfc_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] * (- sinf(A[i])));
+        EXPECT_FLOAT_EQ(dA[i], - dB[i] * 2 / sqrtf((float)std::_Pi) * exp(- A[i] * A[i]));
     }
 
     delete[] dA;
     delete[]  A;
     delete[] dB;
 }
-#endif // DO_VECTOR_COS == 1
-
-#if DO_VECTOR_TAN == 1
-/**********************************************************************
- * 
- *  vector tan forward test.
- * 
-**********************************************************************/
-TEST(forward_vector_tan, no_parallel_case0) {
-    const int m = 8192, n = 8192;
-    float *A = new float[m * n];
-    float *B = new float[m * n];
-
-    for(int i = 0; i < m * n; ++i)
-        B[i] = tanf(A[i]);
-
-    EXPECT_EQ(1,1);
-
-    delete[] A;
-    delete[] B;
-}
-TEST(forward_vector_tan, parallel_case1) {
-    const int m = 8192, n = 8192;
-    float *A = new float[m * n];
-    float *B = new float[m * n];
-
-    forward_vector_tan(B, A, m * n);
-
-    EXPECT_EQ(1,1);
-
-    delete[] A;
-    delete[] B;
-}
-TEST(forward_vector_tan, random_case2) {
-    const int m = 16, n = 16;
-    float *A = new float[m * n];
-    float *B = new float[m * n];
-
-    fill_random(A, m * n);
-
-    forward_vector_tan(B, A, m * n);
-
-    for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], tanf(A[i]));
-    }
-
-    delete[] A;
-    delete[] B;
-}
-/**********************************************************************
- * 
- *  vector tan backward test. (for vector A)
- * 
-**********************************************************************/
-TEST(backward_vector_tan_A, random_case0) {
-    const int m = 16, n = 16;
-    float *dB = new float[m * n];
-    float  *A = new float[m * n];
-    float  *B = new float[m * n];
-    float *dA = new float[m * n];
-
-    fill_random(dB, m * n);
-    fill_random(A, m * n);
-
-    for(int i = 0; i < m * n; i++)
-        B[i] = tanf(A[i]);
-
-    backward_vector_tan_A(dA, dB, B, m * n);
-
-    for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] / powf(cosf(A[i]),2));
-    }
-
-    delete[] dA;
-    delete[]  A;
-    delete[] dB;
-}
-#endif // DO_VECTOR_TAN == 1
+#endif // DO_VECTOR_ERFC == 1

@@ -1,4 +1,4 @@
-#include <example-blas/example-blas.h>
+#include <example-blas/example_blas.h>
 #include <config.h>
 #include <config_gen.h>
 

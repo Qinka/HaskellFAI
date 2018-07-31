@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef _MATRIX_OPT_H_
-#define _MATRIX_OPT_H_
+#ifndef _MATRIX_FUNCTION_H_
+#define _MATRIX_FUNCTION_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,7 +22,7 @@ extern "C" {
  * @param n size
  * @param s size
  */
-void forward_matrix_mul2D(float *C, float *A, float *B, int m, int n, int s);
+void forward_HW_mul2D(float *C, float *A, float *B, int m, int n, int s);
 
 /**
  * @brief $\frac{\partial L}{\partial A} = \frac{\partial L}{\partial C} \frac{\partial C}{\partial A}=  \frac{\partial L}{\partial C} B^\intercal$
@@ -34,7 +34,7 @@ void forward_matrix_mul2D(float *C, float *A, float *B, int m, int n, int s);
  * @param n size
  * @param s size
  */
-void backward_matrix_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s);
+void backward_HW_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s);
 
 /**
  * @brief $\frac{\partial L}{\partial B} =  \frac{\partial C}{\partial B} \frac{\partial L}{\partial C} = A^\intercal \frac{\partial L}{\partial C}$
@@ -46,15 +46,10 @@ void backward_matrix_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s
  * @param n size
  * @param s size
  */
-void backward_matrix_mul2D_B(float *dB, float *A, float *dC, int m, int n, int s);
-
-// Matrix fill
-void fill_matrix_eye(float *mat, int row_num);
-void fill_matrix_num(float *mat, float f, int n);
-void fill_matrix_random(float *mat, int n);
+void backward_HW_mul2D_B(float *dB, float *A, float *dC, int m, int n, int s);
 
 #ifdef __cplusplus
 }
 #endif // ! __cplusplus
 
-#endif // !_MATRIX_MULTIPLICATION_H_
+#endif // ! _MATRIX_FUNCTION_H_

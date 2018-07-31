@@ -37,5 +37,20 @@ void fill_with(float *mat, float f, int num);
 #define DO_VECTOR_SIN       1
 #define DO_VECTOR_COS       1
 #define DO_VECTOR_TAN       1
+#define DO_VECTOR_ASIN      1
+#define DO_VECTOR_ACOS      1
+#define DO_VECTOR_ATAN      1
+#define DO_VECTOR_SINH      1
+#define DO_VECTOR_COSH      1
+#define DO_VECTOR_TANH      1
+#define DO_VECTOR_ASINH     1
+#define DO_VECTOR_ACOSH     1
+#define DO_VECTOR_ATANH     1
+#define DO_VECTOR_CEIL      1
+#define DO_VECTOR_FLOOR     1
+#define DO_VECTOR_ERF       1
+#define DO_VECTOR_ERFC      1
+#define DO_VECTOR_SIGMOID   1
+#define DO_VECTOR_RELU      1
 
 #endif // ! _TEST_PRELUDE_H_
