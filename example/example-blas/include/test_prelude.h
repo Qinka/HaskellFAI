@@ -13,6 +13,9 @@
 #include <random>
 #include <cmath>
 
+#define EXPECT_FLOAT_NEAR(x,y) EXPECT_NEAR((x),(y), fabsf(((x) + (y)) * 0.000006))
+
+
 void fill_eye(float * mat, int row_num);
 void fill_zero(float *mat, int num);
 void fill_random(float *mat, int num);

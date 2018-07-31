@@ -42,7 +42,7 @@ TEST(forward_N_sigmoid, random_case2) {
     forward_N_sigmoid(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], 1 / (1 + expf(-A[i])));
+        EXPECT_FLOAT_NEAR(B[i], 1 / (1 + expf(-A[i])));
     }
 
     delete[] A;
@@ -69,7 +69,7 @@ TEST(backward_N_sigmoid_A, random_case0) {
     backward_N_sigmoid_A(dA, dB, B, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] * ( (1 - B[i]) / B[i]  / B[i]  / B[i] ));
+        EXPECT_FLOAT_NEAR(dA[i], dB[i] * ( (1 - B[i]) / B[i]  / B[i]  / B[i] ));
     }
 
     delete[] dA;
@@ -119,7 +119,7 @@ TEST(forward_N_ReLU, random_case2) {
     forward_N_ReLU(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], (A[i] >= 0) * A[i]);
+        EXPECT_FLOAT_NEAR(B[i], (A[i] >= 0) * A[i]);
     }
 
     delete[] A;
@@ -142,7 +142,7 @@ TEST(backward_N_ReLU_A, random_case0) {
     backward_N_ReLU_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] * (A[i] >= 0));
+        EXPECT_FLOAT_NEAR(dA[i], dB[i] * (A[i] >= 0));
     }
 
     delete[] dA;

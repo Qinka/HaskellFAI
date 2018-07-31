@@ -42,7 +42,7 @@ TEST(forward_N_sinh, random_case2) {
     forward_N_sinh(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], sinhf(A[i]));
+        EXPECT_FLOAT_NEAR(B[i], sinhf(A[i]));
     }
 
     delete[] A;
@@ -65,7 +65,7 @@ TEST(backward_N_sinh_A, random_case0) {
     backward_N_sinh_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] * coshf(A[i]));
+        EXPECT_FLOAT_NEAR(dA[i], dB[i] * coshf(A[i]));
     }
 
     delete[] dA;
@@ -115,7 +115,7 @@ TEST(forward_N_cosh, random_case2) {
     forward_N_cosh(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], coshf(A[i]));
+        EXPECT_FLOAT_NEAR(B[i], coshf(A[i]));
     }
 
     delete[] A;
@@ -138,7 +138,7 @@ TEST(backward_N_cosh_A, random_case0) {
     backward_N_cosh_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] * sinhf(A[i]));
+        EXPECT_FLOAT_NEAR(dA[i], dB[i] * sinhf(A[i]));
     }
 
     delete[] dA;
@@ -188,7 +188,7 @@ TEST(forward_N_tanh, random_case2) {
     forward_N_tanh(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], tanhf(A[i]));
+        EXPECT_FLOAT_NEAR(B[i], tanhf(A[i]));
     }
 
     delete[] A;
@@ -215,7 +215,7 @@ TEST(backward_N_tanh_A, random_case0) {
     backward_N_tanh_A(dA, dB, B, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] * (1 - tanhf(A[i]) * tanhf(A[i])));
+        EXPECT_FLOAT_NEAR(dA[i], dB[i] * (1 - tanhf(A[i]) * tanhf(A[i])));
     }
 
     delete[] dA;
@@ -267,7 +267,7 @@ TEST(forward_N_atanh, random_case2) {
     forward_N_atanh(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], atanhf(A[i]));
+        EXPECT_FLOAT_NEAR(B[i], atanhf(A[i]));
     }
 
     delete[] A;
@@ -290,7 +290,7 @@ TEST(backward_N_atanh_A, random_case0) {
     backward_N_atanh_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] / (1 -  powf(A[i],2)));
+        EXPECT_FLOAT_NEAR(dA[i], dB[i] / (1 - A[i] * A[i]));
     }
 
     delete[] dA;
@@ -340,7 +340,7 @@ TEST(forward_N_asinh, random_case2) {
     forward_N_asinh(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], asinhf(A[i]));
+        EXPECT_FLOAT_NEAR(B[i], asinhf(A[i]));
     }
 
     delete[] A;
@@ -363,7 +363,7 @@ TEST(backward_N_asinh_A, random_case0) {
     backward_N_asinh_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] / sqrt(1 + A[i] * A[i]));
+        EXPECT_FLOAT_NEAR(dA[i], dB[i] / sqrt(1 + A[i] * A[i]));
     }
 
     delete[] dA;
@@ -415,7 +415,7 @@ TEST(forward_N_acosh, random_case2) {
     forward_N_acosh(B, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(B[i], acoshf(A[i]));
+        EXPECT_FLOAT_NEAR(B[i], acoshf(A[i]));
     }
 
     delete[] A;
@@ -440,7 +440,7 @@ TEST(backward_N_acosh_A, random_case0) {
     backward_N_acosh_A(dA, dB, A, m * n);
 
     for(int i = 0; i < m * n; ++i){
-        EXPECT_FLOAT_EQ(dA[i], dB[i] / sqrt(A[i] * A[i] - 1));
+        EXPECT_FLOAT_NEAR(dA[i], dB[i] / sqrt(A[i] * A[i] - 1));
     }
 
     delete[] dA;

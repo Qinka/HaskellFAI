@@ -93,6 +93,6 @@ void backward_N_ReLU_A(float *dA, float *dB, float *A, int n){
         #pragma acc parallel loop
         #endif
         for (i = 0; i < n; i++)
-            dA[i] = - dB[i] * (A[i] >= 0);
+            dA[i] = dB[i] * (A[i] >= 0);
     }
 }
