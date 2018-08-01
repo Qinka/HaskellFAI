@@ -24,3 +24,7 @@ cabal.project.local~
 
 # VS Code
 .vscode
+
+# For C2HS
+*.chs.h
+*.i
