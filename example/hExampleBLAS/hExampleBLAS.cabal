@@ -18,6 +18,11 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     Accelerate.ExampleBLAS.Binding.ActivationFunction
+                     , Accelerate.ExampleBLAS.Binding.BasicFunction
+                     , Accelerate.ExampleBLAS.Binding.ExampleBLAS
+                     , Accelerate.ExampleBLAS.Binding.HyperbolicFunction
+                     , Accelerate.ExampleBLAS.Binding.MatrixFunction
+                     , Accelerate.ExampleBLAS.Binding.TrigonometricFunction
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base == 4.*

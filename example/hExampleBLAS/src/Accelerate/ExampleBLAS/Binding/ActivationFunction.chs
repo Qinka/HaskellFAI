@@ -1,6 +1,11 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 
-module Accelerate.ExampleBLAS.Binding.ActivationFunction where
+module Accelerate.ExampleBLAS.Binding.ActivationFunction
+  ( forward_N_sigmoid
+  , backward_N_sigmoid_A
+  , forward_N_ReLU
+  , backward_N_ReLU_A
+  ) where
 
 #include <example-blas/activation_function.h>
 
