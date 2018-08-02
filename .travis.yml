@@ -158,12 +158,16 @@ before_install: |
   case $TASK in
     FAI)
       FAI_init
+    ;;
     example-blas)
       example-blas_init
+    ;;
     hExampleBLAS)
       hExampleBLAS_init
+    ;;
     *)
       echo $TASK nothing to do
+    ;;
   esac
 
 script: |
@@ -172,26 +176,34 @@ script: |
     FAI)
       FAI_build
       FAI_test
+    ;;
     example-blas)
       example-blas_build
       example-blas_test
+    ;;
     hExampleBLAS)
       hExampleBLAS_build
       hExampleBLAS_test
+    ;;
     *)
       echo $TASK nothing to do
+    ;;
   esac
 after_success: |
   echo after success
   case $TASK in
     FAI)
       FAI_succ
+    ;;
     example-blas)
       example-blas_succ
+    ;;
     hExampleBLAS)
       hExampleBLAS_succ
+    ;;
     *)
       echo $TASK nothing to do
+    ;;
   esac
 
 deploy:
