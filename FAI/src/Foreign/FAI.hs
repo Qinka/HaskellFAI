@@ -54,6 +54,7 @@ module Foreign.FAI
   , reshape
   , bufSize
   , withBuffer
+  , bufByte
   ) where
 
 import           Control.Monad

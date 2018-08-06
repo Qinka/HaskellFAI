@@ -138,17 +138,17 @@ instance FAI CUDA where
 instance FAICopy Host CUDA where
   faiMemCopy dst src = do
     when (bufSize dst /= bufSize src) $ error "Different size."
-    cudaMemCopy doCopyHC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
+    cudaMemCopy doCopyHC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufByte dst
 
 instance FAICopy CUDA Host where
   faiMemCopy dst src = do
     when (bufSize dst /= bufSize src) $ error "Different size."
-    cudaMemCopy doCopyCH (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
+    cudaMemCopy doCopyCH (bufPtr dst) (bufPtr src) $ fromIntegral $ bufByte dst
 
 instance FAICopy CUDA CUDA where
   faiMemCopy dst src = do
     when (bufSize dst /= bufSize src) $ error "Different size."
-    cudaMemCopy doCopyCC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
+    cudaMemCopy doCopyCC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufByte dst
 
 -- | Null pointer context of CUDA
 nullCUDAContext :: Context CUDA

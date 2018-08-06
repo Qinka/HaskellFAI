@@ -69,7 +69,9 @@ dup :: ( FAICopy p1 p2, FAI p1, FAI p2
 dup cc is buf = do
   fin <- faiMemReleaseP cc
   let sh   = bufShape buf
-  ptr  <- faiMemAllocate cc $ shLen sh
+  ptr  <- faiMemAllocate cc $ bufByte buf
   bDst <- autoNewForeignPtr fin cc ptr sh
   when is $ faiMemCopy bDst buf
   return (bDst, cc)
+  where size :: Storable a => Ptr a -> a -> Int
+        size _ = sizeOf

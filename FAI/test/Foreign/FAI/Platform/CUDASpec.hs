@@ -33,7 +33,7 @@ spec = do
             let arr2 = unsafePeekHostBuffer b3
             return (arr1, arr2)
       (arr1, arr2) <- acc
-      arr1 `shouldBe` arr2
+      arr2 `shouldBe` arr1
 
 cc = Context nullPtr
 

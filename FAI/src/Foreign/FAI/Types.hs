@@ -50,6 +50,7 @@ module Foreign.FAI.Types
   , liftIO
   , Shape(..)
   , bufSize
+  , bufByte
   ) where
 
 import           Control.Monad.IO.Class (MonadIO (..))
@@ -128,6 +129,13 @@ class Shape sh where
 
 bufSize :: Shape sh => Buffer sh p a -> Int
 bufSize = shLen . bufShape
+
+bufByte :: (Storable b, b ~ Pf p a, Shape sh)
+        => Buffer sh p a
+        -> Int
+bufByte (Buffer fp sh) = size fp undefined * shLen sh
+  where size :: Storable a => ForeignPtr a -> a -> Int
+        size _ = sizeOf
 
 instance Shape [Int] where
   shLen = product

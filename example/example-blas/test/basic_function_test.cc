@@ -522,8 +522,9 @@ TEST(forward_N_scale, s0_case3) {
     float *matA = new float[m * n];
     float *matB = new float[m * n];
     fill_random(matA, m * n);
+    float s = 0;
 
-    forward_N_scale(matB, matA, 0, m * n);
+    forward_N_scale(matB, matA, &s, m * n);
 
     for(int i = 0; i < m * n; i++) {
         EXPECT_EQ(0, matB[i]);
