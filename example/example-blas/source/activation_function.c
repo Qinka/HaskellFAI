@@ -82,7 +82,7 @@ void backward_N_ReLU_A(float *dA, float *dB, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(dA, dB, A)
     #endif
     {
         int i;

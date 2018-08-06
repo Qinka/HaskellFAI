@@ -440,7 +440,7 @@ void backward_N_sign_A(float *dA, float *dB, int n) {
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA[0:n])
+    #pragma acc data deviceptr(dA)
     #endif
     {
         int i;
@@ -794,7 +794,7 @@ void backward_N_ceil_A(float *dA, float *dB, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA[0:n])
+    #pragma acc data deviceptr(dA)
     #endif
     {
         int i;
@@ -841,7 +841,7 @@ void backward_N_floor_A(float *dA, float *dB, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA[0:n])
+    #pragma acc data deviceptr(dA)
     #endif
     {
         int i;
