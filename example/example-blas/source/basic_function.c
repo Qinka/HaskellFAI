@@ -287,7 +287,7 @@ void backward_N_dot_div_B(float *dB, float *A, float *B, float *dC, int n){
 }
 
 
-void forward_N_scale(float *B, float *A, float s, int n) {
+void forward_N_scale(float *B, float *A, float *s, int n) {
 
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(B, A, s, n)
@@ -307,10 +307,10 @@ void forward_N_scale(float *B, float *A, float s, int n) {
         #pragma acc parallel loop
         #endif
         for (i = 0; i < n; i++)
-            B[i] = A[i] * s;
+            B[i] = A[i] * (*s);
     }
 }
-void backward_N_scale_A(float *dA, float s, float *dB, int n){
+void backward_N_scale_A(float *dA, float *s, float *dB, int n){
 
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(dA, s, dB, n)
@@ -330,7 +330,7 @@ void backward_N_scale_A(float *dA, float s, float *dB, int n){
         #pragma acc parallel loop
         #endif
         for (i = 0; i < n; i++)
-            dA[i] = s * dB[i];
+            dA[i] = (*s) * dB[i];
     }
 }
 void backward_N_scale_s(float *ds, float *A, float *dB, int n){
@@ -431,7 +431,7 @@ void forward_N_sign(float *B, float *A, int n) {
     }
     
 }
-void backward_N_sign_A(float *dA, int n) {
+void backward_N_sign_A(float *dA, float *dB, int n) {
 
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(dA, n)
@@ -690,7 +690,7 @@ void backward_N_sqrt_A(float *dA, float *dB, float *A, int n) {
     }
 }
 //pow
-void forward_N_pow(float *B, float *A, float x, int n) {
+void forward_N_pow(float *B, float *A, float *x, int n) {
 
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(B, A, x, n)
@@ -710,10 +710,10 @@ void forward_N_pow(float *B, float *A, float x, int n) {
         #pragma acc parallel loop
         #endif
         for (i = 0; i < n; i++)
-            B[i] = powf(A[i], x);
+            B[i] = powf(A[i], (*x));
     }
 }
-void backward_N_pow_A(float *dA, float *dB, float *A, float *B, float x, int n) {
+void backward_N_pow_A(float *dA, float *dB, float *A, float *B, float *x, int n) {
 
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(dA, dB, A, B, x, n)
@@ -733,10 +733,10 @@ void backward_N_pow_A(float *dA, float *dB, float *A, float *B, float x, int n) 
         #pragma acc parallel loop
         #endif
         for (i = 0; i < n; i++)
-            dA[i] = dB[i] * B[i] * x / A[i];
+            dA[i] = dB[i] * B[i] * (*x) / A[i];
     }
 }
-void backward_N_pow_w(float *dx, float *dB, float *A, float *B, float x, int n) {
+void backward_N_pow_w(float *dx, float *dB, float *A, float *B, float *x, int n) {
     float sum = 0;
 
     #if   ACC_REGION == OMP_ONLY
@@ -785,7 +785,7 @@ void forward_N_ceil(float *B, float *A, int n){
             B[i] = ceilf(A[i]);
     }
 }
-void backward_N_ceil_A(float *dA, int n){
+void backward_N_ceil_A(float *dA, float *dB, int n){
 
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(dA, n)
@@ -832,7 +832,7 @@ void forward_N_floor(float *B, float *A, int n){
             B[i] = floorf(A[i]);
     }
 }
-void backward_N_floor_A(float *dA, int n){
+void backward_N_floor_A(float *dA, float *dB, int n){
 
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(dA, n)

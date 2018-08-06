@@ -129,7 +129,7 @@ void backward_N_dot_div_B(float *dB, float *A, float *B, float *dC, int n);
  * @param s scalar
  * @param n size
  */
-void forward_N_scale(float *B, float *A, float s, int n);
+void forward_N_scale(float *B, float *A, float *s, int n);
 /**
  * @brief $\frac{\partial L}{\partial S} = s\frac{\partial L}{\partial B}$
  * 
@@ -138,7 +138,7 @@ void forward_N_scale(float *B, float *A, float s, int n);
  * @param dB gradient matrix
  * @param n size
  */
-void backward_N_scale_A(float *dA, float s, float *dB, int n);
+void backward_N_scale_A(float *dA, float *s, float *dB, int n);
 /**
  * @brief $\frac{\partial L}{\partial s} = \frac{\partial L}{\partial B}\sum a_i$
  * 
@@ -154,7 +154,7 @@ void forward_N_abs(float *B, float *A, int n);
 void backward_N_abs_A(float *dA, float *dB, float *A, int n);
 //sign
 void forward_N_sign(float *B, float *A, int n);
-void backward_N_sign_A(float *dA, int n);
+void backward_N_sign_A(float *dA, float *dB, int n);
 //exp
 void forward_N_exp(float *B, float *A, int n);
 void backward_N_exp_A(float *dA, float *dB, float *B, int n);
@@ -171,15 +171,15 @@ void backward_N_log1p_A(float *dA, float *dB, float *A, int n);
 void forward_N_sqrt(float *B, float *A, int n);
 void backward_N_sqrt_A(float *dA, float *dB, float *A, int n);
 //pow
-void forward_N_pow(float *B, float *A, float x, int n);
-void backward_N_pow_A(float *dA, float *dB, float *A, float *B, float x, int n);
-void backward_N_pow_w(float *dx, float *dB, float *A, float *B, float x, int n);
+void forward_N_pow(float *B, float *A, float *x, int n);
+void backward_N_pow_A(float *dA, float *dB, float *A, float *B, float *x, int n);
+void backward_N_pow_w(float *dx, float *dB, float *A, float *B, float *x, int n);
 //ceil
 void forward_N_ceil(float *B, float *A, int n);
-void backward_N_ceil_A(float *dA, int n);
+void backward_N_ceil_A(float *dA, float *dB, int n);
 //floor
 void forward_N_floor(float *B, float *A, int n);
-void backward_N_floor_A(float *dA, int n);
+void backward_N_floor_A(float *dA, float *dB, int n);
 //erf
 void forward_N_erf(float *B, float *A, int n);
 void backward_N_erf_A(float *dA, float *dB, float *A, int n);

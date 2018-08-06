@@ -491,7 +491,8 @@ TEST(forward_N_scale, parallel_case1) {
     float *matA = new float[m * n];
     float *matB = new float[m * n];
 
-    forward_N_scale(matB, matA, 2, m * n);
+    float s = 2;
+    forward_N_scale(matB, matA, &s, m * n);
 
     EXPECT_EQ(1,1);
 
@@ -504,8 +505,9 @@ TEST(forward_N_scale, s1_case2) {
     float *matA = new float[m * n];
     float *matB = new float[m * n];
     fill_random(matA, m * n);
+    float s = 1;
 
-    forward_N_scale(matB, matA, 1, m * n);
+    forward_N_scale(matB, matA, &s, m * n);
 
     for(int i = 0; i < m * n; i++) {
         EXPECT_EQ(matA[i], matB[i]);
@@ -542,7 +544,7 @@ TEST(backward_N_scale_A, specific_case0) {
     float dB[] = {1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1};
     float s = 3.1416;
 
-    backward_N_scale_A(dA, s, dB, m * n);
+    backward_N_scale_A(dA, &s, dB, m * n);
 
     for(int i = 0; i < m * n; ++i) {
         EXPECT_NEAR(dA[i],s,0.00005);
@@ -558,7 +560,7 @@ TEST(backward_N_scale_A, random_case1) {
 
     fill_random(&s, 1);
 
-    backward_N_scale_A(dA, s, dB, m * n);
+    backward_N_scale_A(dA, &s, dB, m * n);
 
     for(int i = 0; i < m * n; ++i) {
         EXPECT_NEAR(dA[i],s,0.00005);
@@ -735,7 +737,7 @@ TEST(backward_N_sign_A, random_case0) {
     const int m = 16, n = 16;
     float *dA = new float[m * n];
 
-    backward_N_sign_A(dA, m * n);
+    backward_N_sign_A(dA, 0, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_NEAR(dA[i], 0);
@@ -1136,7 +1138,7 @@ TEST(forward_N_pow, parallel_case1) {
     float *B = new float[m * n];
     float x = 9.21924;
 
-    forward_N_pow(B, A, x, m * n);
+    forward_N_pow(B, A, &x, m * n);
 
     EXPECT_EQ(1,1);
 
@@ -1151,7 +1153,7 @@ TEST(forward_N_pow, random_case2) {
 
     fill_random(A, m * n);
 
-    forward_N_pow(B, A, x, m * n);
+    forward_N_pow(B, A, &x, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_NEAR(B[i], powf(A[i],x));
@@ -1183,7 +1185,7 @@ TEST(backward_N_pow_A, random_case0) {
 
     fill_random(dB, m * n);
 
-    backward_N_pow_A(dA, dB, A, B, x, m * n);
+    backward_N_pow_A(dA, dB, A, B, &x, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_NEAR(dA[i], dB[i] * x * powf(A[i], x - 1));
@@ -1212,7 +1214,7 @@ TEST(backward_N_pow_x, random_case0) {
     for(int i = 0; i < m * n; ++i)
         B[i] = powf(A[i], x);
 
-    backward_N_pow_w(&dx, dB, A, B, x, m * n);
+    backward_N_pow_w(&dx, dB, A, B, &x, m * n);
 
     float sum = 0;
     for(int i = 0; i < m * n; ++i)
@@ -1282,7 +1284,7 @@ TEST(backward_N_ceil_A, random_case0) {
     const int m = 16, n = 16;
     float *dA = new float[m * n];
 
-    backward_N_ceil_A(dA, m * n);
+    backward_N_ceil_A(dA, 0, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_NEAR(dA[i], 0);
@@ -1348,7 +1350,7 @@ TEST(backward_N_floor_A, random_case0) {
     const int m = 16, n = 16;
     float *dA = new float[m * n];
 
-    backward_N_floor_A(dA, m * n);
+    backward_N_floor_A(dA, 0, m * n);
 
     for(int i = 0; i < m * n; ++i){
         EXPECT_FLOAT_NEAR(dA[i], 0);

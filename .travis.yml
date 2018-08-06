@@ -151,15 +151,60 @@ matrix:
     #         - curl
 
 
-before_install:
-  - source $TRAVIS_BUILD_DIR/.travisci/init.sh
+before_install: |
+  source $TRAVIS_BUILD_DIR/.travisci/autoscript.sh
+  echo init
+  common_init
+  case $TASK in
+    FAI)
+      FAI_init
+    ;;
+    example-blas)
+      example-blas_init
+    ;;
+    hExampleBLAS)
+      hExampleBLAS_init
+    ;;
+    *)
+      echo $TASK nothing to do
+    ;;
+  esac
 
-script:
-  - source $TRAVIS_BUILD_DIR/.travisci/build.sh
-  - source $TRAVIS_BUILD_DIR/.travisci/test.sh
-
-after_success:
-  - source $TRAVIS_BUILD_DIR/.travisci/after.sh
+script: |
+  echo Build and test
+  case $TASK in
+    FAI)
+      FAI_build
+      FAI_test
+    ;;
+    example-blas)
+      example-blas_build
+      example-blas_test
+    ;;
+    hExampleBLAS)
+      hExampleBLAS_build
+      hExampleBLAS_test
+    ;;
+    *)
+      echo $TASK nothing to do
+    ;;
+  esac
+after_success: |
+  echo after success
+  case $TASK in
+    FAI)
+      FAI_succ
+    ;;
+    example-blas)
+      example-blas_succ
+    ;;
+    hExampleBLAS)
+      hExampleBLAS_succ
+    ;;
+    *)
+      echo $TASK nothing to do
+    ;;
+  esac
 
 deploy:
   provider: script

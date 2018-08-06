@@ -38,6 +38,7 @@ The Haskell Foreign Accelerate Interace.
 module Foreign.FAI
   ( Pf
   , Buffer(..)
+  , Shape(..)
   , Context(..)
   , Accelerate(..)
   , FAI(..)
@@ -50,11 +51,15 @@ module Foreign.FAI
   , dupBufferIO
   , dupBufferD
   , liftIO
+  , reshape
+  , bufSize
+  , withBuffer
   ) where
 
 import           Control.Monad
 import           Foreign.FAI.Internal
 import           Foreign.FAI.Types
+import           Foreign.ForeignPtr
 import           Foreign.Ptr
 
 -- | run the @Accelerate@.
@@ -62,48 +67,63 @@ accelerate :: Context p -> Accelerate p a -> IO a
 accelerate cc = (fst <$>) . flip doAccelerate cc
 
 -- | Allocate new buffer (IO)
-newBufferIO :: (FAI p, Storable b, (Pf p a) ~ b)
-            => Int                         -- ^ number of items
+newBufferIO :: (FAI p, Storable b, (Pf p a) ~ b, Shape sh)
+            => sh                          -- ^ shape
             -> Context p                   -- ^ platform context
-            -> IO (Buffer p a, Context p)  -- ^ Buffer and (new) context
-newBufferIO n cc =  do
+            -> IO (Buffer sh p a, Context p)  -- ^ Buffer and (new) context
+newBufferIO sh cc =  do
   fin <- faiMemReleaseP cc
-  (ptr, size) <- alloc cc undefined
+  ptr <- alloc cc undefined
   when (nullPtr == ptr) $ error "Can not allocate memory."
-  buf <- autoNewForeignPtr fin cc ptr size
+  buf <- autoNewForeignPtr fin cc ptr sh
   return (buf, cc)
-  where alloc :: (FAI p, Storable b) => Context p ->  b -> IO (Ptr b, Int)
+  where alloc :: (FAI p, Storable b) => Context p ->  b -> IO (Ptr b)
         alloc c' u =
-          let size = n * sizeOf u
-          in (\p -> (p, size)) <$> faiMemAllocate c' (n * sizeOf u)
+          faiMemAllocate c' $ shLen sh * sizeOf u
 
 -- | Allocate buffer
-newBuffer :: (FAI p, Storable b, (Pf p a) ~ b)
-          => Int                        -- ^ number of items
-          -> Accelerate p (Buffer p a)  -- ^ buffer
-newBuffer = Accelerate .newBufferIO
+newBuffer :: (FAI p, Storable b, (Pf p a) ~ b, Shape sh)
+          => sh                            -- ^ shape
+          -> Accelerate p (Buffer sh p a)  -- ^ buffer
+newBuffer = Accelerate . newBufferIO
 
 -- | Duplicate buffer (IO)
 dupBufferIO :: ( FAICopy p1 p2, FAI p1, FAI p2
-               , Storable b, Pf p2 a ~ b, Pf p1 a ~ b)
+               , Storable b, Pf p2 a ~ b, Pf p1 a ~ b
+               , Shape sh)
             => Bool                           -- ^ Whether copy data
-            -> Buffer p1 a                    -- ^ buffer (src)
+            -> Buffer sh p1 a                    -- ^ buffer (src)
             -> Context p2                     -- ^ platform context
-            -> IO (Buffer p2 a, Context p2)   -- ^ buffer (dst) and context
+            -> IO (Buffer sh p2 a, Context p2)   -- ^ buffer (dst) and context
 dupBufferIO is buf cc = dup cc is buf
 
 -- | Duplicate buffer
 dupBuffer :: ( FAICopy p1 p2, FAI p1, FAI p2
-             , Storable b, Pf p2 a ~ b, Pf p1 a ~ b)
+             , Storable b, Pf p2 a ~ b, Pf p1 a ~ b
+             , Shape sh)
           => Bool                           -- ^ Whether copy data
-          -> Buffer p1 a                    -- ^ buffer (src)
-          -> Accelerate p2 (Buffer p2 a)    -- ^ buffer (dst)
+          -> Buffer sh p1 a                    -- ^ buffer (src)
+          -> Accelerate p2 (Buffer sh p2 a)    -- ^ buffer (dst)
 dupBuffer is buf = Accelerate (dupBufferIO is buf)
 
 -- | Duplicate buffer (for debug)
 dupBufferD :: ( FAICopy p2 p1, FAI p1, FAI p2
-              , Storable b, Pf p2 a ~ b, Pf p1 a ~ b)
+              , Storable b, Pf p2 a ~ b, Pf p1 a ~ b
+              , Shape sh)
            => Bool                           -- ^ Whether copy data
-           -> Buffer p2 a                    -- ^ buffer (src)
-           -> Accelerate p2 (Buffer p1 a)    -- ^ buffer (dst)
+           -> Buffer sh p2 a                    -- ^ buffer (src)
+           -> Accelerate p2 (Buffer sh p1 a)    -- ^ buffer (dst)
 dupBufferD is buf = Accelerate $ \cc -> replaceContext cc <$>  dup undefined is buf
+
+
+reshape :: (Shape sh1, Shape sh2)
+        => Buffer sh1 p a
+        -> sh2
+        -> Buffer sh2 p a
+reshape (Buffer p sh1) sh2 =
+  if shLen sh1 == shLen sh2
+    then Buffer p sh2
+    else error "Different shape lengths"
+
+withBuffer :: FAI p => Buffer sh p a -> (Ptr (Pf p a) -> IO b) -> IO b
+withBuffer buf = withForeignPtr (bufPtr buf)
