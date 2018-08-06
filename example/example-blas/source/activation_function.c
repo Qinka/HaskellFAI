@@ -12,7 +12,7 @@ void forward_N_sigmoid(float *B, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(B[0:n]), copyin(A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(B, A)
     #endif
     {
         int i;
@@ -35,7 +35,7 @@ void backward_N_sigmoid_A(float *dA, float *dB, float *B, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], B[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], B[0:m*n])
+    #pragma acc data deviceptr(B)
     #endif
     {
         int i;
@@ -59,7 +59,7 @@ void forward_N_ReLU(float *B, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(B[0:n]), copyin(A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(B, A)
     #endif
     {
         int i;

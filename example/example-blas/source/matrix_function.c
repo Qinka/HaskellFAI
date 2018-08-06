@@ -9,7 +9,7 @@ void forward_HW_mul2D(float *C, float *A, float *B, int m, int n, int s) {
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(C[0:m*s]), copyin(A[0:m*n], B[0:n*s])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(C[0:m*s], A[0:m*n], B[0:n*s])
+    #pragma acc data deviceptr(C, A, B)
     #endif
     {
         int i, j, k;
@@ -43,7 +43,7 @@ void backward_HW_mul2D_A(float *dA, float *dC, float *B, int m, int n, int s) {
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:m*n]), copyin(B[0:n*s], dC[0:m*s])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA[0:m*n], B[0:n*s], dC[0:m*s])
+    #pragma acc data deviceptr(dA, B, dC)
     #endif
     {
         int i, j, k;
@@ -77,7 +77,7 @@ void backward_HW_mul2D_B(float *dB, float *A, float *dC, int m, int n, int s){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dB[0:n*s]), copyin(A[0:m*n], dC[0:m*s])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dB[0:n*s], A[0:m*n], dC[0:m*s])
+    #pragma acc data deviceptr(dB, A, dC)
     #endif
     {
         int i, j, k;

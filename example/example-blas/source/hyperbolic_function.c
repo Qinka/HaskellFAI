@@ -11,7 +11,7 @@ void forward_N_cosh(float *B, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(B[0:n]), copyin(A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(B, A)
     #endif
     {
         int i;
@@ -34,7 +34,7 @@ void backward_N_cosh_A(float *dA, float *dB, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(dA, dB, A)
     #endif
     {
         int i;
@@ -58,7 +58,7 @@ void forward_N_sinh(float *B, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(B[0:n]), copyin(A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(B, A)
     #endif
     {
         int i;
@@ -81,7 +81,7 @@ void backward_N_sinh_A(float *dA, float *dB, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(dA, dB, A)
     #endif
     {
         int i;
@@ -105,7 +105,7 @@ void forward_N_tanh(float *B, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(B[0:n]), copyin(A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(B, A)
     #endif
     {
         int i;
@@ -128,7 +128,7 @@ void backward_N_tanh_A(float *dA, float *dB, float *B, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], B[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], B[0:m*n])
+    #pragma acc data deviceptr(dA, dB, B)
     #endif
     {
         int i;
@@ -152,7 +152,7 @@ void forward_N_atanh(float *B, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(B[0:n]), copyin(A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(B, A)
     #endif
     {
         int i;
@@ -175,7 +175,7 @@ void backward_N_atanh_A(float *dA, float *dB, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(dA, dB, A)
     #endif
     {
         int i;
@@ -199,7 +199,7 @@ void forward_N_acosh(float *B, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(B[0:n]), copyin(A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(B, A)
     #endif
     {
         int i;
@@ -222,7 +222,7 @@ void backward_N_acosh_A(float *dA, float *dB, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(dA, dB, A)
     #endif
     {
         int i;
@@ -246,7 +246,7 @@ void forward_N_asinh(float *B, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(B[0:n]), copyin(A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(B[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(B, A)
     #endif
     {
         int i;
@@ -269,7 +269,7 @@ void backward_N_asinh_A(float *dA, float *dB, float *A, int n){
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA[0:n], dB[0:m*n], A[0:m*n])
+    #pragma acc data deviceptr(dA, dB, A)
     #endif
     {
         int i;
