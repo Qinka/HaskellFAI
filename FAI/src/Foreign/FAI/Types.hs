@@ -31,6 +31,7 @@ Portability: unknown
 The types and the class of FAI.
 -}
 
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies          #-}
@@ -47,6 +48,8 @@ module Foreign.FAI.Types
   , Ptr
   , ForeignPtr
   , liftIO
+  , Shape(..)
+  , bufSize
   ) where
 
 import           Control.Monad.IO.Class (MonadIO (..))
@@ -58,9 +61,9 @@ import           Foreign.Storable
 type family Pf p t :: *
 
 -- | buffer hosted pointer and size
-data Buffer p a = Buffer
-  { bufPtr  :: {-# UNPACK #-} !(ForeignPtr (Pf p a)) -- ^ pointer
-  , bufSize :: {-# UNPACK #-} !Int                 -- ^ number of size
+data Buffer sh p a = Buffer
+  { bufPtr   :: {-# UNPACK #-} !(ForeignPtr (Pf p a)) -- ^ pointer
+  , bufShape ::                !sh                    -- ^ number of size
   }
   deriving (Show, Eq)
 
@@ -94,9 +97,9 @@ class FAI p where
 
 -- | Copy data from platform @p1@ to platform @p2@.
 class (FAI p1, FAI p2) =>  FAICopy p1 p2 where
-  faiMemCopy :: (Storable b, (Pf p1 a) ~ b, Storable c, (Pf p2 a) ~ c)
-             => Buffer p2 a       -- ^ Destination
-             -> Buffer p1 a       -- ^ Source
+  faiMemCopy :: (Storable b, (Pf p1 a) ~ b, Storable c, (Pf p2 a) ~ c, Shape sh)
+             => Buffer sh p2 a       -- ^ Destination
+             -> Buffer sh p1 a       -- ^ Source
              -> IO ()
 
 instance Functor (Accelerate p) where
@@ -119,3 +122,27 @@ instance Monad (Accelerate p) where
 
 instance MonadIO (Accelerate p) where
   liftIO m = Accelerate $ \c -> (\r -> (r,c)) <$> m
+
+class Shape sh where
+  shLen :: sh -> Int
+
+bufSize :: Shape sh => Buffer sh p a -> Int
+bufSize = shLen . bufShape
+
+instance Shape [Int] where
+  shLen = product
+
+instance Shape Int where
+  shLen = id
+
+instance Shape (Int, Int) where
+  shLen (h, w) = h * w
+
+instance Shape (Int, Int, Int) where
+  shLen (h, w, d) = h * w * d
+
+instance Shape (Int ,Int, Int, Int) where
+  shLen (h, w, d, c) = h * w * d * c
+
+instance Shape (Int, Int, Int, Int, Int) where
+  shLen (h, w, d, c, n) = h * w * d * c * n

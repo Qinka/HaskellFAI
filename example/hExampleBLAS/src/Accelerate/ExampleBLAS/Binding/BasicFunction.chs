@@ -118,19 +118,19 @@ import Foreign.C
   { castPtr `Ptr Float'
   , castPtr `Ptr Float'
   , castPtr `Ptr Float'
-  ,             `Float'
+  , castPtr `Ptr Float'
   , `Int'} -> `()' #}
 
 -- scale
 {#fun forward_N_scale
   { castPtr `Ptr Float'
   , castPtr `Ptr Float'
-  ,             `Float'
+  , castPtr `Ptr Float'
   , `Int'} -> `()' #}
 
 {#fun backward_N_scale_A
   { castPtr `Ptr Float'
-  ,             `Float'
+  , castPtr `Ptr Float'
   , castPtr `Ptr Float'
   , `Int'} -> `()' #}
 
@@ -160,6 +160,7 @@ import Foreign.C
 
 {# fun backward_N_sign_A
   { castPtr `Ptr Float'
+  , castPtr `Ptr Float'
   , `Int' } -> `()' #}
 
 -- exp
@@ -226,7 +227,7 @@ import Foreign.C
 {# fun forward_N_pow
   { castPtr `Ptr Float'
   , castPtr `Ptr Float'
-  ,             `Float'
+  , castPtr `Ptr Float'
   , `Int'} -> `()' #}
 
 {# fun backward_N_pow_A
@@ -234,7 +235,7 @@ import Foreign.C
   , castPtr `Ptr Float'
   , castPtr `Ptr Float'
   , castPtr `Ptr Float'
-  ,             `Float'
+  , castPtr `Ptr Float'
   , `Int'} -> `()' #}
 
 {# fun backward_N_pow_w
@@ -242,7 +243,7 @@ import Foreign.C
   , castPtr `Ptr Float'
   , castPtr `Ptr Float'
   , castPtr `Ptr Float'
-  ,             `Float'
+  , castPtr `Ptr Float'
   , `Int'} -> `()' #}
 
 -- ceil
@@ -253,6 +254,7 @@ import Foreign.C
 
 {# fun backward_N_ceil_A
   { castPtr `Ptr Float'
+  , castPtr `Ptr Float'
   , `Int' } -> `()' #}
 
 -- floor
@@ -263,6 +265,7 @@ import Foreign.C
 
 {# fun backward_N_floor_A
   { castPtr `Ptr Float'
+  , castPtr `Ptr Float'
   , `Int' } -> `()' #}
 
 -- erf

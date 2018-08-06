@@ -50,18 +50,16 @@ import           Foreign.Marshal.Array
 import           System.IO.Unsafe
 
 -- | Copy the data from pointer to Haskell list.
-peekHostBuffer :: (Storable b, Pf Host a ~ b)
-               => Buffer Host a   -- ^ Buffer
+peekHostBuffer :: (Storable b, Pf Host a ~ b, Shape sh)
+               => Buffer sh Host a   -- ^ Buffer
                -> IO [b]          -- ^ Haskell list
 peekHostBuffer bf =
   withForeignPtr (bufPtr bf) $ \ptr ->
-  peekBuf undefined ptr
-  where peekBuf :: Storable a => a -> Ptr a -> IO [a]
-        peekBuf = peekArray . (bufSize bf `div`) . sizeOf
+    peekArray (bufSize bf) ptr
 
 -- | Copy the data from Haskell list into pointer.
-pokeHostBuffer :: (Storable b, Pf Host a ~ b)
-               => Buffer Host a -- ^ Host buffer
+pokeHostBuffer :: (Storable b, Pf Host a ~ b, Shape sh)
+               => Buffer sh Host a -- ^ Host buffer
                -> [b]           -- ^ list
                -> IO ()
 pokeHostBuffer (Buffer fp s) ls = do
@@ -69,13 +67,13 @@ pokeHostBuffer (Buffer fp s) ls = do
     pokeArray ptr $ take len ls
   return ()
   where lsLen = length ls
-        bfLen = s `div` sizeOf (head ls)
+        bfLen = shLen s
         len   = min bfLen lsLen
 
 -- | Transform list to host buffer.
 toHostBuffer :: (Storable b, Pf Host a ~ b)
              => [b]                 -- ^ List
-             -> IO (Buffer Host a)  -- ^ Host buffer
+             -> IO (Buffer Int Host a)  -- ^ Host buffer
 toHostBuffer ls = do
   bf <- fst <$> newBufferIO (length ls) cc
   withForeignPtr (bufPtr bf) $ \ptr ->
@@ -84,13 +82,13 @@ toHostBuffer ls = do
   where cc :: Context Host
         cc = Context undefined
 -- | Unsafe peek
-unsafePeekHostBuffer :: (Storable b,Pf Host a ~ b)
-                     => Buffer Host a
+unsafePeekHostBuffer :: (Storable b,Pf Host a ~ b, Shape sh)
+                     => Buffer sh Host a
                      -> [b]
 unsafePeekHostBuffer = unsafePerformIO . peekHostBuffer
 
 -- | Unsafe poke
 unsafeToHostBuffer :: (Storable b, Pf Host a ~ b)
                    => [b]
-                   -> Buffer Host a
+                   -> Buffer Int Host a
 unsafeToHostBuffer = unsafePerformIO . toHostBuffer
