@@ -44,48 +44,43 @@ module Foreign.FAI.Platform.CUDA.Debug
   , unsafeToCUDABuffer
   ) where
 
+import           Foreign.C.Types
 import           Foreign.FAI
+import           Foreign.FAI.Internal
 import           Foreign.FAI.Platform.CUDA
 import           Foreign.FAI.Platform.Host
+import           Foreign.FAI.Platform.Host.Debug
 import           Foreign.FAI.Types
 import           Foreign.ForeignPtr
-import           Foreign.Marshal.Array
-import qualified Language.C.Inline         as C
+import           Foreign.Ptr
 import           System.IO.Unsafe
+
+import qualified Language.C.Inline               as C
 
 C.include "<cuda_runtime.h>"
 C.include "<stdio.h>"
 
 -- | Copy the data from pointer to Haskell list.
-peekCUDABuffer :: (Storable b, Pf CUDA a ~ b, Shape sh)
+peekCUDABuffer :: (Storable b, Pf CUDA a ~ b, Shape sh, Pf Host a ~ b)
                => Buffer sh CUDA a   -- ^ Buffer
                -> IO [b]          -- ^ Haskell list
-peekCUDABuffer bf = do
-  hostBuf <- fst <$> newBufferIO nullHostContext $ bufShape bf
-  let size = bufByte bf
-  withForeignPtr (bufPtr bf) $ \src -> withBuffer hostBuf $ \dst -> do
-    [C.block| void {
-        cudaError_t err = cudaMemcpy($(void *dst), $(void *src),
-                                    $(int size), cudaMemcpyDeviceToHost);
-        if(err != cudaSuccess) {
-            printf("Failed to copy memory(HC), %d", err);
-            return -1;
-        }
-        return 0;
-    }
-    |]
-    peekArray (bufSize bf) dst
+peekCUDABuffer bf =
+  peekHostBuffer =<< fst <$> dup nullHostContext True bf
+
 
 -- | Copy the data from Haskell list into pointer.
-pokeCUDABuffer :: (Storable b, Pf CUDA a ~ b, Shape sh)
+pokeCUDABuffer :: (Storable b, Pf CUDA a ~ b, Shape sh, Pf Host a ~ b)
                => Buffer sh CUDA a -- ^ CUDA buffer
                -> [b]           -- ^ list
                -> IO ()
-pokeCUDABuffer (Buffer fp s) ls = do
-  hostBuf <- fst <$> newBufferIO (bufShape bf) nullHostContext
-  withForeignPtr (bufPtr bf) $ \dst -> withBuffer hostBuf $ \src -> do
-    pokeArray src $ take len ls
-    [C.block| void {
+pokeCUDABuffer bf ls = do
+  hostBuf <- fst <$> dup nullHostContext False bf
+  pokeHostBuffer hostBuf ls
+  withForeignPtr (bufPtr bf) $ \dst' -> withBuffer hostBuf $ \src' -> do
+    let dst = castPtr dst'
+        src = castPtr src'
+        size = fromIntegral $ size' dst' undefined
+    _ <- [C.block| int {
         cudaError_t err = cudaMemcpy($(void *dst), $(void *src),
                                     $(int size), cudaMemcpyHostToDevice);
         if(err != cudaSuccess) {
@@ -95,29 +90,30 @@ pokeCUDABuffer (Buffer fp s) ls = do
         return 0;
     }
     |]
-  return ()
+    return ()
   where lsLen = length ls
-        bfLen = shLen s
+        bfLen = bufSize bf
         len   = min bfLen lsLen
+        size' :: Storable a => Ptr a -> a -> Int
+        size' _ x = sizeOf x * len
 
 -- | Transform list to CUDA buffer.
-toCUDABuffer :: (Storable b, Pf CUDA a ~ b)
+toCUDABuffer :: (Storable b, Pf CUDA a ~ b, Pf Host a ~ b)
              => [b]                 -- ^ List
              -> IO (Buffer Int CUDA a)  -- ^ CUDA buffer
 toCUDABuffer ls = do
   bf <- fst <$> newBufferIO (length ls) nullCUDAContext
   pokeCUDABuffer bf ls
   return bf
-  where cc :: Context CUDA
-        cc = Context undefined
+
 -- | Unsafe peek
-unsafePeekCUDABuffer :: (Storable b,Pf CUDA a ~ b, Shape sh)
+unsafePeekCUDABuffer :: (Storable b,Pf CUDA a ~ b, Shape sh, Pf Host a ~ b)
                      => Buffer sh CUDA a
                      -> [b]
 unsafePeekCUDABuffer = unsafePerformIO . peekCUDABuffer
 
 -- | Unsafe poke
-unsafeToCUDABuffer :: (Storable b, Pf CUDA a ~ b)
+unsafeToCUDABuffer :: (Storable b, Pf CUDA a ~ b, Pf Host a ~ b)
                    => [b]
                    -> Buffer Int CUDA a
 unsafeToCUDABuffer = unsafePerformIO . toCUDABuffer

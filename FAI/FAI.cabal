@@ -48,7 +48,7 @@ library
   if (flag(enable-cuda))
      extra-libraries:     cudart
      exposed-modules:     Foreign.FAI.Platform.CUDA
-                       -- , Foreign.FAI.Platform.CUDA.Debug
+                        , Foreign.FAI.Platform.CUDA.Debug
 
 
 test-suite spec
