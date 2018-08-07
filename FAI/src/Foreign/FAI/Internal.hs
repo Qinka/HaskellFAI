@@ -73,5 +73,3 @@ dup cc is buf = do
   bDst <- autoNewForeignPtr fin cc ptr sh
   when is $ faiMemCopy bDst buf
   return (bDst, cc)
-  where size :: Storable a => Ptr a -> a -> Int
-        size _ = sizeOf
