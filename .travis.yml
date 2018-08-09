@@ -20,31 +20,191 @@
 sudo: required
 dist: trusty
 
+
 ## Matrix of building
-env:
-  - GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
-  - GHC_VER=8.2.2            LLVM=3.9 DEBUG=t RUN_TEST=t
-  - GHC_VER=8.2.2 THREADED=t          DEBUG=t RUN_TEST=t
-  - GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
+# env:
+#   - GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
+#   - GHC_VER=8.2.2            LLVM=3.9 DEBUG=t RUN_TEST=t
+#   - GHC_VER=8.2.2 THREADED=t          DEBUG=t RUN_TEST=t
+#   - GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
 
-addons:
-  apt:
-    update: true
-    sources:
-      - hvr-ghc
-    packages:
-      - wget
-      - curl
+matrix:
+  include:
+    # FAI
+    # - name: "FAI"
+    #   env: TASK=FAI GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
+    #   addons:
+    #     apt:
+    #       update: true
+    #       sources:
+    #         - hvr-ghc
+    #       packages:
+    #         - wget
+    #         - curl
+    - name: "FAI"
+      env: TASK=FAI GHC_VER=8.2.2 THREADED=t LLVM=3.9 DEBUG=t RUN_TEST=t
+      addons:
+        apt:
+          update: true
+          sources:
+            - hvr-ghc
+          packages:
+            - wget
+            - curl
+    - name: "FAI"
+      env: TASK=FAI GHC_VER=8.2.2            LLVM=3.9 DEBUG=t RUN_TEST=t
+      addons:
+        apt:
+          update: true
+          sources:
+            - hvr-ghc
+          packages:
+            - wget
+            - curl
+    - name: "FAI"
+      env: TASK=FAI GHC_VER=8.2.2 THREADED=t          DEBUG=t RUN_TEST=t
+      addons:
+        apt:
+          update: true
+          sources:
+            - hvr-ghc
+          packages:
+            - wget
+            - curl
+    - name: "FAI"
+      env: TASK=FAI GHC_VER=8.2.2                     DEBUG=t RUN_TEST=t
+      addons:
+        apt:
+          update: true
+          sources:
+            - hvr-ghc
+          packages:
+            - wget
+            - curl
 
-before_install:
-  - source $TRAVIS_BUILD_DIR/.travisci/init.sh
+    # example of blas
+    - name: "Example of BLAS"
+      env: TASK=example-blas RUN_TEST=t
+      addons:
+        apt:
+          update: true
+          packages:
+            - wget
+            - curl
+            - libgtest-dev
+            - cmake
+            - gcc
+            - g++
+            - make
+    - name: "Example of BLAS"
+      env: TASK=example-blas RUN_TEST=t ACC_BACKEND=OpenMP
+      addons:
+        apt:
+          update: true
+          packages:
+            - wget
+            - curl
+            - libgtest-dev
+            - cmake
+            - gcc
+            - g++
+            - make
+    - name: "Example of BLAS"
+      env: TASK=example-blas RUN_TEST=t
+      addons:
+        apt:
+          update: true
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - wget
+            - curl
+            - libgtest-dev
+            - cmake
+            - gcc
+            - g++
+            - make
+    # example of blas
+    # - name: "Example of BLAS"
+    #   env: TASK=example-blas RUN_TEST=t ACC_BACKEND=OpenACC
+    #   addons:
+    #      apt:
+    #       update: true
+    #       packages:
+    #         - wget
+    #         - curl
+    #         - libgtest-dev
+    #         - cmake
+    #         - gcc-7
+    #         - g++-7
+    #         - make
 
-script:
-  - source $TRAVIS_BUILD_DIR/.travisci/build.sh
-  - source $TRAVIS_BUILD_DIR/.travisci/test.sh
 
-after_success:
-  - source $TRAVIS_BUILD_DIR/.travisci/after.sh
+    # EMPTY
+    # - name:
+    #   env: 
+    #   addons:
+    #     apt:
+    #       update: true
+    #       packages:
+    #         - wget
+    #         - curl
+
+
+before_install: |
+  source $TRAVIS_BUILD_DIR/.travisci/autoscript.sh
+  echo init
+  common_init
+  case $TASK in
+    FAI)
+      FAI_init
+    ;;
+    example-blas)
+      example-blas_init
+    ;;
+    hExampleBLAS)
+      hExampleBLAS_init
+    ;;
+    *)
+      echo $TASK nothing to do
+    ;;
+  esac
+
+script: |
+  echo Build and test
+  case $TASK in
+    FAI)
+      FAI_build
+      FAI_test
+    ;;
+    example-blas)
+      example-blas_build
+      example-blas_test
+    ;;
+    hExampleBLAS)
+      hExampleBLAS_build
+      hExampleBLAS_test
+    ;;
+    *)
+      echo $TASK nothing to do
+    ;;
+  esac
+after_success: |
+  echo after success
+  case $TASK in
+    FAI)
+      FAI_succ
+    ;;
+    example-blas)
+      example-blas_succ
+    ;;
+    hExampleBLAS)
+      hExampleBLAS_succ
+    ;;
+    *)
+      echo $TASK nothing to do
+    ;;
+  esac
 
 deploy:
   provider: script

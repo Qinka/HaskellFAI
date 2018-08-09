@@ -1,0 +1,40 @@
+#pragma once
+
+#ifndef _INNER_BLAS_
+#error This head file should not be included from outside.
+#endif
+
+#include <config.h>
+
+#ifndef _CONFIG_GEN_H_
+#define _CONFIG_GEN_H_
+
+#define _EXAMPLE_BLAS_VER_MAJOR @PROJECT_VERSION_MAJOR@
+#define _EXAMPLE_BLAS_VER_MINOR @PROJECT_VERSION_MINOR@
+#define _EXAMPLE_BLAS_VER_PATCH @PROJECT_VERSION_PATCH@
+#define _EXAMPLE_BLAS_VER_DIFF  @PROJECT_VERSION_TWEAK@
+#define _EXAMPLE_BLAS_VER_STR "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@.@PROJECT_VERSION_TWEAK@"
+
+#if defined _OMP_ENABLE_
+#  if defined _OMP_TARGET_
+#    define _ACC_BACKEND_ID   OMP_TARGET
+#    define _ACC_BACKEND_STR "OMP_TARGET"
+#  else
+#    define _ACC_BACKEND_ID   OMP_ONLY
+#    define _ACC_BACKEND_STR "OMP_ONLY"
+#  endif
+#elif defined _OACC_ENABLE_
+#  if defined _OACC_DRVPTR_
+#    define _ACC_BACKEND_ID   OACC_DRVPTR
+#    define _ACC_BACKEND_STR "OACC_DRVPTR"
+#  else
+#    define _ACC_BACKEND_ID   OACC_ONLY
+#    define _ACC_BACKEND_STR "OACC_ONLY"
+#  endif
+#else 
+#    define _ACC_BACKEND_ID   NO_ACC
+#    define _ACC_BACKEND_STR "NO_ACC"
+#endif
+
+
+#endif // ! _CONFIG_GEN_H_

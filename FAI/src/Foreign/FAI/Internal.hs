@@ -49,9 +49,9 @@ import           Foreign.ForeignPtr
 autoNewForeignPtr :: FinalizerContextPtr p (Pf p a) -- ^ Context p concerned finalizer
                   -> Context p                      -- ^ Context
                   -> Ptr (Pf p a)                   -- ^ pointer
-                  -> Int                            -- ^ Size
-                  -> IO (Buffer p a)                -- ^ buffer
-autoNewForeignPtr fin cc ptr size = fmap (`Buffer` size) $ case fin of
+                  -> sh                             -- ^ Shape
+                  -> IO (Buffer sh p a)             -- ^ buffer
+autoNewForeignPtr fin cc ptr sh = fmap (`Buffer` sh) $ case fin of
   Left  f -> withForeignPtr (unContextPtr cc) $ \p ->
              newForeignPtrEnv f p ptr
   Right f -> newForeignPtr    f   ptr
@@ -61,15 +61,16 @@ replaceContext cc (a, _) = (a, cc)
 
 -- | Duplicate data
 dup :: ( FAICopy p1 p2, FAI p1, FAI p2
-       , Storable b, Pf p2 a ~ b, Pf p1 a ~ b)
-       => Context p2                    -- ^ context
-       -> Bool                          -- ^ whether copy data
-       -> Buffer p1 a                   -- ^ buffer (src)
-       -> IO (Buffer p2 a, Context p2)  -- ^ buffer (dst)
+       , Storable b, Pf p2 a ~ b, Pf p1 a ~ b
+       , Shape sh)
+       => Context p2                       -- ^ context
+       -> Bool                             -- ^ whether copy data
+       -> Buffer sh p1 a                   -- ^ buffer (src)
+       -> IO (Buffer sh p2 a, Context p2)  -- ^ buffer (dst)
 dup cc is buf = do
   fin <- faiMemReleaseP cc
-  let size = bufSize buf
-  ptr  <- faiMemAllocate cc size
-  bDst <- autoNewForeignPtr fin cc ptr size
+  let sh   = bufShape buf
+  ptr  <- faiMemAllocate cc $ bufByte buf
+  bDst <- autoNewForeignPtr fin cc ptr sh
   when is $ faiMemCopy bDst buf
   return (bDst, cc)

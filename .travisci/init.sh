@@ -20,45 +20,86 @@
 
 set -e
 
-echo
-echo Pre-install
-echo
 
-echo Fetching the system\' name
-export OS_CORENAME=$(lsb_release -c | awk '{print $2}')
-export OS_DISTRIBUTOR=$(lsb_release -i | awk '{print $3}')
-echo Using $OS_DISTRIBUTOR $OS_CORENAME for building
+##########################################################
+##
+## Initialization of FAI
+##
+##########################################################
+function init_FAI() {
+    sudo $APT install -y ghc-$GHC_VER 
 
-export APT=apt-get
-echo Updating $APT source
-sudo $APT update
+    if [ -n "$LLVM" ]; then
+        echo
+        echo Using llvm-$LLVM
+        echo
+        sudo $APT install -y lldb-$LLVM llvm-$LLVM llvm-$LLVM-dev llvm-$LLVM-runtime
+    fi
 
-sudo $APT install -y ghc-$GHC_VER 
+    #
+    # I was planning enable the CUDA test, but the Travis-CI do not support such things.
+    # So it's abandoned now.
+    #
+    if [ -n "$CUDA" ]; then
+        echo CUDA should be disable.
+        exit 3
+    fi
 
-if [ -n "$LLVM" ]; then
+    echo Setting up ghc-$GHC_VER
+    export PATH=/opt/ghc/$GHC_VER/bin:$PATH
+    ghc -V
+
+    mkdir -p $HOME/.local/bin
+    export PATH=$HOME/.local/bin:$PATH
+    travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+
+
+    echo Configuring
+    stack config set system-ghc --global true
+}
+
+##########################################################
+##
+## Initialization of example of blas
+##
+##########################################################
+function init_example_blas() {
+    echo Build gtest
+    cd /usr/src/gtest/
+    sudo cmake -DCMAKE_INSTALL_PREFIX=/usr/ .
+    sudo make
+    sudo find .
+}
+
+##########################################################
+##
+## Common initialization
+##
+##########################################################
+function init_common() {
     echo
-    echo Using llvm-$LLVM
+    echo Pre-install
     echo
-    sudo $APT install -y lldb-$LLVM llvm-$LLVM llvm-$LLVM-dev llvm-$LLVM-runtime
-fi
 
-#
-# I was planning enable the CUDA test, but the Travis-CI do not support such things.
-# So it's abandoned now.
-#
-if [ -n "$CUDA" ]; then
-    echo CUDA should be disable.
-    exit 3
-fi
+    echo Fetching the system\' name
+    export OS_CORENAME=$(lsb_release -c | awk '{print $2}')
+    export OS_DISTRIBUTOR=$(lsb_release -i | awk '{print $3}')
+    echo Using $OS_DISTRIBUTOR $OS_CORENAME for building
 
-echo Setting up ghc-$GHC_VER
-export PATH=/opt/ghc/$GHC_VER/bin:$PATH
-ghc -V
-
-mkdir -p $HOME/.local/bin
-export PATH=$HOME/.local/bin:$PATH
-travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+    export APT=apt-get
+    echo Updating $APT source
+    sudo $APT update
+}
 
 
-echo Configuring
-stack config set system-ghc --global true
+init_common
+case $TASK in
+    FAI)
+        init_FAI
+    ;;
+    example-blas)
+        init_example_blas
+    ;;
+esac
+
+cd $TRAVIS_BUILD_DIR

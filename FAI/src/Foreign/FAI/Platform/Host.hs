@@ -89,7 +89,7 @@ instance FAI Host where
 instance FAICopy Host Host where
   faiMemCopy dst src = do
     when (bufSize dst /= bufSize src) $ error "Different size."
-    hostMemCopy (bufPtr dst) (bufPtr src) $ fromIntegral $ bufSize dst
+    hostMemCopy (bufPtr dst) (bufPtr src) $ fromIntegral $ bufByte dst
 
 -- | Null pointer context of Host
 nullHostContext :: IO (Context Host)

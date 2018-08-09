@@ -37,6 +37,7 @@ resolver: lts-11.15
 # will not be run. This is useful for tweaking upstream packages.
 packages:
 - FAI
+- example/hExampleBLAS
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
 # extra-deps: []
@@ -62,17 +63,11 @@ packages:
 # extra-include-dirs: [/path/to/dir]
 # extra-lib-dirs: [/path/to/dir]
 extra-lib-dirs:
-  - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.2\lib\x64
-  - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\lib\x64
-  - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\lib\x64
-  - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64
-  - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\lib\x64
+  - example/example-blas/build
+  - example/example-blas/build/Debug
 extra-include-dirs:
-  - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.2\include
-  - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\include
-  - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include
-  - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\include
-  - C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include
+  - example/example-blas/include
+
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor

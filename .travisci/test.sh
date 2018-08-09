@@ -18,13 +18,41 @@
 # along with Haskell-FAI. If not, see <http://www.gnu.org/licenses/>.
 #
 
+##########################################################
+##
+## Testing of FAI
+##
+##########################################################
+function test_FAI() {
+    cd $TRAVIS_BUILD_DIR
+    echo
+    echo Run testing of FAI
+    stack test $FLAGS
+}
+
+##########################################################
+##
+## Testing of example of blas
+##
+##########################################################
+function test_example_blas() {
+    echo
+    echo Run testing of examples of blas
+    cd $EBLAS_BUILD_DIR
+    ctest -V
+}
 
 if [ -n "$RUN_TEST" ]; then
-    cd $TRAVIS_BUILD_DIR
-
     echo
     echo Run testing
     echo
 
-    stack test $FLAGS
+    case $TASK in
+        FAI)
+            test_FAI
+        ;;
+        example-blas)
+            test_example_blas
+        ;;
+    esac
 fi

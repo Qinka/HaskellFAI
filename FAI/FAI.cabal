@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                FAI
-version:             0.1.0.20
+version:             0.1.0.57
 synopsis:            Haskell Foreign Accelerate Interface
 description:         The haskell interface for foreign accelerate framework.
 homepage:            https://github.com/Qinka/HaskellFAI
@@ -48,7 +48,7 @@ library
   if (flag(enable-cuda))
      extra-libraries:     cudart
      exposed-modules:     Foreign.FAI.Platform.CUDA
-                       -- , Foreign.FAI.Platform.CUDA.Debug
+                        , Foreign.FAI.Platform.CUDA.Debug
 
 
 test-suite spec
