@@ -39,8 +39,9 @@ l2p = return . flip step 0
 mkContextP :: Name -> Type -> Type
 mkContextP pn = AppT (AppT ArrowT (AppT (ConT ''Context) (VarT pn)))
 
-mkFunSig :: Int -> Int -> Name -> Name -> Type
-mkFunSig p1 p2 shN pN = mk1p shN pN (p1 - 1) . mkAccT pN . mkBufferTSP (ConT ''Int) pN $ ConT ''Float
+mkFunSig :: Bool -> Int -> Int -> Name -> Name -> Type
+mkFunSig is p1 p2 shN pN = mk1p shN pN (p1 - 1) . mkAccT pN . mkBufferTSP realShape pN $ ConT ''Float
+  where realShape = if is then (VarT shN) else (ConT ''Int)
 
 mkSel :: Bool -> [Bool] -> [Name] -> Exp
 mkSel sg is bs =
@@ -55,12 +56,9 @@ mkSel sg is bs =
 mkBufLen :: Name -> Exp
 mkBufLen = AppE (VarE 'bufSize) . VarE
 
-selShapeN :: Monad m => Bool -> [Int] -> m (Int, Int)
-selShapeN is (t:ts) =
-  let bufSize = step t ts
-      newSize = if is then bufSize else 1
-  in return (newSize, bufSize)
-  where step t []      = t
+selShapeN :: Monad m => Bool -> [Int] -> m ()
+selShapeN is (t:ts) = step t ts `seq` return ()
+  where step t []      = True
         step t (t':ts) = if t == t' then step t ts else error "Not same shape"
 
 mkIOT :: Name -> Type -> Type
@@ -86,14 +84,14 @@ mkWith fn vn pn e = AppE (AppE (VarE fn) (VarE vn)) (LamE [VarP pn] e)
 mkWithSeq :: Name -> Exp -> [(Name, Name)] -> Exp
 mkWithSeq fn = foldl (\e (vn, pn) -> mkWith fn vn pn e)
 
-appFunc :: Name -> Name -> [Name] -> Exp
-appFunc shn fn = flip AppE (AppE (VarE 'shLen) (VarE shn)) . foldl (\e p -> AppE e (AppE (VarE 'castPtr) (VarE p))) (VarE fn)
+appFunc :: Exp -> Name -> [Name] -> Exp
+appFunc shn fn = flip AppE (AppE (VarE 'shLen) shn) . foldl (\e p -> AppE e (AppE (VarE 'castPtr) (VarE p))) (VarE fn)
 
 mkReturn :: Name -> Name -> Exp
 mkReturn cpn bfn = AppE (VarE 'return) (TupE [VarE bfn, VarE cpn])
 
-mkNewBuffer :: Name -> Name -> Exp
-mkNewBuffer pn = flip AppE (VarE pn) . AppE (VarE 'newBufferIO) . VarE
+mkNewBuffer :: Name -> Exp -> Exp
+mkNewBuffer pn = flip AppE (VarE pn) . AppE (VarE 'newBufferIO)
 
 mkBindingFAI :: Name -> Bool -> [Bool] -> Q [Dec]
 mkBindingFAI bindingName' sg is = do
@@ -106,14 +104,12 @@ mkBindingFAI bindingName' sg is = do
   pconName <- newName "c"
   pncnName <- newName "c"
   aName    <- newName "a"
-  bufSh    <- newName "sh"
-  newSh    <- newName "sh"
   allBufName @ (outBufName : bufNames)
     <-  replicateM floatN $ newName "buf"
   allPtrName @ (outPtrName : ptrNames)
     <-  replicateM floatN $ newName "ptr"
   let funcName    = mkNewFuncName bindingName
-      bindingType = mkFunSig floatN intN shName platName
+      bindingType = mkFunSig sg floatN intN shName platName
       bindingKind = ForallT [ PlainTV shName, PlainTV platName, PlainTV aName]
                             [ AppT (ConT ''Shape) (VarT shName)
                             , AppT (ConT ''FAI) (VarT platName)
@@ -121,8 +117,10 @@ mkBindingFAI bindingName' sg is = do
                             , AppT (ConT ''Storable) (VarT aName) ]
                             bindingType
       bindingSigD = SigD funcName bindingKind
+      bufSh = AppE (VarE 'bufShape) (VarE $ head bufNames)
+      newSh = if sg then bufSh else LitE $ IntegerL 1
       bindingBody = NormalB $ AppE (ConE 'Accelerate) $ LamE [VarP pconName] $ DoE
-                    [ BindS (TupP [VarP newSh, VarP bufSh]) (mkSel sg is bufNames)
+                    [ NoBindS (mkSel sg is bufNames)
                     , BindS (TupP [VarP outBufName, VarP pncnName]) (mkNewBuffer pconName newSh)
                     , NoBindS (mkWithSeq (mkName "withBuffer") (appFunc bufSh bindingName allPtrName) (zip allBufName allPtrName))
                     , NoBindS (mkReturn pncnName outBufName)

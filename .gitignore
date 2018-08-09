@@ -28,3 +28,6 @@ cabal.project.local~
 # For C2HS
 *.chs.h
 *.i
+
+# .ignore
+.ignore
