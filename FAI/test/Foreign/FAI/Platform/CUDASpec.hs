@@ -23,7 +23,7 @@ spec :: Spec
 spec = do
   describe "Test CUDA" $ do
     it "copy and same" $ do
-      let acc = accelerate cc $ do
+      let acc = accelerate nullCUDAContext $ do
             let arr1 = [1..100] :: [Float]
                 b1  = unsafeToHostBuffer arr1 :: Buffer Int Host Float
             liftIO $ print b1
@@ -35,8 +35,6 @@ spec = do
             return (arr1, arr2)
       (arr1, arr2) <- acc
       arr2 `shouldBe` arr1
-
-cc = unsafePerformIO nullCUDAContext
 
 #else
 spec = describe "Skip CUDA Test" $ it "Do nothing" $ putStrLn "Skip."

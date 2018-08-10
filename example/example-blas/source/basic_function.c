@@ -335,6 +335,10 @@ void backward_N_scale_A(float *dA, float *s, float *dB, int n){
 }
 void backward_N_scale_s(float *ds, float *A, float *dB, int n){
 
+    #if   ACC_LOOP != OACC_ENABLE
+    float sum = 0;
+    #endif
+
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(A, ds, dB, n)
     #elif ACC_REGION == OMP_TARGET
@@ -346,11 +350,11 @@ void backward_N_scale_s(float *ds, float *A, float *dB, int n){
     #endif
     {
         int i;
-        float sum = 0;
 
         #if   ACC_LOOP == OMP_ENABLE
         #pragma omp for reduction(+:sum)
         #elif ACC_LOOP == OACC_ENABLE
+        float sum = 0;
         #pragma acc parallel loop reduction(+:sum)
         #endif
         for (i = 0; i < n; i++)
@@ -738,6 +742,10 @@ void backward_N_pow_A(float *dA, float *dB, float *A, float *B, float *x, int n)
 }
 void backward_N_pow_w(float *dx, float *dB, float *A, float *B, float *x, int n) {
 
+    #if   ACC_LOOP != OACC_ENABLE
+    float sum = 0;
+    #endif
+
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(dx, dB, A, B, x, n)
     #elif ACC_REGION == OMP_TARGET
@@ -749,11 +757,11 @@ void backward_N_pow_w(float *dx, float *dB, float *A, float *B, float *x, int n)
     #endif
     {
         int i;
-        float sum = 0;
 
         #if   ACC_LOOP == OMP_ENABLE
         #pragma omp for reduction(+:sum)
         #elif ACC_LOOP == OACC_ENABLE
+        float sum = 0;
         #pragma acc parallel loop reduction(+:sum)
         #endif
         for (i = 0; i < n; i++)

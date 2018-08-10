@@ -20,14 +20,14 @@ spec :: Spec
 spec = do
   describe "Allocate buffer" $ do
     it "newBuffer" $ do
-      let acc = accelerate cc $ do
+      let acc = accelerate nullHostContext $ do
             b <- newBuffer 20 :: Accelerate Host (Buffer Int Host Float)
             liftIO $ print b
             peekBufferA b >>= liftIO . print
             return ()
       acc `shouldReturn` ()
     it "dupBuffer" $ do
-      let acc = accelerate cc $ do
+      let acc = accelerate nullHostContext $ do
             b1 <- newBuffer 20 :: Accelerate Host (Buffer Int Host Float)
             peekBufferA b1 >>= liftIO . print
             b2 <- dupBuffer False b1
@@ -36,7 +36,7 @@ spec = do
       acc `shouldReturn` ()
   describe "Debug" $ do
     it "peek and poke" $ do
-      ls <- accelerate cc $ do
+      ls <- accelerate nullHostContext $ do
         bf <- newBuffer 10 :: Accelerate Host (Buffer Int Host Float)
         liftIO (peekHostBuffer bf) >>= liftIO . print
         liftIO $ pokeHostBuffer bf [0..9]
@@ -46,7 +46,7 @@ spec = do
       ls `shouldBe` [0..9]
   describe "Test host" $ do
     it "copy and same" $ do
-      let acc = accelerate cc $ do
+      let acc = accelerate nullHostContext $ do
             let arr1 = [1..100] :: [Float]
                 b1  = unsafeToHostBuffer arr1 :: Buffer Int Host Float
             b2 <- dupBuffer True b1 :: Accelerate Host (Buffer Int Host Float)
@@ -54,6 +54,3 @@ spec = do
             return (arr1, arr2)
       (arr1, arr2) <- acc
       arr2 `shouldBe` arr1
-
-cc :: Context Host
-cc = unsafePerformIO nullHostContext
