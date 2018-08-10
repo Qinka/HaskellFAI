@@ -2,6 +2,8 @@
 
 module Accelerate.ExampleBLAS.Fill
     ( scale
+    , random
+    , eye2D
     )where
 
 import           Accelerate.ExampleBLAS.Binding.Fill

@@ -75,6 +75,7 @@ if(${ENABLE_OPENMP} AND ${ENABLE_OPENACC})
     message(FATAL_ERROR "Can not enable OpenMP and OpenAcc at the same time!")
 endif()
 
+
 ## OpenMP
 if(ENABLE_OPENMP)
     FIND_PACKAGE(OpenMP REQUIRED)
@@ -107,6 +108,7 @@ if(ENABLE_OPENACC)
             message("Using drive pointer with OpenACC")
             add_definitions(-D_OACC_DRVPTR_)
         endif()
+        FIND_PACKAGE(CUDA REQUIRED)
     endif()
 endif()
 
@@ -120,6 +122,10 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 include_directories("${PROJECT_BINARY_DIR}/include")
 
 add_library(example-blas SHARED ${SRC_FILES})
+if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI") AND ENABLE_OPENACC)
+    message("Link with cuda's library")
+    target_link_libraries(example-blas ${CUDA_curand_LIBRARY} ${CUDA_LIBRARIES})
+endif()
 
 ### install
 file (GLOB BLAS_PUB_HEADS "${PROJECT_SOURCE_DIR}/include/example-blas/*.h")

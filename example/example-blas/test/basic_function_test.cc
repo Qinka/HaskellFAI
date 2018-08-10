@@ -1206,7 +1206,7 @@ TEST(backward_N_pow_x, random_case0) {
     const int m = 16, n = 16;
     float *dB = new float[m * n];
     float  *A = new float[m * n];
-    float  dx;
+    float  dx = 0;
     float  *B = new float[m * n];
     float x = 9.21924;
 

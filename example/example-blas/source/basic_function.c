@@ -294,9 +294,9 @@ void forward_N_scale(float *B, float *A, float *s, int n) {
     #elif ACC_REGION == OMP_TARGET
     #pragma omp target parallel shared(B, A, s, n)
     #elif ACC_REGION == OACC_ONLY
-    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n], s[1])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(B, A)
+    #pragma acc data deviceptr(B, A, s)
     #endif
     {
         int i;
@@ -317,7 +317,7 @@ void backward_N_scale_A(float *dA, float *s, float *dB, int n){
     #elif ACC_REGION == OMP_TARGET
     #pragma omp target parallel shared(dA, s, dB, n)
     #elif ACC_REGION == OACC_ONLY
-    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n])
+    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], s[1])
     #elif ACC_REGION == OACC_DRVPTR
     #pragma acc data deviceptr(dA, dB)
     #endif
@@ -334,19 +334,19 @@ void backward_N_scale_A(float *dA, float *s, float *dB, int n){
     }
 }
 void backward_N_scale_s(float *ds, float *A, float *dB, int n){
-    float sum = 0;
 
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(A, ds, dB, n)
     #elif ACC_REGION == OMP_TARGET
     #pragma omp target parallel shared(A, ds, dB, n)
     #elif ACC_REGION == OACC_ONLY
-    #pragma acc data copyout(ds[0:1]), copyin(dB[0:n])
+    #pragma acc data copyout(ds[0]), copyin(dB[0:n])
     #elif ACC_REGION == OACC_DRVPTR
     #pragma acc data deviceptr(ds, dB)
     #endif
     {
         int i;
+        float sum = 0;
 
         #if   ACC_LOOP == OMP_ENABLE
         #pragma omp for reduction(+:sum)
@@ -355,8 +355,8 @@ void backward_N_scale_s(float *ds, float *A, float *dB, int n){
         #endif
         for (i = 0; i < n; i++)
             sum += dB[i] * A[i];
+        *ds = sum;
     }
-    *ds = sum;
 }
 
 //abs
@@ -697,9 +697,9 @@ void forward_N_pow(float *B, float *A, float *x, int n) {
     #elif ACC_REGION == OMP_TARGET
     #pragma omp target parallel shared(B, A, x,  n)
     #elif ACC_REGION == OACC_ONLY
-    #pragma acc data copyout(B[0:n]), copyin(A[0:n])
+    #pragma acc data copyout(B[0:n]), copyin(A[0:n], x[1])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(B, A)
+    #pragma acc data deviceptr(B, A, x)
     #endif
     {
         int i;
@@ -720,9 +720,9 @@ void backward_N_pow_A(float *dA, float *dB, float *A, float *B, float *x, int n)
     #elif ACC_REGION == OMP_TARGET
     #pragma omp target parallel shared(dA, dB, A, B, x, n)
     #elif ACC_REGION == OACC_ONLY
-    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n], B[0:n])
+    #pragma acc data copyout(dA[0:n]), copyin(dB[0:n], A[0:n], B[0:n], x[1])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(dA, dB, A, B)
+    #pragma acc data deviceptr(dA, dB, A, B, x)
     #endif
     {
         int i;
@@ -737,19 +737,19 @@ void backward_N_pow_A(float *dA, float *dB, float *A, float *B, float *x, int n)
     }
 }
 void backward_N_pow_w(float *dx, float *dB, float *A, float *B, float *x, int n) {
-    float sum = 0;
 
     #if   ACC_REGION == OMP_ONLY
     #pragma omp parallel shared(dx, dB, A, B, x, n)
     #elif ACC_REGION == OMP_TARGET
     #pragma omp target parallel shared(dx, dB, A, B, x, n)
     #elif ACC_REGION == OACC_ONLY
-    #pragma acc data copyout(sum), copyin(dB[0:n], A[0:n], B[0:n])
+    #pragma acc data copyout(dx[0]), copyin(dB[0:n], A[0:n], B[0:n], x[1])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data copyout(sum), deviceptr(dB, A, B)
+    #pragma acc data deviceptr(dx, dB, A, B, x)
     #endif
     {
         int i;
+        float sum = 0;
 
         #if   ACC_LOOP == OMP_ENABLE
         #pragma omp for reduction(+:sum)
@@ -758,8 +758,8 @@ void backward_N_pow_w(float *dx, float *dB, float *A, float *B, float *x, int n)
         #endif
         for (i = 0; i < n; i++)
             sum += dB[i] * B[i] * logf(A[i]);
+        *dx = sum;
     }
-    *dx = sum;
 }
 //ceil
 void forward_N_ceil(float *B, float *A, int n){
