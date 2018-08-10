@@ -41,6 +41,7 @@ module Foreign.FAI.Platform.CUDA
   ( CUDA(..)
   , Pf
   , nullCUDAContext
+  , nullCUDAContextIO
   ) where
 
 import           Control.Monad
@@ -50,6 +51,7 @@ import           Foreign.FAI.Types
 import           Foreign.ForeignPtr
 import           Foreign.Ptr
 import qualified Language.C.Inline         as C
+import           System.IO.Unsafe
 
 C.include "<cuda_runtime.h>"
 C.include "<stdio.h>"
@@ -151,5 +153,8 @@ instance FAICopy CUDA CUDA where
     cudaMemCopy doCopyCC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufByte dst
 
 -- | Null pointer context of CUDA
-nullCUDAContext :: IO (Context CUDA)
-nullCUDAContext = Context <$> newForeignPtr_ nullPtr
+nullCUDAContextIO :: IO (Context CUDA)
+nullCUDAContextIO = Context <$> newForeignPtr_ nullPtr
+
+nullCUDAContext :: Context Host
+nullCUDAContext = unsafePerformIO nullCUDAContextIO

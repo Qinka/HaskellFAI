@@ -41,6 +41,7 @@ module Foreign.FAI.Platform.Host
   ( Host(..)
   , Pf
   , nullHostContext
+  , nullHostContextIO
   ) where
 
 import           Control.Monad
@@ -49,6 +50,7 @@ import           Foreign.FAI.Types
 import           Foreign.ForeignPtr
 import           Foreign.Ptr
 import qualified Language.C.Inline  as C
+import           System.IO.Unsafe
 
 C.include "<string.h>"
 C.include "<stdlib.h>"
@@ -92,5 +94,8 @@ instance FAICopy Host Host where
     hostMemCopy (bufPtr dst) (bufPtr src) $ fromIntegral $ bufByte dst
 
 -- | Null pointer context of Host
-nullHostContext :: IO (Context Host)
-nullHostContext = Context <$> newForeignPtr_ nullPtr
+nullHostContextIO :: IO (Context Host)
+nullHostContextIO = Context <$> newForeignPtr_ nullPtr
+
+nullHostContext :: Context Host
+nullHostContext = unsafePerformIO nullHostContextIO
