@@ -6,7 +6,6 @@ module Accelerate.ExampleBLAS.BasicFunction where
 import           Accelerate.ExampleBLAS.Binding.BasicFunction
 import           Accelerate.ExampleBLAS.Binding.GenTH
 import           Foreign.FAI
-import           Foreign.Ptr
 
 mkBindingFAI 'forward_N_add                     True  []
 mkBindingFAI 'backward_N_add_A                  True  []

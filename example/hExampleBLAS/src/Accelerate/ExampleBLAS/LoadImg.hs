@@ -17,7 +17,7 @@ import           Foreign.Storable
 
 
 data ImgFormat = Y8 | Y16 | Y32 | YF |  RGB8 | RGB16 | RGBF | RGBA8
-    deriving (Show)
+    deriving (Eq, Show)
 
 readImageToBufferFloat :: FAI p
                        => FilePath

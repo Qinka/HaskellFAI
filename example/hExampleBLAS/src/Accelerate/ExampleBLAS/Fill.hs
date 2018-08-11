@@ -10,7 +10,6 @@ import           Accelerate.ExampleBLAS.Binding.Fill
 import           Foreign.FAI
 import           Foreign.Ptr
 import           Foreign.Storable
-import           System.IO.Unsafe
 
 scale :: (FAI p, Shape sh, Storable b, b ~ Pf p Float)
       => sh -> Float -> Accelerate p (Buffer sh p Float)
