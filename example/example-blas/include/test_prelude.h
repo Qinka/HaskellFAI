@@ -56,5 +56,7 @@ void fill_with(float *mat, float f, int num);
 #define DO_VECTOR_SIGMOID   1
 #define DO_VECTOR_RELU      1
 #define DO_FILL_EYE         1
+#define DO_VECTOR_MAX       1
+#define DO_VECTOR_MIN       1
 
 #endif // ! _TEST_PRELUDE_H_

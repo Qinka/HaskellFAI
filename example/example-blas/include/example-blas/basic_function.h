@@ -187,6 +187,15 @@ void backward_N_erf_A(float *dA, float *dB, float *A, int n);
 void forward_N_erfc(float *B, float *A, int n);
 void backward_N_erfc_A(float *dA, float *dB, float *A, int n);
 
+//max
+void forward_N_max(float *C, float *A, float *B, int n);
+void backward_N_max_A(float *dA, float *dC, float *A, float *B, int n);
+void backward_N_max_B(float *dB, float *dC, float *A, float *B, int n);
+//min
+void forward_N_min(float *C, float *A, float *B, int n);
+void backward_N_min_A(float *dA, float *dC, float *A, float *B, int n);
+void backward_N_min_B(float *dB, float *dC, float *A, float *B, int n);
+
 #ifdef __cplusplus
 }
 #endif // ! __cplusplus

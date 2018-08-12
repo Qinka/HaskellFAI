@@ -41,6 +41,12 @@ module Accelerate.ExampleBLAS.Binding.BasicFunction
   , backward_N_erf_A
   , forward_N_erfc
   , backward_N_erfc_A
+  , forward_N_max
+  , backward_N_max_A
+  , backward_N_max_B
+  , forward_N_min
+  , backward_N_min_B
+  , backward_N_min_A
   ) where
 
 #include <example-blas/basic_function.h>
@@ -288,6 +294,48 @@ import Foreign.C
 
 {# fun backward_N_erfc_A
   { castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , `Int' } -> `()' #}
+
+-- max
+{# fun forward_N_max
+  { castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , `Int' } -> `()' #}
+
+{# fun backward_N_max_A
+  { castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , `Int' } -> `()' #}
+
+{# fun backward_N_max_B
+  { castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , `Int' } -> `()' #}
+
+-- min
+{# fun forward_N_min
+  { castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , `Int' } -> `()' #}
+
+{# fun backward_N_min_A
+  { castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , castPtr `Ptr Float'
+  , `Int' } -> `()' #}
+
+{# fun backward_N_min_B
+  { castPtr `Ptr Float'
+  , castPtr `Ptr Float'
   , castPtr `Ptr Float'
   , castPtr `Ptr Float'
   , `Int' } -> `()' #}

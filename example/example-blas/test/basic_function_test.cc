@@ -302,7 +302,7 @@ TEST(backward_N_dot_prd_A, specific_case0){
     delete[] dA;
 }
 
-TEST(backwad_vector_dot_prd_A, random_Case1) {
+TEST(backward_vector_dot_prd_A, random_Case1) {
     const int m = 4, n = 4;
     float *dA = new float[m * n];
     float * B = new float[m * n];
@@ -342,7 +342,7 @@ TEST(backward_N_dot_prd_B, specific_case0){
     delete[] dB;
 }
 
-TEST(backwad_vector_dot_prd_B, random_Case1) {
+TEST(backward_vector_dot_prd_B, random_Case1) {
     const int m = 4, n = 4;
     float *dB = new float[m * n];
     float * A = new float[m * n];
@@ -1508,3 +1508,267 @@ TEST(backward_N_erfc_A, random_case0) {
     delete[] dB;
 }
 #endif // DO_VECTOR_ERFC == 1
+
+#if DO_VECTOR_MAX == 1
+#define max(i,j) ((i) >= (j) ? (i) : (j))
+/**********************************************************************
+ * 
+ *  vector max forward test. 
+ * 
+**********************************************************************/
+TEST(forward_N_max, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float *C = new float[m * n];
+
+    for(int i = 0; i < m; ++i)
+        for(int j =0; j < n; ++j)
+            C[i] = max(A[i], B[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+    delete[] C;
+}
+TEST(forward_N_max, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float *C = new float[m * n];
+
+    forward_N_max(C, A, B, m * n);
+    
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+    delete[] C;
+}
+TEST(forward_N_max, specific_case2) {
+    
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float *C = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i) {
+        A[i] = (float)i;
+        B[i] = (float)(m * n - i);
+    }
+
+    forward_N_max(C, A, B, m * n);
+    
+    for(int i = 0; i < m * n; ++i) {
+        EXPECT_FLOAT_EQ(C[i], max(i, m * n -i));
+    }
+
+    delete[] A;
+    delete[] B;
+    delete[] C;
+}
+
+inline float bMax(float a, float b) {
+    if (a > b)
+        return 1;
+    else if (a == b)
+        return 0.5;
+    else
+        return 0;
+}
+/**********************************************************************
+ * 
+ *  vector max backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_N_max_A, specific_case0) {
+
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float *dC = new float[m * n];
+    float *dA = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i) {
+        A[i] = (float)i;
+        B[i] = (float)(m * n - i);
+    }
+    fill_random(dC, m * n);
+
+    backward_N_max_A(dA, dC, A, B, m * n);
+
+    for(int i = 0; i < m * n; ++i) {
+        EXPECT_FLOAT_EQ(dA[i], dC[i] * bMax(A[i], B[i]));
+    }
+
+    delete[]  A;
+    delete[]  B;
+    delete[] dA;
+    delete[] dC;
+}
+/**********************************************************************
+ * 
+ *  vector max backward test. (for vector B)
+ * 
+**********************************************************************/
+TEST(backward_N_max_B, specific_case0) {
+
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float *dC = new float[m * n];
+    float *dB = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i) {
+        A[i] = (float)i;
+        B[i] = (float)(m * n - i);
+    }
+    fill_random(dC, m * n);
+
+    backward_N_max_B(dB, dC, A, B, m * n);
+
+    for(int i = 0; i < m * n; ++i) {
+        EXPECT_FLOAT_EQ(dB[i], dC[i] * bMax(B[i], A[i]));
+    }
+
+    delete[]  A;
+    delete[]  B;
+    delete[] dB;
+    delete[] dC;
+}
+#undef max
+#endif // DO_VECTOR_MAX = =1
+
+#if DO_VECTOR_MIN == 1
+#define min(i,j) ((i) <= (j) ? (i) : (j))
+/**********************************************************************
+ * 
+ *  vector min forward test. 
+ * 
+**********************************************************************/
+TEST(forward_N_min, no_parallel_case0) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float *C = new float[m * n];
+
+    for(int i = 0; i < m; ++i)
+        for(int j =0; j < n; ++j)
+            C[i] = min(A[i], B[i]);
+
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+    delete[] C;
+}
+TEST(forward_N_min, parallel_case1) {
+    const int m = 8192, n = 8192;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float *C = new float[m * n];
+
+    forward_N_min(C, A, B, m * n);
+    
+    EXPECT_EQ(1,1);
+
+    delete[] A;
+    delete[] B;
+    delete[] C;
+}
+TEST(forward_N_min, specific_case2) {
+    
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float *C = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i) {
+        A[i] = (float)i;
+        B[i] = (float)(m * n - i);
+    }
+
+    forward_N_min(C, A, B, m * n);
+    
+    for(int i = 0; i < m * n; ++i) {
+        EXPECT_FLOAT_EQ(C[i], min(i, m * n -i));
+    }
+
+    delete[] A;
+    delete[] B;
+    delete[] C;
+}
+
+inline float bMin(float a, float b) {
+    if (a < b)
+        return 1;
+    else if (a == b)
+        return 0.5;
+    else
+        return 0;
+}
+/**********************************************************************
+ * 
+ *  vector min backward test. (for vector A)
+ * 
+**********************************************************************/
+TEST(backward_N_min_A, specific_case0) {
+
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float *dC = new float[m * n];
+    float *dA = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i) {
+        A[i] = (float)i;
+        B[i] = (float)(m * n - i);
+    }
+    fill_random(dC, m * n);
+
+    backward_N_min_A(dA, dC, A, B, m * n);
+
+    for(int i = 0; i < m * n; ++i) {
+        EXPECT_FLOAT_EQ(dA[i], dC[i] * bMin(A[i], B[i]));
+    }
+
+    delete[]  A;
+    delete[]  B;
+    delete[] dA;
+    delete[] dC;
+}
+/**********************************************************************
+ * 
+ *  vector min backward test. (for vector B)
+ * 
+**********************************************************************/
+TEST(backward_N_min_B, specific_case0) {
+
+    const int m = 16, n = 16;
+    float *A = new float[m * n];
+    float *B = new float[m * n];
+    float *dC = new float[m * n];
+    float *dB = new float[m * n];
+
+    for(int i = 0; i < m * n; ++i) {
+        A[i] = (float)i;
+        B[i] = (float)(m * n - i);
+    }
+    //fill_random(dC, m * n);
+    fill_with(dC, 1, m * n);
+    fill_with(dB, 2, m * n);
+
+    backward_N_min_B(dB, dC, A, B,  m * n);
+
+    for(int i = 0; i < m * n; ++i) {
+        EXPECT_FLOAT_EQ(dB[i], dC[i] * bMin(B[i], A[i]));
+    }
+
+    delete[]  A;
+    delete[]  B;
+    delete[] dB;
+    delete[] dC;
+}
+#undef min
+#endif // DO_VECTOR_MIN = =1

@@ -14,6 +14,10 @@ inline float sign(float a) {
     return (.0f < a) - (a < .0f);
 }
 
+inline float gt(float a, float b) {
+    return (float)(int)(a > b);
+}
+
 
 #ifdef __cplusplus
 }

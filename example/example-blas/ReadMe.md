@@ -32,6 +32,8 @@ The exmaple-blas includes the following functions:
     - [ ] atanh
     - [ ] ceil
     - [ ] floor
+    - [ ] Max
+    - [ ] Min
 - [ ] Matrix operations
     - [x] Matrix multiplication
 - [ ] Reduction operations
