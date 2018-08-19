@@ -35,6 +35,7 @@ The types and the class of FAI.
 {-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE TypeOperators         #-}
 
 module Foreign.FAI.Types
   ( Pf
@@ -49,6 +50,8 @@ module Foreign.FAI.Types
   , ForeignPtr
   , liftIO
   , Shape(..)
+  , Z(..)
+  , (:.)(..)
   , bufSize
   , bufByte
   ) where
@@ -128,6 +131,20 @@ instance Monad (Accelerate p) where
 instance MonadIO (Accelerate p) where
   liftIO m = Accelerate $ \c -> (\r -> (r,c)) <$> m
 
+data Z = Z
+  deriving(Show, Read, Eq, Ord)
+
+infixl 3 :.
+data tail :. head = !tail :. !head
+  deriving(Show, Read, Eq, Ord)
+
+type DIM0       = Z
+type DIM1       = DIM0 :. Int
+type DIM2       = DIM1 :. Int
+type DIM3       = DIM2 :. Int
+type DIM4       = DIM3 :. Int
+type DIM5       = DIM4 :. Int
+
 class Shape sh where
   shLen :: sh -> Int
 
@@ -161,3 +178,9 @@ instance Shape (Int ,Int, Int, Int) where
 
 instance Shape (Int, Int, Int, Int, Int) where
   shLen (h, w, d, c, n) = h * w * d * c * n
+
+instance Shape Z where
+  shLen _ = 1
+
+instance Shape sh => Shape (sh :. Int) where
+  shLen (sh :. i) = shLen sh * i

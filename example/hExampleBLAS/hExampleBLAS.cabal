@@ -25,6 +25,7 @@ library
                      , Accelerate.ExampleBLAS.TrigonometricFunction
                      , Accelerate.ExampleBLAS.LoadImg
                      , Accelerate.ExampleBLAS.Fill
+                     , Accelerate.ExampleBLAS.ComputerVision
   other-modules:       Accelerate.ExampleBLAS.Binding.ActivationFunction
                      , Accelerate.ExampleBLAS.Binding.BasicFunction
                      , Accelerate.ExampleBLAS.Binding.ExampleBLAS
@@ -33,6 +34,7 @@ library
                      , Accelerate.ExampleBLAS.Binding.TrigonometricFunction
                      , Accelerate.ExampleBLAS.Binding.GenTH
                      , Accelerate.ExampleBLAS.Binding.Fill
+                     , Accelerate.ExampleBLAS.Binding.ComputerVision
   -- other-extensions:    
   build-depends:       base == 4.*
                      , template-haskell

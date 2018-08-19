@@ -44,6 +44,8 @@ module Foreign.FAI
   , FAI(..)
   , FAICopy(..)
   , FinalizerContextPtr
+  , Z(..)
+  , (:.)(..)
   , accelerate
   , newBuffer
   , newBufferIO
