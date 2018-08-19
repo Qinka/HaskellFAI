@@ -11,7 +11,7 @@ void color_background_mask(float *out, float *in, float *img_bg_color, int n, in
     #elif ACC_REGION == OACC_ONLY
     #pragma acc data copyout(out[0:n]), copyin(in[0:n], img_bg_color[0:en])
     #elif ACC_REGION == OACC_DRVPTR
-    #pragma acc data deviceptr(out, in)
+    #pragma acc data deviceptr(out, in, img_bg_color)
     #endif
     {
         int i;
@@ -25,14 +25,14 @@ void color_background_mask(float *out, float *in, float *img_bg_color, int n, in
             float mask = 1;
             int j;
             #if   ACC_LOOP == OACC_ENABLE
-            #pragma acc parallel loop
+            #pragma acc loop
             #endif
             for(j = 0; j < en; j ++) {
                 mask *= in[j + i * en] == img_bg_color[j];
             }
             mask = 1 - mask;
             #if   ACC_LOOP == OACC_ENABLE
-            #pragma acc parallel loop
+            #pragma acc loop
             #endif
             for(j = 0; j < en; j ++) {
                 out[j + i * en] = mask;
