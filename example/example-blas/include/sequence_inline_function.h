@@ -16,7 +16,7 @@ extern "C" {
 #define P5 5.235987755982989f
 #define P6 6.283185307179586f
 
-#ifdef __APPLE__
+#ifdef __DISABLEO3__
 #define sign(a) ((.0f < a) - (a < .0f))
 #define hpr(h) ((h <= P1) + (h >= P5)                  \
               + (h > P1 && h < P2) * (P2 - h) / P1     \
