@@ -1,9 +1,11 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE LambdaCase   #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Accelerate.ExampleBLAS.LoadImg
-  ( readImageToBufferFloat
-  , writeImageFromBufferFloat
+  ( readImageToBufferFloatHost
+  , writeImageFromBufferFloatHost
   , ImgFormat(..)
+  , LoadSaveImg(..)
   ) where
 
 import           Codec.Picture
@@ -18,6 +20,14 @@ import           Foreign.Storable
 data ImgFormat = Y8 | Y16 | Y32 | YF |  RGB8 | RGB16 | RGBF | RGBA8
     deriving (Eq, Show)
 
+class FAI p => LoadSaveImg p where
+  readImageToBufferFloat :: (Storable b, b ~ Pf p Float) => Bool -> FilePath -> Accelerate p (Buffer (Int, Int, Int) p Float, ImgFormat)
+  writeImageFromBufferFloat :: (Storable b, b ~ Pf p Float) => Bool -> FilePath -> ImgFormat -> Buffer (Int, Int, Int) p Float -> Accelerate p ()
+
+instance LoadSaveImg Host where
+  readImageToBufferFloat = readImageToBufferFloatHost
+  writeImageFromBufferFloat  = writeImageFromBufferFloatHost
+
 toColorFloat :: (Integral a, Bounded a) => a -> Float
 toColorFloat x = fromIntegral x / mf x maxBound
     where mf :: (Integral a, Bounded a) => a -> a -> Float
@@ -28,11 +38,11 @@ fromColorFloat = mf maxBound
     where mf :: (Integral a, Bounded a) => a -> Float -> a
           mf m f = round $ f * fromIntegral m
 
-readImageToBufferFloat :: FAI p
-                       => Bool -- ^ whether transform from integer to (0, 1) :: [Float]
-                       -> FilePath
-                       -> Accelerate p (Buffer (Int, Int, Int) Host Float, ImgFormat)
-readImageToBufferFloat is fp = Accelerate $ \cc -> do
+readImageToBufferFloatHost :: FAI p
+                           => Bool -- ^ whether transform from integer to (0, 1) :: [Float]
+                           -> FilePath
+                           -> Accelerate p (Buffer (Int, Int, Int) Host Float, ImgFormat)
+readImageToBufferFloatHost is fp = Accelerate $ \cc -> do
   (fs, h, w, c, f) <- readImage fp >>= \case
     Left err -> error err
     Right di -> fromDynImg di
@@ -53,13 +63,13 @@ readImageToBufferFloat is fp = Accelerate $ \cc -> do
         fromDynImg (ImageRGBF  (Image w h d)) = return (trans id d, h, w, 3, RGBF)
         fromDynImg _ = error "Not support!"
 
-writeImageFromBufferFloat :: FAI p
-                          => Bool  -- ^ whether transform  to integer from (0, 1) :: [Float]
-                          -> FilePath
-                          -> ImgFormat
-                          -> Buffer (Int, Int, Int) Host Float
-                          -> Accelerate p ()
-writeImageFromBufferFloat is fp f (Buffer p sh) = Accelerate $ \cc -> do
+writeImageFromBufferFloatHost :: FAI p
+                              => Bool  -- ^ whether transform  to integer from (0, 1) :: [Float]
+                              -> FilePath
+                              -> ImgFormat
+                              -> Buffer (Int, Int, Int) Host Float
+                              -> Accelerate p ()
+writeImageFromBufferFloatHost is fp f (Buffer p sh) = Accelerate $ \cc -> do
   di <- toDynImg f p sh
   savePngImage fp di
   return ((), cc)

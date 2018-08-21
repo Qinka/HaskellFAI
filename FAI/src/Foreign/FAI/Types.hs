@@ -54,6 +54,12 @@ module Foreign.FAI.Types
   , (:.)(..)
   , bufSize
   , bufByte
+  , DIM0
+  , DIM1
+  , DIM2
+  , DIM3
+  , DIM4
+  , DIM5
   ) where
 
 import           Control.Monad.IO.Class (MonadIO (..))

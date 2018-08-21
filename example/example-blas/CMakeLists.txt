@@ -126,6 +126,11 @@ if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI") AND ENABLE_OPENACC)
     message("Link with cuda's library")
     target_link_libraries(example-blas ${CUDA_curand_LIBRARY} ${CUDA_LIBRARIES})
 endif()
+if(APPLE AND ENABLE_OPENMP)
+    message("In Apple macOS with OpenMP")
+    target_link_libraries(example-blas omp)
+endif()
+    
 
 ### install
 file (GLOB BLAS_PUB_HEADS "${PROJECT_SOURCE_DIR}/include/example-blas/*.h")

@@ -16,6 +16,12 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
 
+
+flag enable-cuda
+      default:             False
+      manual:              False
+      description:         Enable the Nvidia's CUDA platform.
+
 library
   exposed-modules:     Accelerate.ExampleBLAS.ActivationFunction
                      , Accelerate.ExampleBLAS.BasicFunction
@@ -46,3 +52,5 @@ library
   hs-source-dirs:      src
   default-language:    Haskell2010
   extra-libraries:     example-blas
+  if (flag(enable-cuda))
+     exposed-modules:     Accelerate.ExampleBLAS.LoadImg.CUDA

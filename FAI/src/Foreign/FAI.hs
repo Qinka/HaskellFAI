@@ -46,6 +46,12 @@ module Foreign.FAI
   , FinalizerContextPtr
   , Z(..)
   , (:.)(..)
+  , DIM0
+  , DIM1
+  , DIM2
+  , DIM3
+  , DIM4
+  , DIM5
   , accelerate
   , newBuffer
   , newBufferIO

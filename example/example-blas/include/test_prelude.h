@@ -58,5 +58,7 @@ void fill_with(float *mat, float f, int num);
 #define DO_FILL_EYE         1
 #define DO_VECTOR_MAX       1
 #define DO_VECTOR_MIN       1
+#define DO_COLOR_RGB2HSV    1
+#define DO_COLOR_HSV2RGB    1
 
 #endif // ! _TEST_PRELUDE_H_

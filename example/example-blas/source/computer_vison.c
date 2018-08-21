@@ -1,6 +1,7 @@
 #include <example-blas/activation_function.h>
 #include <config.h>
 #include <math.h>
+#include <sequence_inline_function.h>
 
 void color_background_mask(float *out, float *in, float *img_bg_color, int n, int en) {
     
@@ -97,13 +98,15 @@ void color_rgb_to_hsv(float *out, float *in, int n){
             float r = in[i * 3 + 0],
                   g = in[i * 3 + 1],
                   b = in[i * 3 + 2];
-            float p = acosf((r -g) * (r - b) / 2 / sqrtf((r -g) * (r - g) + (r - b) * (g - b)));
-            out[i * 3 + 0] = (b < g) * p + (b >= g) * (6.283185307179586f - p);
             float max = (r >= b) * r + (b > r) * b;
             max = (g >= max) * g + (max > g) * max;
             float min = (r <= b) * r + (b < r) * b;
             min = (g <= min) * g + (min < g) * min;
-            out[i * 3 + 1] = (max - min) / max;
+            float p = acosf(((r - g) + (r - b)) / 2 / sqrtf((r - g) * (r - g) + (r - b) * (g - b)));
+            if (p != p) p = 0;
+            out[i * 3 + 0] = (b <= g) * p + (b > g) * (6.283185307179586f - p);
+            if (max) out[i * 3 + 1] = (max - min) / max;
+            else     out[i * 3 + 1] = 0;
             out[i * 3 + 2] = max;
         }
     }
@@ -128,17 +131,12 @@ void color_hsv_to_rgb(float *out, float *in, int n){
         #pragma acc parallel loop
         #endif
         for(i = 0; i < n; ++i) {
-            float r = in[i * 3 + 0],
-                  g = in[i * 3 + 1],
-                  b = in[i * 3 + 2];
-            float p = acosf((r -g) * (r - b) / 2 / sqrtf((r -g) * (r - g) + (r - b) * (g - b)));
-            out[i * 3 + 0] = (b < g) * p + (b >= g) * (6.283185307179586f - p);
-            float max = (r >= b) * r + (b > r) * b;
-            max = (g >= max) * g + (max > g) * max;
-            float min = (r <= b) * r + (b < r) * b;
-            min = (g <= min) * g + (min < g) * min;
-            out[i * 3 + 1] = (max - min) / max;
-            out[i * 3 + 2] = max;
+            float h = in[i * 3 + 0],
+                  s = in[i * 3 + 1],
+                  v = in[i * 3 + 2];
+            out[i * 3 + 0] = v * (1 + s * (hpr(h) - 1.0f));
+            out[i * 3 + 1] = v * (1 + s * (hpg(h) - 1.0f));
+            out[i * 3 + 2] = v * (1 + s * (hpb(h) - 1.0f));
         }
     }
 }
