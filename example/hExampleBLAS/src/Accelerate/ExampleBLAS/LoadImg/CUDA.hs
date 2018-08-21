@@ -10,8 +10,9 @@ import           Foreign.FAI.Platform.Host
 
 instance LoadSaveImg CUDA where
   readImageToBufferFloat is fp = do
-    host <- readImageToBufferFloatHost is fp
-    dupBuffer True host
+    (host, tf) <- readImageToBufferFloatHost is fp
+    cu <- dupBuffer True host
+    (cu, tf)
   writeImageFromBufferFloat is fp f cu = do
     host <- liftIO $ dupBufferIO True cu nullHostContext
-    writeImageFromBufferFloatHost is fp f host
+    writeImageFromBufferFloatHost is fp f $ fst host

@@ -60,9 +60,6 @@ TEST(color_hsb_to_rgb, specific_case_0) {
   color_hsv_to_rgb(rt, testhsv, test_len);
 
   for(int i = 0; i < test_len ; ++i) {
-    std::cout << testhsv[i * 3 + 0] << " " << testhsv[i * 3 + 1] << " " << testhsv[i * 3 + 2] << std::endl;
-    std::cout << rt[i * 3 + 0] << " " << rt[i * 3 + 1] << " " << rt[i * 3 + 2] << std::endl;
-    std::cout << "\t\t" << hpg(0) << std::endl;
     EXPECT_FLOAT_NEAR(testrgb[i * 3 + 0], rt[i * 3 + 0]);
     EXPECT_FLOAT_NEAR(testrgb[i * 3 + 1], rt[i * 3 + 1]);
     EXPECT_FLOAT_NEAR(testrgb[i * 3 + 2], rt[i * 3 + 2]);
