@@ -170,3 +170,13 @@ if(${BUILD_TESTS})
     endif()
     add_test(BLAS_TEST example-blas-test)
 endif()
+
+## Packaing
+set(CPACK_PACKAGE_NAME "example-blas")
+set(CPACK_GENERATOR "TXZ;STGZ;TGZ;TZ;ZIP")  
+set(CPACK_PACKAGE_VENDOR "Johann Lee <me@qinka.pro>")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Johann Lee <me@qinka.pro>")
+set(CPACK_PACKAGE_DESCRIPTION "A set of subprogram of math.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY, "An example of BLAS")
+set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/LICENSE)
+include(CPack)
