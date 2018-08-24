@@ -32,6 +32,7 @@ library
                      , Accelerate.ExampleBLAS.LoadImg
                      , Accelerate.ExampleBLAS.Fill
                      , Accelerate.ExampleBLAS.ComputerVision
+                     , Accelerate.ExampleBLAS.Wrapper
   other-modules:       Accelerate.ExampleBLAS.Binding.ActivationFunction
                      , Accelerate.ExampleBLAS.Binding.BasicFunction
                      , Accelerate.ExampleBLAS.Binding.ExampleBLAS
@@ -54,3 +55,4 @@ library
   extra-libraries:     example-blas
   if (flag(enable-cuda))
      exposed-modules:     Accelerate.ExampleBLAS.LoadImg.CUDA
+     cpp-options:        -D__CUDA_ENABLE
