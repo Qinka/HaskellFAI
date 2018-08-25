@@ -33,15 +33,7 @@ library
                      , Accelerate.ExampleBLAS.Fill
                      , Accelerate.ExampleBLAS.ComputerVision
                      , Accelerate.ExampleBLAS.Wrapper
-  other-modules:       Accelerate.ExampleBLAS.Binding.ActivationFunction
-                     , Accelerate.ExampleBLAS.Binding.BasicFunction
-                     , Accelerate.ExampleBLAS.Binding.ExampleBLAS
-                     , Accelerate.ExampleBLAS.Binding.HyperbolicFunction
-                     , Accelerate.ExampleBLAS.Binding.MatrixFunction
-                     , Accelerate.ExampleBLAS.Binding.TrigonometricFunction
-                     , Accelerate.ExampleBLAS.Binding.GenTH
-                     , Accelerate.ExampleBLAS.Binding.Fill
-                     , Accelerate.ExampleBLAS.Binding.ComputerVision
+  other-modules:       Accelerate.ExampleBLAS.TH
   -- other-extensions:    
   build-depends:       base == 4.*
                      , template-haskell
@@ -49,10 +41,9 @@ library
                      , split
                      , JuicyPixels
                      , vector
-  build-tools:         c2hs
+                     , hExampleBLAS-binding
   hs-source-dirs:      src
   default-language:    Haskell2010
-  extra-libraries:     example-blas
   if (flag(enable-cuda))
      exposed-modules:     Accelerate.ExampleBLAS.LoadImg.CUDA
      cpp-options:        -D__CUDA_ENABLE

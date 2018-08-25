@@ -3,14 +3,14 @@
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Accelerate.ExampleBLAS.Wrapper
     ( bestContextIO
-    , MayContext(..)
+    , bestContext
     , Wrappered(..)
     , module X
-    , CUDA(..)
-    , nullCUDAContextIO
+    
     ) where
 
 import           Foreign.FAI                                  as X
@@ -36,25 +36,11 @@ import           System.Environment                           as X
 import           Accelerate.ExampleBLAS.LoadImg.CUDA          as X
 import           Foreign.FAI.Platform.CUDA                    as X
 import           Foreign.FAI.Platform.CUDA.Debug              as X
-#else
-data CUDA = CUDA
-nullCUDAContextIO = undefined
 #endif
 
-data MayContext = H' (Context Host)
-                | C' (Context CUDA)
+import Accelerate.ExampleBLAS.TH(mkBestContext)
 
-
---bestContextIO :: IO MayContext
-bestContextIO = case exampleBLASBackend of
-#ifdef __CUDA_ENABLE
-  "OACC_DRVPTR" -> C' <$> nullCUDAContextIO
-#endif
-  "OMP_TARGET"  -> H' <$> nullHostContextIO
-  "OMP_ONLY"    -> H' <$> nullHostContextIO
-  "OACC_ONLY"   -> H' <$> nullHostContextIO
-  "NO_ACC"      -> H' <$> nullHostContextIO
-  _             -> error "Unsupported backend."
+mkBestContext
 
 
 class (LoadSaveImg p, FAI p, Storable (Pf p Float)) => Wrappered p

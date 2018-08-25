@@ -4,7 +4,7 @@
 module Accelerate.ExampleBLAS.ActivationFunction where
 
 import           Accelerate.ExampleBLAS.Binding.ActivationFunction
-import           Accelerate.ExampleBLAS.Binding.GenTH
+import           Accelerate.ExampleBLAS.TH
 import           Foreign.FAI
 import           Foreign.Ptr
 

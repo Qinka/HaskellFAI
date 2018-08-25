@@ -133,9 +133,10 @@ doCopyCC dst src size =
       return 0;}|]
 
 instance FAI CUDA where
-  faiMemAllocate _ = cudaMemAllocate . fromIntegral
-  faiMemRelease  _ = cudaMemRelease
-  faiMemReleaseP _ = Right <$> cudaMemReleaseP
+  faiMemAllocate    _ = cudaMemAllocate . fromIntegral
+  faiMemRelease     _ = cudaMemRelease
+  faiMemReleaseP    _ = Right <$> cudaMemReleaseP
+  faiDefaultContextIO = nullCUDAContextIO
 
 instance FAICopy Host CUDA where
   faiMemCopy dst src = do

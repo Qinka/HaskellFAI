@@ -3,7 +3,7 @@
 
 module Accelerate.ExampleBLAS.TrigonometricFunction where
 
-import           Accelerate.ExampleBLAS.Binding.GenTH
+import           Accelerate.ExampleBLAS.TH
 import           Accelerate.ExampleBLAS.Binding.TrigonometricFunction
 import           Foreign.FAI
 import           Foreign.Ptr

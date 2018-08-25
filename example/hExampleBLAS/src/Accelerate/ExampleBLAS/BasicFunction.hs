@@ -4,7 +4,7 @@
 module Accelerate.ExampleBLAS.BasicFunction where
 
 import           Accelerate.ExampleBLAS.Binding.BasicFunction
-import           Accelerate.ExampleBLAS.Binding.GenTH
+import           Accelerate.ExampleBLAS.TH
 import           Foreign.FAI
 
 mkBindingFAI 'forward_N_add                     True  []

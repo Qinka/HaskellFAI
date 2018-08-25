@@ -3,7 +3,7 @@
 
 module Accelerate.ExampleBLAS.HyperbolicFunction where
 
-import           Accelerate.ExampleBLAS.Binding.GenTH
+import           Accelerate.ExampleBLAS.TH
 import           Accelerate.ExampleBLAS.Binding.HyperbolicFunction
 import           Foreign.FAI
 import           Foreign.Ptr

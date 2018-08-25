@@ -108,6 +108,7 @@ class FAI p where
                  -> IO (FinalizerContextPtr p a)
                       -- ^ pointer of the function
                       --   of release the pointer
+  faiDefaultContextIO :: IO (Context p)
 
 -- | Copy data from platform @p1@ to platform @p2@.
 class (FAI p1, FAI p2) =>  FAICopy p1 p2 where

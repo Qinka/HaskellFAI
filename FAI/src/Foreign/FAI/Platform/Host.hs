@@ -84,9 +84,10 @@ hostMemCopy fdst fsrc size =
   in void $ [C.exp| void* {memcpy($(void *dst), $(void *src), $(int size))} |]
 
 instance FAI Host where
-  faiMemAllocate _ = hostMemAllocate . fromIntegral
-  faiMemRelease  _ = hostMemRelease
-  faiMemReleaseP _ = Right <$> hostMemReleaseP
+  faiMemAllocate    _ = hostMemAllocate . fromIntegral
+  faiMemRelease     _ = hostMemRelease
+  faiMemReleaseP    _ = Right <$> hostMemReleaseP
+  faiDefaultContextIO = nullHostContextIO
 
 instance FAICopy Host Host where
   faiMemCopy dst src = do
