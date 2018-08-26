@@ -1,16 +1,16 @@
 {-# LANGUAGE CPP                  #-}
 {-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 module Accelerate.ExampleBLAS.Wrapper
     ( bestContextIO
     , bestContext
     , Wrappered(..)
     , module X
-    
+
     ) where
 
 import           Foreign.FAI                                  as X
@@ -28,6 +28,7 @@ import           Accelerate.ExampleBLAS.MatrixFunction        as X
 import           Accelerate.ExampleBLAS.TrigonometricFunction as X
 
 import           Control.Monad                                as X
+import           Control.Monad.Logger                         as X
 import           Foreign.Storable                             as X
 import           System.Environment                           as X
 
@@ -38,7 +39,7 @@ import           Foreign.FAI.Platform.CUDA                    as X
 import           Foreign.FAI.Platform.CUDA.Debug              as X
 #endif
 
-import Accelerate.ExampleBLAS.TH(mkBestContext)
+import           Accelerate.ExampleBLAS.TH                    (mkBestContext)
 
 mkBestContext
 

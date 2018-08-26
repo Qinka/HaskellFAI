@@ -63,6 +63,8 @@ module Foreign.FAI
   , bufSize
   , withBuffer
   , bufByte
+  , ignoreLogger
+  , logger
   ) where
 
 import           Control.Monad
@@ -70,6 +72,7 @@ import           Foreign.FAI.Internal
 import           Foreign.FAI.Types
 import           Foreign.ForeignPtr
 import           Foreign.Ptr
+import Control.Monad.Logger
 
 -- | run the @Accelerate@.
 accelerate :: Context p -> Accelerate p a -> IO a
@@ -136,3 +139,6 @@ reshape (Buffer p sh1) sh2 =
 
 withBuffer :: FAI p => Buffer sh p a -> (Ptr (Pf p a) -> IO b) -> IO b
 withBuffer buf = withForeignPtr (bufPtr buf)
+
+logger :: FAI p => LoggingT (Accelerate p) ()
+logger = LoggingT $ \contextLogger -> Accelerate $ \c -> return ((), c {unContextLogger = contextLogger})

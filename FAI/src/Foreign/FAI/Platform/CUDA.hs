@@ -155,7 +155,7 @@ instance FAICopy CUDA CUDA where
 
 -- | Null pointer context of CUDA
 nullCUDAContextIO :: IO (Context CUDA)
-nullCUDAContextIO = Context <$> newForeignPtr_ nullPtr
+nullCUDAContextIO = Context <$> newForeignPtr_ nullPtr <*> return ignoreLogger
 
 nullCUDAContext :: Context CUDA
 nullCUDAContext = unsafePerformIO nullCUDAContextIO

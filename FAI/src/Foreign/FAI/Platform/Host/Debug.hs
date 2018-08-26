@@ -75,12 +75,11 @@ toHostBuffer :: (Storable b, Pf Host a ~ b)
              => [b]                 -- ^ List
              -> IO (Buffer Int Host a)  -- ^ Host buffer
 toHostBuffer ls = do
-  bf <- fst <$> newBufferIO (length ls) cc
+  bf <- fst <$> newBufferIO (length ls) nullHostContext
   withForeignPtr (bufPtr bf) $ \ptr ->
     pokeArray ptr ls
   return bf
-  where cc :: Context Host
-        cc = Context undefined
+
 -- | Unsafe peek
 unsafePeekHostBuffer :: (Storable b,Pf Host a ~ b, Shape sh)
                      => Buffer sh Host a

@@ -60,9 +60,12 @@ module Foreign.FAI.Types
   , DIM3
   , DIM4
   , DIM5
+  , ignoreLogger
   ) where
 
 import           Control.Monad.IO.Class (MonadIO (..))
+import           Control.Monad.Logger
+import Control.Monad.Catch
 import           Foreign.ForeignPtr
 import           Foreign.Ptr
 import           Foreign.Storable
@@ -82,10 +85,16 @@ data Buffer sh p a = Buffer
 -- The Haskell GC can not guarantee that @Context p@ will be released after
 -- all the @Buffer p a@ is released.
 -- So the C implement at lower level need to make sure it.
-newtype Context p = Context
-  { unContextPtr :: ForeignPtr (Context p)
+data Context p = Context
+  { unContextPtr    :: !(ForeignPtr (Context p))
+  , unContextLogger :: !(Loc -> LogSource -> LogLevel -> LogStr -> IO ())
   }
-  deriving (Show, Eq)
+
+instance Show p => Show (Context p) where
+  show = show . unContextPtr
+
+instance Eq p => Eq (Context p) where
+  (==) a b = unContextPtr a == unContextPtr b
 
 -- | Accelearate type.
 newtype Accelerate p a = Accelerate
@@ -137,6 +146,19 @@ instance Monad (Accelerate p) where
 
 instance MonadIO (Accelerate p) where
   liftIO m = Accelerate $ \c -> (\r -> (r,c)) <$> m
+
+instance MonadLogger (Accelerate p) where
+  monadLoggerLog l ls ll msg = Accelerate $ \c -> (\rt -> (rt, c)) <$> unContextLogger c l ls ll (toLogStr msg)
+
+ignoreLogger :: Loc -> LogSource -> LogLevel -> LogStr -> IO ()
+ignoreLogger _ _ _ _ = return ()
+
+instance MonadThrow (Accelerate p) where
+  throwM e = Accelerate $ \c -> (\r -> (r,c)) <$> throwM e
+
+instance MonadCatch (Accelerate p) where
+  catch (Accelerate m) h = Accelerate $ \c -> catch (m c) (`hIO` c)
+    where hIO e = let (Accelerate hm) = h e in hm
 
 data Z = Z
   deriving(Show, Read, Eq, Ord)
