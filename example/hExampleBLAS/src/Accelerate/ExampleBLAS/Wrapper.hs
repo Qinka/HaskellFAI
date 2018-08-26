@@ -28,6 +28,7 @@ import           Accelerate.ExampleBLAS.MatrixFunction        as X
 import           Accelerate.ExampleBLAS.TrigonometricFunction as X
 
 import           Control.Monad                                as X
+import           Control.Monad.Catch                          as X
 import           Control.Monad.Logger                         as X
 import           Foreign.Storable                             as X
 import           System.Environment                           as X

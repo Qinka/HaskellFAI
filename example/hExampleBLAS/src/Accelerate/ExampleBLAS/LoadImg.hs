@@ -1,14 +1,20 @@
-{-# LANGUAGE LambdaCase   #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE LambdaCase        #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TypeFamilies      #-}
 
 module Accelerate.ExampleBLAS.LoadImg
   ( readImageToBufferFloatHost
   , writeImageFromBufferFloatHost
+  , loadImageToBufferFloat
+  , saveImageFromBufferFloat
   , ImgFormat(..)
   , LoadSaveImg(..)
   ) where
 
 import           Codec.Picture
+import           Control.Monad.Logger
+import qualified Data.Text                 as T
 import           Data.Vector.Storable      (Vector, fromList, toList,
                                             unsafeToForeignPtr0)
 import           Foreign.FAI
@@ -19,6 +25,27 @@ import           Foreign.Storable
 
 data ImgFormat = Y8 | Y16 | Y32 | YF |  RGB8 | RGB16 | RGBF | RGBA8
     deriving (Eq, Show)
+
+loadImageToBufferFloat :: (LoadSaveImg p, Storable b, b ~ Pf p Float)
+                       => Bool -- ^ to [0,1]
+                       -> FilePath -- ^ Image
+                       -> Accelerate p (Buffer (Int, Int, Int) p Float, ImgFormat)
+loadImageToBufferFloat is fp = do
+  (b, f) <- readImageToBufferFloat is fp
+  $(logInfo) $ mconcat ["load image from ", T.pack fp]
+  $(logInfo) $ mconcat ["image in format of ", T.pack (show f), " with shape", T.pack (show $ bufShape b)]
+  return (b, f)
+
+saveImageFromBufferFloat :: (LoadSaveImg p, Storable b, b ~ Pf p Float)
+                         => Bool
+                         -> FilePath
+                         -> ImgFormat
+                         -> Buffer (Int, Int, Int) p Float
+                         -> Accelerate p ()
+saveImageFromBufferFloat is fp f b = do
+  $(logInfo) $ mconcat ["save image to ", T.pack fp]
+  $(logInfo) $ mconcat ["image in format of ", T.pack (show f), " with shape", T.pack (show $ bufShape b)]
+  writeImageFromBufferFloat is fp f b
 
 class FAI p => LoadSaveImg p where
   readImageToBufferFloat :: (Storable b, b ~ Pf p Float) => Bool -> FilePath -> Accelerate p (Buffer (Int, Int, Int) p Float, ImgFormat)
