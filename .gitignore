@@ -34,3 +34,21 @@ cabal.project.local~
 
 # macOS
 .DS_Store
+
+# Debian
+# For debian build
+*.dsc
+*.deb
+*.xz
+obj-x86_64-linux-gnu
+*.ddeb
+*.debhelper
+*.tar.gz
+*.buildinfo
+*.changes
+*.tar
+*.upload
+*.build
+*/debian/changelog
+*.ppa.upload
+*/debian/files
