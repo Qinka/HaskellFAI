@@ -1,0 +1,66 @@
+Source: haskell-fai
+Maintainer: Johann Lee <me@qinka.pro>
+Uploaders: Johann Lee <me@qinka.pro>
+Priority: extra
+Section: haskell
+Build-Depends: debhelper (>= 9),
+ haskell-devscripts-minimal | haskell-devscripts (>= 0.8),
+ cdbs,
+ ghc,
+ ghc-prof,
+ libghc-exceptions-dev (>= 0.8),
+ libghc-exceptions-prof (>= 0.8),
+ libghc-inline-c-dev (>= 0.6),
+ libghc-inline-c-prof (>= 0.6),
+ libghc-monad-logger-dev (>= 0.3.20),
+ libghc-monad-logger-prof (>= 0.3.20),
+ libghc-hspec-dev,
+ libghc-inline-c-dev,
+Build-Depends-Indep: ghc-doc,
+ libghc-exceptions-doc,
+ libghc-inline-c-doc,
+ libghc-monad-logger-doc,
+Standards-Version: 3.9.6
+Homepage: https://github.com/Qinka/HaskellFAI
+X-Description: Haskell Foreign Accelerate Interface
+ The haskell interface for foreign accelerate framework.
+
+Package: libghc-fai-dev
+Architecture: any
+Depends: ${haskell:Depends},
+ ${misc:Depends},
+ ${shlibs:Depends},
+Recommends: ${haskell:Recommends},
+Suggests: ${haskell:Suggests},
+Conflicts: ${haskell:Conflicts},
+Provides: ${haskell:Provides},
+Description: ${haskell:ShortDescription}${haskell:ShortBlurb}
+ ${haskell:LongDescription}
+ .
+ ${haskell:Blurb}
+
+Package: libghc-fai-prof
+Architecture: any
+Depends: ${haskell:Depends},
+ ${misc:Depends},
+Recommends: ${haskell:Recommends},
+Suggests: ${haskell:Suggests},
+Conflicts: ${haskell:Conflicts},
+Provides: ${haskell:Provides},
+Description: ${haskell:ShortDescription}${haskell:ShortBlurb}
+ ${haskell:LongDescription}
+ .
+ ${haskell:Blurb}
+
+Package: libghc-fai-doc
+Architecture: all
+Section: doc
+Depends: ${haskell:Depends},
+ ${misc:Depends},
+Recommends: ${haskell:Recommends},
+Suggests: ${haskell:Suggests},
+Conflicts: ${haskell:Conflicts},
+Description: ${haskell:ShortDescription}${haskell:ShortBlurb}
+ ${haskell:LongDescription}
+ .
+ ${haskell:Blurb}
