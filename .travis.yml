@@ -82,48 +82,7 @@ matrix:
             - wget
             - curl
 
-    # example of blas
-    - name: "Example of BLAS"
-      env: TASK=example-blas RUN_TEST=t
-      addons:
-        apt:
-          update: true
-          packages:
-            - wget
-            - curl
-            - libgtest-dev
-            - cmake
-            - gcc
-            - g++
-            - make
-    - name: "Example of BLAS"
-      env: TASK=example-blas RUN_TEST=t ACC_BACKEND=OpenMP
-      addons:
-        apt:
-          update: true
-          packages:
-            - wget
-            - curl
-            - libgtest-dev
-            - cmake
-            - gcc
-            - g++
-            - make
-    - name: "Example of BLAS"
-      env: TASK=example-blas RUN_TEST=t
-      addons:
-        apt:
-          update: true
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - wget
-            - curl
-            - libgtest-dev
-            - cmake
-            - gcc
-            - g++
-            - make
+    
     # example of blas
     # - name: "Example of BLAS"
     #   env: TASK=example-blas RUN_TEST=t ACC_BACKEND=OpenACC
@@ -159,12 +118,6 @@ before_install: |
     FAI)
       FAI_init
     ;;
-    example-blas)
-      example-blas_init
-    ;;
-    hExampleBLAS)
-      hExampleBLAS_init
-    ;;
     *)
       echo $TASK nothing to do
     ;;
@@ -177,14 +130,6 @@ script: |
       FAI_build
       FAI_test
     ;;
-    example-blas)
-      example-blas_build
-      example-blas_test
-    ;;
-    hExampleBLAS)
-      hExampleBLAS_build
-      hExampleBLAS_test
-    ;;
     *)
       echo $TASK nothing to do
     ;;
@@ -194,12 +139,6 @@ after_success: |
   case $TASK in
     FAI)
       FAI_succ
-    ;;
-    example-blas)
-      example-blas_succ
-    ;;
-    hExampleBLAS)
-      hExampleBLAS_succ
     ;;
     *)
       echo $TASK nothing to do
