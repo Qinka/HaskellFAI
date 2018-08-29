@@ -1,0 +1,5 @@
+haskell-fai (0.1.0.0-distro()) distro(); urgency=medium
+
+  * Initial release
+
+ -- Johann Lee <me@qinka.pro>  esyscmd(`date -R')
