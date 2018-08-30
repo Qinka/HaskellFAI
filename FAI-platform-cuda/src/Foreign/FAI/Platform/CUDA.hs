@@ -63,7 +63,7 @@ C.include "<stdio.h>"
 --  @cudaFree@ is used to free pointer.
 --
 --  @cudaMemcpy@ is used to copy data between Host and CUDA.
-data CUDA = CUDA
+data CUDA = CUDA !(ForeignPtr CUDA) !Logger
 
 type instance Pf CUDA Float  = Float
 type instance Pf CUDA Double = Double
@@ -132,30 +132,38 @@ doCopyCC dst src size =
       }
       return 0;}|]
 
+instance ContextLogger CUDA where
+  getContextLogger (CUDA _ l) = l
+  setContextLogger (CUDA p _) = CUDA p
+
+instance ContextPointer CUDA where
+  getContextPointer (CUDA p _) = p
+  setContextPointer (CUDA _ l) = (`CUDA` l)
+  nullContextIO = nullCUDAContextIO
+
 instance FAI CUDA where
   faiMemAllocate    _ = cudaMemAllocate . fromIntegral
   faiMemRelease     _ = cudaMemRelease
   faiMemReleaseP    _ = Right <$> cudaMemReleaseP
-  faiDefaultContextIO = nullCUDAContextIO
 
 instance FAICopy Host CUDA where
   faiMemCopy dst src = do
     when (bufSize dst /= bufSize src) $ error "Different size."
-    cudaMemCopy doCopyHC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufByte dst
+    cudaMemCopy doCopyHC (getBufferPtr dst) (getBufferPtr src) $ fromIntegral $ bufByte dst
 
 instance FAICopy CUDA Host where
   faiMemCopy dst src = do
     when (bufSize dst /= bufSize src) $ error "Different size."
-    cudaMemCopy doCopyCH (bufPtr dst) (bufPtr src) $ fromIntegral $ bufByte dst
+    cudaMemCopy doCopyCH (getBufferPtr dst) (getBufferPtr src) $ fromIntegral $ bufByte dst
 
 instance FAICopy CUDA CUDA where
   faiMemCopy dst src = do
     when (bufSize dst /= bufSize src) $ error "Different size."
-    cudaMemCopy doCopyCC (bufPtr dst) (bufPtr src) $ fromIntegral $ bufByte dst
+    cudaMemCopy doCopyCC (getBufferPtr dst) (getBufferPtr src) $ fromIntegral $ bufByte dst
 
 -- | Null pointer context of CUDA
-nullCUDAContextIO :: IO (Context CUDA)
-nullCUDAContextIO = Context <$> newForeignPtr_ nullPtr <*> return ignoreLogger
+nullCUDAContextIO :: IO CUDA
+nullCUDAContextIO = CUDA <$> newForeignPtr_ nullPtr <*> return ignoreLogger
 
-nullCUDAContext :: Context CUDA
+nullCUDAContext :: CUDA
 nullCUDAContext = unsafePerformIO nullCUDAContextIO

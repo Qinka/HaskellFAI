@@ -54,29 +54,40 @@ import           Foreign.FAI.Types
 import           Foreign.ForeignPtr
 import           Foreign.Ptr
 import           System.IO.Unsafe
+import Foreign.Storable
 
 import qualified Language.C.Inline               as C
 
 C.include "<cuda_runtime.h>"
 C.include "<stdio.h>"
 
+
+
 -- | Copy the data from pointer to Haskell list.
-peekCUDABuffer :: (Storable b, Pf CUDA a ~ b, Shape sh, Pf Host a ~ b)
-               => Buffer sh CUDA a   -- ^ Buffer
-               -> IO [b]          -- ^ Haskell list
+peekCUDABuffer :: ( Storable c, Pf Host a ~ c, Pf CUDA a ~ c
+                  , Shape sh, Buffer b
+                  , BufferPlatform b ~ CUDA
+                  , BufferShape    b ~ sh
+                  , BufferType     b ~ a)
+               => b   -- ^ Buffer
+               -> IO [c]          -- ^ Haskell list
 peekCUDABuffer bf =
   peekHostBuffer =<< fst <$> dup nullHostContext True bf
 
 
 -- | Copy the data from Haskell list into pointer.
-pokeCUDABuffer :: (Storable b, Pf CUDA a ~ b, Shape sh, Pf Host a ~ b)
-               => Buffer sh CUDA a -- ^ CUDA buffer
-               -> [b]           -- ^ list
+pokeCUDABuffer :: ( Storable c, Pf Host a ~ c, Pf CUDA a ~ c
+                  , Shape sh, Buffer b
+                  , BufferPlatform b ~ CUDA
+                  , BufferShape    b ~ sh
+                  , BufferType     b ~ a)
+               => b -- ^ CUDA buffer
+               -> [c]           -- ^ list
                -> IO ()
-pokeCUDABuffer bf ls = do
+pokeCUDABuffer buf ls = do
   hostBuf <- fst <$> dup nullHostContext False bf
   pokeHostBuffer hostBuf ls
-  withForeignPtr (bufPtr bf) $ \dst' -> withBuffer hostBuf $ \src' -> do
+  withBuffer buf $ \dst' -> withBuffer hostBuf $ \src' -> do
     let dst = castPtr dst'
         src = castPtr src'
         size = fromIntegral $ size' dst' undefined
@@ -92,29 +103,41 @@ pokeCUDABuffer bf ls = do
     |]
     return ()
   where lsLen = length ls
-        bfLen = bufSize bf
+        bfLen = bufSize buf
         len   = min bfLen lsLen
         size' :: Storable a => Ptr a -> a -> Int
         size' _ x = sizeOf x * len
 
 -- | Transform list to CUDA buffer.
-toCUDABuffer :: (Storable b, Pf CUDA a ~ b, Pf Host a ~ b)
-             => [b]                 -- ^ List
-             -> IO (Buffer Int CUDA a)  -- ^ CUDA buffer
+toCUDABuffer :: ( Storable c, Pf Host a ~ c, Pf CUDA a ~ c
+                , Buffer b
+                , BufferPlatform b ~ CUDA
+                , BufferShape    b ~ Int
+                , BufferType     b ~ a)
+             => [c]                 -- ^ List
+             -> IO b  -- ^ CUDA buffer
 toCUDABuffer ls = do
   bf <- fst <$> newBufferIO (length ls) nullCUDAContext
   pokeCUDABuffer bf ls
   return bf
 
 -- | Unsafe peek
-unsafePeekCUDABuffer :: (Storable b,Pf CUDA a ~ b, Shape sh, Pf Host a ~ b)
-                     => Buffer sh CUDA a
-                     -> [b]
+unsafePeekCUDABuffer :: ( Storable c, Pf Host a ~ c, Pf CUDA a ~ c
+                        , Shape sh, Buffer b
+                        , BufferPlatform b ~ CUDA
+                        , BufferShape    b ~ sh
+                        , BufferType     b ~ a)
+                     => b
+                     -> [c]
 unsafePeekCUDABuffer = unsafePerformIO . peekCUDABuffer
 
 -- | Unsafe poke
-unsafeToCUDABuffer :: (Storable b, Pf CUDA a ~ b, Pf Host a ~ b)
-                   => [b]
-                   -> Buffer Int CUDA a
+unsafeToCUDABuffer :: ( Storable c, Pf Host a ~ c, Pf CUDA a ~ c
+                      , Buffer b
+                      , BufferPlatform b ~ CUDA
+                      , BufferShape    b ~ Int
+                      , BufferType     b ~ a)
+                   => [c]
+                   -> b
 unsafeToCUDABuffer = unsafePerformIO . toCUDABuffer
 

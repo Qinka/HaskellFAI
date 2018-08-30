@@ -36,109 +36,115 @@ The Haskell Foreign Accelerate Interace.
 {-# LANGUAGE TypeFamilies          #-}
 
 module Foreign.FAI
-  ( Pf
-  , Buffer(..)
-  , Shape(..)
-  , Context(..)
-  , Accelerate(..)
-  , FAI(..)
-  , FAICopy(..)
-  , FinalizerContextPtr
-  , Z(..)
-  , (:.)(..)
-  , DIM0
-  , DIM1
-  , DIM2
-  , DIM3
-  , DIM4
-  , DIM5
+  ( module Foreign.FAI.Types
   , accelerate
   , newBuffer
   , newBufferIO
   , dupBuffer
-  , dupBufferIO
   , dupBufferD
-  , liftIO
-  , reshape
-  , bufSize
-  , withBuffer
-  , bufByte
-  , ignoreLogger
+  , dupBufferIO
   , logger
+  , withBuffer
   ) where
 
 import           Control.Monad
 import           Foreign.FAI.Internal
 import           Foreign.FAI.Types
-import           Foreign.ForeignPtr
-import           Foreign.Ptr
-import Control.Monad.Logger
+import           Foreign.Ptr(Ptr, nullPtr)
+import Control.Monad.Logger(LoggingT(..))
+import Foreign.Storable(Storable(..))
+import Foreign.ForeignPtr(withForeignPtr)
 
 -- | run the @Accelerate@.
-accelerate :: Context p -> Accelerate p a -> IO a
+accelerate :: p -> Accelerate p a -> IO a
 accelerate cc = (fst <$>) . flip doAccelerate cc
 
 -- | Allocate new buffer (IO)
-newBufferIO :: (FAI p, Storable b, (Pf p a) ~ b, Shape sh)
+newBufferIO :: ( FAI p, Buffer b, ContextPointer p
+               , Storable c, (Pf p a) ~ c
+               , BufferShape    b ~ sh, Shape sh
+               , BufferType     b ~ a
+               , BufferPlatform b ~ p
+               )
             => sh                          -- ^ shape
-            -> Context p                   -- ^ platform context
-            -> IO (Buffer sh p a, Context p)  -- ^ Buffer and (new) context
+            -> p                           -- ^ platform context
+            -> IO (b, p)  -- ^ Buffer and (new) context
 newBufferIO sh cc =  do
   fin <- faiMemReleaseP cc
   ptr <- alloc cc undefined
   when (nullPtr == ptr) $ error "Can not allocate memory."
   buf <- autoNewForeignPtr fin cc ptr sh
   return (buf, cc)
-  where alloc :: (FAI p, Storable b) => Context p ->  b -> IO (Ptr b)
+  where alloc :: (FAI p, Storable b) => p ->  b -> IO (Ptr b)
         alloc c' u =
           faiMemAllocate c' $ shLen sh * sizeOf u
 
 -- | Allocate buffer
-newBuffer :: (FAI p, Storable b, (Pf p a) ~ b, Shape sh)
+newBuffer :: ( FAI p, Buffer b, ContextPointer p
+             , Storable c, (Pf p a) ~ c
+             , BufferShape    b ~ sh, Shape sh
+             , BufferType     b ~ a
+             , BufferPlatform b ~ p
+             )
           => sh                            -- ^ shape
-          -> Accelerate p (Buffer sh p a)  -- ^ buffer
+          -> Accelerate p b  -- ^ buffer
 newBuffer = Accelerate . newBufferIO
 
 -- | Duplicate buffer (IO)
 dupBufferIO :: ( FAICopy p1 p2, FAI p1, FAI p2
-               , Storable b, Pf p2 a ~ b, Pf p1 a ~ b
+               , Storable c, Pf p2 a ~ c, Pf p1 a ~ c
+               , Buffer b1, Buffer b2
+               , BufferPlatform b1 ~ p1
+               , BufferPlatform b2 ~ p2
+               , BufferShape    b1 ~ sh
+               , BufferShape    b2 ~ sh
+               , BufferType     b1 ~ a
+               , BufferType     b2 ~ a
                , Shape sh)
             => Bool                           -- ^ Whether copy data
-            -> Buffer sh p1 a                    -- ^ buffer (src)
-            -> Context p2                     -- ^ platform context
-            -> IO (Buffer sh p2 a, Context p2)   -- ^ buffer (dst) and context
+            -> b1                    -- ^ buffer (src)
+            -> p2                     -- ^ platform context
+            -> IO (b2, p2)   -- ^ buffer (dst) and context
 dupBufferIO is buf cc = dup cc is buf
 
 -- | Duplicate buffer
 dupBuffer :: ( FAICopy p1 p2, FAI p1, FAI p2
-             , Storable b, Pf p2 a ~ b, Pf p1 a ~ b
+             , Storable c, Pf p2 a ~ c, Pf p1 a ~ c
+             , Buffer b1, Buffer b2
+             , BufferPlatform b1 ~ p1
+             , BufferPlatform b2 ~ p2
+             , BufferShape    b1 ~ sh
+             , BufferShape    b2 ~ sh
+             , BufferType     b1 ~ a
+             , BufferType     b2 ~ a
              , Shape sh)
           => Bool                           -- ^ Whether copy data
-          -> Buffer sh p1 a                    -- ^ buffer (src)
-          -> Accelerate p2 (Buffer sh p2 a)    -- ^ buffer (dst)
+          -> b1                    -- ^ buffer (src)
+          -> Accelerate p2 b2    -- ^ buffer (dst)
 dupBuffer is buf = Accelerate (dupBufferIO is buf)
 
 -- | Duplicate buffer (for debug)
-dupBufferD :: ( FAICopy p2 p1, FAI p1, FAI p2
-              , Storable b, Pf p2 a ~ b, Pf p1 a ~ b
-              , Shape sh)
+dupBufferD :: ( FAICopy p1 p2, FAI p1, FAI p2
+             , Storable c, Pf p2 a ~ c, Pf p1 a ~ c
+             , Buffer b1, Buffer b2
+             , BufferPlatform b1 ~ p1
+             , BufferPlatform b2 ~ p2
+             , BufferShape    b1 ~ sh
+             , BufferShape    b2 ~ sh
+             , BufferType     b1 ~ a
+             , BufferType     b2 ~ a
+             , Shape sh)
            => Bool                           -- ^ Whether copy data
-           -> Buffer sh p2 a                    -- ^ buffer (src)
-           -> Accelerate p2 (Buffer sh p1 a)    -- ^ buffer (dst)
+           -> b1                   -- ^ buffer (src)
+           -> Accelerate p1 b2    -- ^ buffer (dst)
 dupBufferD is buf = Accelerate $ \cc -> replaceContext cc <$>  dup undefined is buf
 
+withBuffer :: ( FAI p, Buffer b
+              , BufferType     b ~ a
+              , BufferPlatform b ~ p
+              ) 
+           => b -> (Ptr (Pf p a) -> IO c) -> IO c
+withBuffer buf = withForeignPtr (getBufferPtr buf)
 
-reshape :: (Shape sh1, Shape sh2)
-        => Buffer sh1 p a
-        -> sh2
-        -> Buffer sh2 p a
-reshape (Buffer p sh1) sh2 =
-  if shLen sh1 == shLen sh2
-    then Buffer p sh2
-    else error "Different shape lengths"
-
-withBuffer :: FAI p => Buffer sh p a -> (Ptr (Pf p a) -> IO b) -> IO b
-withBuffer buf = withForeignPtr (bufPtr buf)
-
-logger :: FAI p => LoggingT (Accelerate p) ()
-logger = LoggingT $ \contextLogger -> Accelerate $ \c -> return ((), c {unContextLogger = contextLogger})
+logger :: (FAI p, ContextLogger p) => LoggingT (Accelerate p) ()
+logger = LoggingT $ \contextLogger -> Accelerate $ \c -> return ((), setContextLogger c contextLogger)

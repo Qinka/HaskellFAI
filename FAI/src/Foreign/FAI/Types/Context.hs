@@ -20,27 +20,34 @@ along with HaskellFAI. If not, see <http://www.gnu.org/licenses/>.
 -}
 
 {-|
-Module: Foreign.FAI.Types
-Description: The types and the class of FAI
+Module: Foreign.FAI.Types.Context
+Description: The context of points and logger
 Copyright: (C) 2018 Johann Lee <me@qinka.pro>
 License: LGPL3
 Maintainer: me@qinka.pro
 Stability: experimental
 Portability: unknown
 
-The types and the class of FAI.
+The context of points and logger.
 -}
 
-module Foreign.FAI.Types
-  ( module Foreign.FAI.Types.Accelerate
-  , module Foreign.FAI.Types.Buffer
-  , module Foreign.FAI.Types.Context
-  , module Foreign.FAI.Types.FAI
-  , module Foreign.FAI.Types.Shape
+module Foreign.FAI.Types.Context
+  ( ContextPointer(..)
+  , ContextLogger(..)
+  , Logger
   ) where
 
-import Foreign.FAI.Types.Accelerate
-import Foreign.FAI.Types.Buffer
-import Foreign.FAI.Types.Context
-import Foreign.FAI.Types.FAI
-import Foreign.FAI.Types.Shape
+import Foreign.ForeignPtr (ForeignPtr)
+import           Control.Monad.Logger(Loc, LogSource, LogLevel, LogStr)
+
+type Logger = Loc -> LogSource -> LogLevel -> LogStr -> IO ()
+
+class ContextPointer p where
+  getContextPointer  :: p -> ForeignPtr p
+  setContextPointer  :: p -> ForeignPtr p -> p
+  nullContextIO    :: IO p
+
+
+class ContextLogger p where
+  getContextLogger :: p -> Logger
+  setContextLogger :: p -> Logger -> p

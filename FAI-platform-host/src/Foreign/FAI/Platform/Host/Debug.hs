@@ -48,46 +48,67 @@ import           Foreign.FAI.Types
 import           Foreign.ForeignPtr
 import           Foreign.Marshal.Array
 import           System.IO.Unsafe
+import Foreign.Storable
 
 -- | Copy the data from pointer to Haskell list.
-peekHostBuffer :: (Storable b, Pf Host a ~ b, Shape sh)
-               => Buffer sh Host a   -- ^ Buffer
-               -> IO [b]          -- ^ Haskell list
+peekHostBuffer :: ( Storable c, Pf Host a ~ c
+                  , Shape sh, Buffer b
+                  , BufferPlatform b ~ Host
+                  , BufferShape    b ~ sh
+                  , BufferType     b ~ a)
+               => b   -- ^ Buffer
+               -> IO [c]          -- ^ Haskell list
 peekHostBuffer bf =
-  withForeignPtr (bufPtr bf) $ \ptr ->
+  withBuffer bf $ \ptr ->
     peekArray (bufSize bf) ptr
 
 -- | Copy the data from Haskell list into pointer.
-pokeHostBuffer :: (Storable b, Pf Host a ~ b, Shape sh)
-               => Buffer sh Host a -- ^ Host buffer
-               -> [b]           -- ^ list
+pokeHostBuffer :: ( Storable c, Pf Host a ~ c
+                  , Shape sh, Buffer b
+                  , BufferPlatform b ~ Host
+                  , BufferShape    b ~ sh
+                  , BufferType     b ~ a)
+               => b -- ^ Host buffer
+               -> [c]           -- ^ list
                -> IO ()
-pokeHostBuffer (Buffer fp s) ls = do
-  withForeignPtr fp $ \ptr ->
+pokeHostBuffer buf ls = do
+  withBuffer buf $ \ptr ->
     pokeArray ptr $ take len ls
   return ()
   where lsLen = length ls
-        bfLen = shLen s
+        bfLen = bufSize buf
         len   = min bfLen lsLen
 
 -- | Transform list to host buffer.
-toHostBuffer :: (Storable b, Pf Host a ~ b)
-             => [b]                 -- ^ List
-             -> IO (Buffer Int Host a)  -- ^ Host buffer
+toHostBuffer :: ( Storable c, Pf Host a ~ c
+                , Buffer b
+                , BufferPlatform b ~ Host
+                , BufferShape    b ~ Int
+                , BufferType     b ~ a)
+             => [c]                 -- ^ List
+             -> IO b  -- ^ Host buffer
 toHostBuffer ls = do
   bf <- fst <$> newBufferIO (length ls) nullHostContext
-  withForeignPtr (bufPtr bf) $ \ptr ->
+  withBuffer bf $ \ptr ->
     pokeArray ptr ls
   return bf
 
 -- | Unsafe peek
-unsafePeekHostBuffer :: (Storable b,Pf Host a ~ b, Shape sh)
-                     => Buffer sh Host a
-                     -> [b]
+unsafePeekHostBuffer :: ( Storable c, Pf Host a ~ c
+                        , Shape sh, Buffer b
+                        , BufferPlatform b ~ Host
+                        , BufferShape    b ~ sh
+                        , BufferType     b ~ a)
+                     => b
+                     -> [c]
 unsafePeekHostBuffer = unsafePerformIO . peekHostBuffer
 
 -- | Unsafe poke
-unsafeToHostBuffer :: (Storable b, Pf Host a ~ b)
-                   => [b]
-                   -> Buffer Int Host a
+unsafeToHostBuffer :: ( Storable c, Pf Host a ~ c
+                      , Buffer b
+                      , BufferPlatform b ~ Host
+                      , BufferShape    b ~ Int
+                      , BufferType     b ~ a)
+                   => [c]
+                   -> b
 unsafeToHostBuffer = unsafePerformIO . toHostBuffer

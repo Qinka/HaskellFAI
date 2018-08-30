@@ -58,7 +58,7 @@ C.include "<stdlib.h>"
 -- | Host backend (use C runtime)
 --
 -- The @malloc@ and @free@ are used for memory management.
-data Host = Host
+data Host = Host !(ForeignPtr Host) !Logger
 
 type instance Pf Host Float  = Float
 type instance Pf Host Double = Double
@@ -83,20 +83,28 @@ hostMemCopy fdst fsrc size =
       src = castPtr src'
   in void $ [C.exp| void* {memcpy($(void *dst), $(void *src), $(int size))} |]
 
+instance ContextLogger Host where
+  getContextLogger (Host _ l) = l
+  setContextLogger (Host p _) = Host p
+
+instance ContextPointer Host where
+  getContextPointer (Host p _) = p
+  setContextPointer (Host _ l) = (`Host` l)
+  nullContextIO = nullHostContextIO
+
 instance FAI Host where
   faiMemAllocate    _ = hostMemAllocate . fromIntegral
   faiMemRelease     _ = hostMemRelease
   faiMemReleaseP    _ = Right <$> hostMemReleaseP
-  faiDefaultContextIO = nullHostContextIO
 
 instance FAICopy Host Host where
   faiMemCopy dst src = do
     when (bufSize dst /= bufSize src) $ error "Different size."
-    hostMemCopy (bufPtr dst) (bufPtr src) $ fromIntegral $ bufByte dst
+    hostMemCopy (getBufferPtr dst) (getBufferPtr src) $ fromIntegral $ bufByte dst
 
 -- | Null pointer context of Host
-nullHostContextIO :: IO (Context Host)
-nullHostContextIO = Context <$> newForeignPtr_ nullPtr <*> return ignoreLogger
+nullHostContextIO :: IO Host
+nullHostContextIO = Host <$> newForeignPtr_ nullPtr <*> return ignoreLogger
 
-nullHostContext :: Context Host
+nullHostContext :: Host
 nullHostContext = unsafePerformIO nullHostContextIO

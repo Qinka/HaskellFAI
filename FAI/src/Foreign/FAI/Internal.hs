@@ -43,34 +43,48 @@ module Foreign.FAI.Internal
 
 import           Control.Monad
 import           Foreign.FAI.Types
-import           Foreign.ForeignPtr
+import           Foreign.ForeignPtr(withForeignPtr, newForeignPtr, newForeignPtrEnv)
+import Foreign.Ptr(Ptr)
+import Foreign.Storable(Storable)
 
--- | allocate new foreign pointer
-autoNewForeignPtr :: FinalizerContextPtr p (Pf p a) -- ^ Context p concerned finalizer
-                  -> Context p                      -- ^ Context
+-- | create foreign ptr from pointer for a new Buffer
+autoNewForeignPtr :: ( ContextPointer p, Buffer b
+                     , BufferShape    b ~ sh
+                     , BufferPlatform b ~ p
+                     , BufferType     b ~ a
+                     )
+                  => FinalizerContextPtr p (Pf p a) -- ^ Context p concerned finalizer
+                  -> p                      -- ^ Context
                   -> Ptr (Pf p a)                   -- ^ pointer
                   -> sh                             -- ^ Shape
-                  -> IO (Buffer sh p a)             -- ^ buffer
-autoNewForeignPtr fin cc ptr sh = fmap (`Buffer` sh) $ case fin of
-  Left  f -> withForeignPtr (unContextPtr cc) $ \p ->
+                  -> IO b             -- ^ buffer
+autoNewForeignPtr fin cc ptr sh = fmap (`makeBuffer` sh) $ case fin of
+  Left  f -> withForeignPtr (getContextPointer cc) $ \p ->
              newForeignPtrEnv f p ptr
   Right f -> newForeignPtr    f   ptr
 
-replaceContext :: Context p2 -> (a, Context p1) -> (a, Context p2)
+replaceContext :: p2 -> (a, p1) -> (a, p2)
 replaceContext cc (a, _) = (a, cc)
 
 -- | Duplicate data
-dup :: ( FAICopy p1 p2, FAI p1, FAI p2
-       , Storable b, Pf p2 a ~ b, Pf p1 a ~ b
+dup :: ( FAICopy p1 p2
+       , Storable c, Pf p2 a ~ c, Pf p1 a ~ c
+       , Buffer b1, Buffer b2
+       , BufferPlatform b1 ~ p1
+       , BufferPlatform b2 ~ p2
+       , BufferType     b1 ~ a
+       , BufferType     b2 ~ a
+       , BufferShape    b1 ~ sh
+       , BufferShape    b2 ~ sh
        , Shape sh)
-       => Context p2                       -- ^ context
+       => p2                       -- ^ context
        -> Bool                             -- ^ whether copy data
-       -> Buffer sh p1 a                   -- ^ buffer (src)
-       -> IO (Buffer sh p2 a, Context p2)  -- ^ buffer (dst)
+       -> b1                   -- ^ buffer (src)
+       -> IO (b2, p2)  -- ^ buffer (dst)
 dup cc is buf = do
   fin <- faiMemReleaseP cc
-  let sh   = bufShape buf
   ptr  <- faiMemAllocate cc $ bufByte buf
   bDst <- autoNewForeignPtr fin cc ptr sh
   when is $ faiMemCopy bDst buf
   return (bDst, cc)
+  where sh = getBufferShape buf
