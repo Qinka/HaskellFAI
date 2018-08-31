@@ -56,13 +56,13 @@ type FinalizerContextPtr p a =
 
 -- | The methods of FAI.
 class ContextPointer p => FAI p where
-  faiMemAllocate :: p   -- ^ Context
+  faiMemAllocate :: p           -- ^ Context
                  -> Int         -- ^ size
                  -> IO (Ptr a)  -- ^ Pointer
-  faiMemRelease  :: p   -- ^ Context
+  faiMemRelease  :: p           -- ^ Context
                  -> Ptr a       -- ^ Pointer
                  -> IO ()
-  faiMemReleaseP :: p   -- ^ Context
+  faiMemReleaseP :: p           -- ^ Context
                  -> IO (FinalizerContextPtr p a)
                       -- ^ pointer of the function
                       --   of release the pointer

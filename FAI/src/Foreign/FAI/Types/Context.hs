@@ -45,11 +45,11 @@ type Logger = Loc -> LogSource -> LogLevel -> LogStr -> IO ()
 
 -- | The methods about context's pointer
 class ContextPointer p where
-  getContextPointer  :: p -> ForeignPtr p -- ^ Get context's pointer
+  getContextPointer  :: p -> ForeignPtr p      -- ^ Get context's pointer
   setContextPointer  :: p -> ForeignPtr p -> p -- ^ Set context's pointer
-  nullContextIO      :: IO p -- ^ Create a new context with null pointer
+  nullContextIO      :: IO p                   -- ^ Create a new context with null pointer
 
 -- | The methods about context's logger .
 class ContextLogger p where
-  getContextLogger :: p -> Logger -- ^ Get the logger
+  getContextLogger :: p -> Logger      -- ^ Get the logger
   setContextLogger :: p -> Logger -> p -- ^ Set the logger

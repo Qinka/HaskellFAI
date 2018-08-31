@@ -43,7 +43,7 @@ function cuda_init() {
 
 ## FAI
 function FAI_init() {
-    cuda_init
+    #cuda_init
 
     sudo $APT install -y ghc-$GHC_VER 
 
@@ -101,14 +101,14 @@ function FAI_build() {
     cd $TRAVIS_BUILD_DIR
     export FLAGS="$X_THREADED_FLAGS $X_LLVM_FLAGS $X_DEBUG_FLAGS"
     echo Using flags: $FLAGS
-    stack build $FLAGS
+    stack build $FLAGS FAI FAI-platform-host
 }
 
 function FAI_test() {
     cd $TRAVIS_BUILD_DIR
     echo
     echo Run testing of FAI
-    stack test $FLAGS
+    stack test $FLAGS FAI FAI-platform-host
 }
 
 function FAI_succ() {

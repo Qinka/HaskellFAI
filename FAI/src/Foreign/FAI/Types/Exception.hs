@@ -36,7 +36,7 @@ module Foreign.FAI.Types.Exception
   , NullPtrAllocated(..)
   ) where
 
-import Control.Monad.Catch
+import           Control.Monad.Catch
 
 -- | Buffer allocated null pointer
 data NullPtrAllocated = NullPtrAllocated
@@ -44,6 +44,6 @@ data NullPtrAllocated = NullPtrAllocated
 
 instance Show NullPtrAllocated where
   show _ = "Error: The buffer allocator allocated a null pointer for the buffer."
-  
+
 instance Exception NullPtrAllocated
-  
+

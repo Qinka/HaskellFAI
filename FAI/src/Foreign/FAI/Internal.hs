@@ -55,10 +55,10 @@ autoNewForeignPtr :: ( ContextPointer p, Buffer b
                      , BufferType     b ~ a
                      )
                   => FinalizerContextPtr p (Pf p a) -- ^ Context p concerned finalizer
-                  -> p                      -- ^ Context
+                  -> p                              -- ^ Context
                   -> Ptr (Pf p a)                   -- ^ pointer
                   -> sh                             -- ^ Shape
-                  -> IO b             -- ^ buffer
+                  -> IO b                           -- ^ buffer
 autoNewForeignPtr fin cc ptr sh = fmap (`makeBuffer` sh) $ case fin of
   Left  f -> withForeignPtr (getContextPointer cc) $ \p ->
              newForeignPtrEnv f p ptr
@@ -78,12 +78,12 @@ dup :: ( FAICopy p1 p2
        , BufferShape    b1 ~ sh
        , BufferShape    b2 ~ sh
        , Shape sh)
-       => p2                       -- ^ context
-       -> Bool                             -- ^ whether copy data
-       -> b1                   -- ^ buffer (src)
+       => p2           -- ^ context
+       -> Bool         -- ^ whether copy data
+       -> b1           -- ^ buffer (src)
        -> IO (b2, p2)  -- ^ buffer (dst)
 dup cc is buf = do
-  fin <- faiMemReleaseP cc
+  fin  <- faiMemReleaseP cc
   ptr  <- faiMemAllocate cc $ bufByte buf
   bDst <- autoNewForeignPtr fin cc ptr sh
   when is $ faiMemCopy bDst buf

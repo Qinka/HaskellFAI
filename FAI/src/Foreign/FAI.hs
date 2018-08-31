@@ -48,13 +48,13 @@ module Foreign.FAI
   ) where
 
 import           Control.Monad
-import           Control.Monad.Logger (LoggingT (..))
+import           Control.Monad.Logger        (LoggingT (..))
 import           Foreign.FAI.Internal
 import           Foreign.FAI.Types
-import Foreign.FAI.Types.Exception
-import           Foreign.ForeignPtr   (castForeignPtr, withForeignPtr)
-import           Foreign.Ptr          (Ptr, nullPtr)
-import           Foreign.Storable     (Storable (..))
+import           Foreign.FAI.Types.Exception
+import           Foreign.ForeignPtr          (castForeignPtr, withForeignPtr)
+import           Foreign.Ptr                 (Ptr, nullPtr)
+import           Foreign.Storable            (Storable (..))
 
 infix 3 `accelerate`
 
@@ -73,8 +73,8 @@ newBufferIO :: ( FAI p, Buffer b, ContextPointer p
                , BufferType     b ~ a
                , BufferPlatform b ~ p
                )
-            => sh                          -- ^ shape
-            -> p                           -- ^ platform context
+            => sh         -- ^ shape
+            -> p          -- ^ platform context
             -> IO (b, p)  -- ^ Buffer and (new) context
 newBufferIO sh cc =  do
   fin <- faiMemReleaseP cc
@@ -93,7 +93,7 @@ newBuffer :: ( FAI p, Buffer b, ContextPointer p
              , BufferType     b ~ a
              , BufferPlatform b ~ p
              )
-          => sh                            -- ^ shape
+          => sh              -- ^ shape
           -> Accelerate p b  -- ^ buffer
 newBuffer = Accelerate . newBufferIO
 
@@ -108,9 +108,9 @@ dupBufferIO :: ( FAICopy p1 p2, FAI p1, FAI p2
                , BufferType     b1 ~ a
                , BufferType     b2 ~ a
                , Shape sh)
-            => Bool                           -- ^ Whether copy data
-            -> b1                    -- ^ buffer (src)
-            -> p2                     -- ^ platform context
+            => Bool          -- ^ Whether copy data
+            -> b1            -- ^ buffer (src)
+            -> p2            -- ^ platform context
             -> IO (b2, p2)   -- ^ buffer (dst) and context
 dupBufferIO is buf cc = dup cc is buf
 
@@ -125,8 +125,8 @@ dupBuffer :: ( FAICopy p1 p2, FAI p1, FAI p2
              , BufferType     b1 ~ a
              , BufferType     b2 ~ a
              , Shape sh)
-          => Bool                           -- ^ Whether copy data
-          -> b1                    -- ^ buffer (src)
+          => Bool                -- ^ Whether copy data
+          -> b1                  -- ^ buffer (src)
           -> Accelerate p2 b2    -- ^ buffer (dst)
 dupBuffer is buf = Accelerate (dupBufferIO is buf)
 
@@ -141,8 +141,8 @@ dupBufferD :: ( FAICopy p1 p2, FAI p1, FAI p2
              , BufferType     b1 ~ a
              , BufferType     b2 ~ a
              , Shape sh)
-           => Bool                           -- ^ Whether copy data
-           -> b1                   -- ^ buffer (src)
+           => Bool                -- ^ Whether copy data
+           -> b1                  -- ^ buffer (src)
            -> Accelerate p1 b2    -- ^ buffer (dst)
 dupBufferD is buf = Accelerate $ \cc -> replaceContext cc <$>  dup undefined is buf
 
