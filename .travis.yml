@@ -28,7 +28,6 @@ addons:
     packages:
       - wget
       - curl
-      - nvidia-cuda-toolkit
 
 # Matrix of building
 env:
