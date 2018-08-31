@@ -89,16 +89,8 @@ function FAI_build() {
         export X_DEBUG_FLAGS=" --ghc-options -rtsopts=some --ghc-options --ghc-options --ghc-options -O3"
     fi
 
-    if [ -n "$CUDA" ]; then
-        echo Enable CUDA
-        export X_CUDA_FLAGS=" "
-    else
-        echo Disable CUDA
-        export X_CUDA_FLAGS=" --flag FAI:-enable-cuda "
-    fi
-
     cd $TRAVIS_BUILD_DIR
-    export FLAGS="$X_THREADED_FLAGS $X_LLVM_FLAGS $X_DEBUG_FLAGS $X_CUDA_FLAGS"
+    export FLAGS="$X_THREADED_FLAGS $X_LLVM_FLAGS $X_DEBUG_FLAGS"
     echo Using flags: $FLAGS
     stack build $FLAGS
 }
