@@ -34,8 +34,17 @@ function common_init() {
     sudo $APT update
 }
 
+## Install CUDA
+function cuda_init() {
+    local CUDA=8.0.61-1
+    wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/cuda-repo-ubuntu1404_${CUDA}_amd64.deb
+    sudo dpkg -i cuda-repo-ubuntu1404_${CUDA}_amd64.deb
+}
+
 ## FAI
 function FAI_init() {
+    cuda_init
+
     sudo $APT install -y ghc-$GHC_VER 
 
     if [ -n "$LLVM" ]; then
