@@ -27,6 +27,7 @@ library
   exposed-modules:    Foreign.FAI.Types.Accelerate
                     , Foreign.FAI.Types.Buffer
                     , Foreign.FAI.Types.Context
+                    , Foreign.FAI.Types.Exception
                     , Foreign.FAI.Types.FAI
                     , Foreign.FAI.Types.Shape
                     , Foreign.FAI

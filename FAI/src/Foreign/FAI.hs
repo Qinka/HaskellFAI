@@ -51,6 +51,7 @@ import           Control.Monad
 import           Control.Monad.Logger (LoggingT (..))
 import           Foreign.FAI.Internal
 import           Foreign.FAI.Types
+import Foreign.FAI.Types.Exception
 import           Foreign.ForeignPtr   (castForeignPtr, withForeignPtr)
 import           Foreign.Ptr          (Ptr, nullPtr)
 import           Foreign.Storable     (Storable (..))
@@ -58,6 +59,10 @@ import           Foreign.Storable     (Storable (..))
 -- | run the @Accelerate@.
 accelerate :: p -> Accelerate p a -> IO a
 accelerate cc = (fst <$>) . flip doAccelerate cc
+
+accelerateEither :: (Exception e)
+                 => p -> Accelerate p a -> IO (Either e a)
+accelerateEither cc = try . (fst <$>) . flip doAccelerate cc
 
 -- | Allocate new buffer (IO)
 newBufferIO :: ( FAI p, Buffer b, ContextPointer p
@@ -72,7 +77,7 @@ newBufferIO :: ( FAI p, Buffer b, ContextPointer p
 newBufferIO sh cc =  do
   fin <- faiMemReleaseP cc
   ptr <- alloc cc undefined
-  when (nullPtr == ptr) $ error "Can not allocate memory."
+  when (nullPtr == ptr) $ throwM NullPtrAllocated
   buf <- autoNewForeignPtr fin cc ptr sh
   return (buf, cc)
   where alloc :: (FAI p, Storable b) => p ->  b -> IO (Ptr b)
