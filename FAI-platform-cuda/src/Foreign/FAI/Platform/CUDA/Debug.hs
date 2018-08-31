@@ -46,15 +46,13 @@ module Foreign.FAI.Platform.CUDA.Debug
 
 import           Foreign.C.Types
 import           Foreign.FAI
-import           Foreign.FAI.Internal
 import           Foreign.FAI.Platform.CUDA
 import           Foreign.FAI.Platform.Host
-import           Foreign.FAI.Platform.Host.Debug
-import           Foreign.FAI.Types
 import           Foreign.ForeignPtr
 import           Foreign.Ptr
 import           Foreign.Storable
 import           System.IO.Unsafe
+import Foreign.Marshal.Array
 
 import qualified Language.C.Inline               as C
 
@@ -72,14 +70,14 @@ peekCUDABuffer :: ( Storable c, Pf Host a ~ c, Pf CUDA a ~ c
                => b   -- ^ Buffer
                -> IO [c]          -- ^ Haskell list
 peekCUDABuffer bf = do
-  hostBuf <- mallocForeginPtrArray $ bufSize bf
-  withBuffer buf $ \src' -> withForeignPtr hostBuf $ \dst' -> do
+  hostBuf <- mallocForeignPtrArray $ bufSize bf
+  withBuffer bf $ \src' -> withForeignPtr hostBuf $ \dst' -> do
     let dst = castPtr dst'
         src = castPtr src'
         size = fromIntegral $ bufByte bf
     _ <- [C.block| int {
         cudaError_t err = cudaMemcpy($(void *dst), $(void *src),
-                                    $(int size), cudaMemcpyDeviceToHost);
+                                     $(int size), cudaMemcpyDeviceToHost);
         if(err != cudaSuccess) {
             printf("Failed to copy memory(HC), %d", err);
             return -1;
@@ -87,12 +85,8 @@ peekCUDABuffer bf = do
         return 0;
     }
     |]
-    peekArray dst'
-  where lsLen = length ls
-        bfLen = bufSize buf
-        len   = min bfLen lsLen
-        size' :: Storable a => Ptr a -> a -> Int
-        size' _ x = sizeOf x * len
+    peekArray bfLen dst'
+  where bfLen = bufSize bf
 
 -- | Copy the data from Haskell list into pointer.
 pokeCUDABuffer :: ( Storable c, Pf Host a ~ c, Pf CUDA a ~ c
@@ -104,7 +98,7 @@ pokeCUDABuffer :: ( Storable c, Pf Host a ~ c, Pf CUDA a ~ c
                -> [c]           -- ^ list
                -> IO ()
 pokeCUDABuffer buf ls = do
-  hostBuf <- mallocForeginPtrArray lsLen
+  hostBuf <- mallocForeignPtrArray lsLen
   withBuffer buf $ \dst' -> withForeignPtr hostBuf $ \src' -> do
     pokeArray src' ls
     let dst = castPtr dst'

@@ -33,6 +33,7 @@ The functions and types about ``Accelerate''.
 module Foreign.FAI.Types.Accelerate
   ( Accelerate(..)
   , ignoreLogger
+  , liftIO
   ) where
 
 import           Control.Monad.Catch       (MonadCatch (..), MonadThrow (..))

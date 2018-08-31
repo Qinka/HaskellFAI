@@ -56,6 +56,8 @@ import           Foreign.ForeignPtr   (castForeignPtr, withForeignPtr)
 import           Foreign.Ptr          (Ptr, nullPtr)
 import           Foreign.Storable     (Storable (..))
 
+infix 3 `accelerate`
+
 -- | run the @Accelerate@.
 accelerate :: p -> Accelerate p a -> IO a
 accelerate cc = (fst <$>) . flip doAccelerate cc

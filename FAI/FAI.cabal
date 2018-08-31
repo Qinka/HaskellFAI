@@ -18,11 +18,6 @@ extra-source-files:  ChangeLog.md
 cabal-version:       >=1.21
 stability:           experimental
 
--- flag enable-cuda
---       default:             False
---       manual:              False
---       description:         Enable the Nvidia's CUDA platform.
-
 library
   exposed-modules:    Foreign.FAI.Types.Accelerate
                     , Foreign.FAI.Types.Buffer
@@ -33,14 +28,13 @@ library
                     , Foreign.FAI
                     , Foreign.FAI.Types
                     , Foreign.FAI.Internal
-                    -- , Foreign.FAI.Platform.Host
-                    -- , Foreign.FAI.Platform.Host.Debug
 
   other-extensions:    MultiParamTypeClasses
                      , GADTs
                      , TypeFamilies
                      , QuasiQuotes
                      , TemplateHaskell
+                     , TypeOperators
 
   reexported-modules:  Control.Monad.Logger
                      , Control.Monad.Catch
@@ -53,32 +47,8 @@ library
   default-language:    Haskell2010
   ghc-options:         -Wall
 
-  -- if (flag(enable-cuda))
-  --    extra-libraries:     cudart
-    --  exposed-modules:     Foreign.FAI.Platform.CUDA
-    --                     , Foreign.FAI.Platform.CUDA.Debug
-
-
--- test-suite spec
---   type:                exitcode-stdio-1.0
---   main-is:             Spec.hs
---   hs-source-dirs:      test
---   ghc-options:         -Wall
---   build-depends:       base
---                      , FAI
---                      , inline-c
---                      , hspec
---   other-modules:       Foreign.FAI.Platform.HostSpec
---                      , Foreign.FAI.Platform.CUDASpec
---   other-extensions:    CPP
---                      , TypeFamilies
-
---   default-language:    Haskell2010
---   if(flag(enable-cuda))
---      cpp-options: -DENABLE_CUDA
-
--- source-repository head
---   type:                git
---   location:            https://github.com/Qinka/HaskellFAI.git
---   branch:              dev/master
---   subdir:              FAI
+source-repository head
+  type:                git
+  location:            https://github.com/Qinka/HaskellFAI.git
+  branch:              dev/master
+  subdir:              FAI
