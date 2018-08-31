@@ -106,5 +106,6 @@ instance FAICopy Host Host where
 nullHostContextIO :: IO Host
 nullHostContextIO = Host <$> newForeignPtr_ nullPtr <*> return ignoreLogger
 
+-- | Null pointer contexet of Host @unsafePerformIO nullHostContextIO@
 nullHostContext :: Host
 nullHostContext = unsafePerformIO nullHostContextIO

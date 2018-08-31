@@ -31,8 +31,8 @@ Portability: unknown
 Class of buffers.
 -}
 
-{-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeFamilies     #-}
 
 module Foreign.FAI.Types.Buffer
   ( Buffer(..)
@@ -41,28 +41,31 @@ module Foreign.FAI.Types.Buffer
   , bufByte
   ) where
 
-import Foreign.ForeignPtr (ForeignPtr)
-import Foreign.FAI.Types.Shape(Shape(..))
-import Foreign.Storable(Storable(..))
+import           Foreign.FAI.Types.Shape (Shape (..))
+import           Foreign.ForeignPtr      (ForeignPtr)
+import           Foreign.Storable        (Storable (..))
 
--- | Platform types
+-- | Platform types.
+-- The instance @Storable (Pf p t)@ means the real world infomation about storing.
 type family Pf p t :: *
 
+-- | Class Buffer defined what should be able to do with a buffer.
 class Shape (BufferShape b) => Buffer b where
-  type BufferPlatform b
-  type BufferType     b
-  type BufferShape    b
-  getBufferPtr   :: b -> ForeignPtr (Pf (BufferPlatform b) (BufferType b))
-  setBufferPtr   :: b -> ForeignPtr (Pf (BufferPlatform b) (BufferType b)) -> b
-  getBufferShape :: b -> BufferShape b
-  setBufferShape :: b -> BufferShape b -> b
-  makeBuffer     :: ForeignPtr (Pf (BufferPlatform b) (BufferType b)) -> BufferShape b -> b
+  type BufferPlatform b -- ^ The platform of a buffer
+  type BufferType     b -- ^ The type of a buffer refer to
+  type BufferShape    b -- ^ The shape of Buffer
+  getBufferPtr   :: b -> ForeignPtr (Pf (BufferPlatform b) (BufferType b)) -- ^ Get pointer
+  setBufferPtr   :: b -> ForeignPtr (Pf (BufferPlatform b) (BufferType b)) -> b -- ^ Set pointer
+  getBufferShape :: b -> BufferShape b -- ^ Get the shape
+  setBufferShape :: b -> BufferShape b -> b -- ^ Set the shape
+  makeBuffer     :: ForeignPtr (Pf (BufferPlatform b) (BufferType b)) -> BufferShape b -> b -- ^ Combine the pointer and shape.
 
-  
+-- | The number of elements.
 bufSize :: (Shape sh, BufferShape b ~ sh, Buffer b)
         => b -> Int
 bufSize = shLen . getBufferShape
 
+-- | The bytes of buffer's elements.
 bufByte :: ( Storable c, c ~ Pf p a
            , BufferType     b ~ a
            , BufferPlatform b ~ p

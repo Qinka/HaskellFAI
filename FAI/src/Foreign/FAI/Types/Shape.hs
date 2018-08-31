@@ -31,8 +31,8 @@ Portability: unknown
 Class of shape.
 -}
 
-{-# LANGUAGE TypeOperators         #-}
-{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeOperators     #-}
 
 module Foreign.FAI.Types.Shape
   ( Shape(..)
@@ -45,21 +45,30 @@ module Foreign.FAI.Types.Shape
   , DIM5
   ) where
 
+-- | Shape
 class Shape sh where
   shLen :: sh -> Int
 
+-- | Zero dim
 data Z = Z
   deriving(Show, Read, Eq, Ord)
 
+-- | Combinator for higher dim
 infixl 3 :.
 data tail :. head = !tail :. !head
   deriving(Show, Read, Eq, Ord)
 
+-- | Zero dim
 type DIM0       = Z
+-- | (x)
 type DIM1       = DIM0 :. Int
+-- | (x,y)
 type DIM2       = DIM1 :. Int
+-- | (x,y,z)
 type DIM3       = DIM2 :. Int
+-- | (x,y,z,w)
 type DIM4       = DIM3 :. Int
+-- | (x,y,z,w,c)
 type DIM5       = DIM4 :. Int
 
 instance Shape () where
@@ -88,15 +97,3 @@ instance Shape Z where
 
 instance Shape sh => Shape (sh :. Int) where
   shLen (sh :. i) = shLen sh * i
-
-  
-
--- bufSize :: Shape sh => Buffer sh p a -> Int
--- bufSize = shLen . bufShape
-
--- bufByte :: (Storable b, b ~ Pf p a, Shape sh)
---         => Buffer sh p a
---         -> Int
--- bufByte (Buffer fp sh) = size fp undefined * shLen sh
---   where size :: Storable a => ForeignPtr a -> a -> Int
---         size _ = sizeOf

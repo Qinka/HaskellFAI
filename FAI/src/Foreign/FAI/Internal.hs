@@ -43,9 +43,10 @@ module Foreign.FAI.Internal
 
 import           Control.Monad
 import           Foreign.FAI.Types
-import           Foreign.ForeignPtr(withForeignPtr, newForeignPtr, newForeignPtrEnv)
-import Foreign.Ptr(Ptr)
-import Foreign.Storable(Storable)
+import           Foreign.ForeignPtr (newForeignPtr, newForeignPtrEnv,
+                                     withForeignPtr)
+import           Foreign.Ptr        (Ptr)
+import           Foreign.Storable   (Storable)
 
 -- | create foreign ptr from pointer for a new Buffer
 autoNewForeignPtr :: ( ContextPointer p, Buffer b

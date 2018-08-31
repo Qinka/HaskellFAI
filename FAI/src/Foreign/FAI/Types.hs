@@ -39,8 +39,8 @@ module Foreign.FAI.Types
   , module Foreign.FAI.Types.Shape
   ) where
 
-import Foreign.FAI.Types.Accelerate
-import Foreign.FAI.Types.Buffer
-import Foreign.FAI.Types.Context
-import Foreign.FAI.Types.FAI
-import Foreign.FAI.Types.Shape
+import           Foreign.FAI.Types.Accelerate
+import           Foreign.FAI.Types.Buffer
+import           Foreign.FAI.Types.Context
+import           Foreign.FAI.Types.FAI
+import           Foreign.FAI.Types.Shape

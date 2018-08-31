@@ -48,12 +48,12 @@ module Foreign.FAI
   ) where
 
 import           Control.Monad
+import           Control.Monad.Logger (LoggingT (..))
 import           Foreign.FAI.Internal
 import           Foreign.FAI.Types
-import           Foreign.Ptr(Ptr, nullPtr)
-import Control.Monad.Logger(LoggingT(..))
-import Foreign.Storable(Storable(..))
-import Foreign.ForeignPtr(withForeignPtr)
+import           Foreign.ForeignPtr   (castForeignPtr, withForeignPtr)
+import           Foreign.Ptr          (Ptr, nullPtr)
+import           Foreign.Storable     (Storable (..))
 
 -- | run the @Accelerate@.
 accelerate :: p -> Accelerate p a -> IO a
@@ -139,12 +139,22 @@ dupBufferD :: ( FAICopy p1 p2, FAI p1, FAI p2
            -> Accelerate p1 b2    -- ^ buffer (dst)
 dupBufferD is buf = Accelerate $ \cc -> replaceContext cc <$>  dup undefined is buf
 
+-- | With buffer for a pointer
 withBuffer :: ( FAI p, Buffer b
               , BufferType     b ~ a
               , BufferPlatform b ~ p
-              ) 
+              )
            => b -> (Ptr (Pf p a) -> IO c) -> IO c
 withBuffer buf = withForeignPtr (getBufferPtr buf)
 
+-- | With buffer for a pointer(casted)
+withBuffer' :: ( FAI p, Buffer b
+               , BufferType     b ~ a
+               , BufferPlatform b ~ p
+               )
+            => b -> (Ptr a -> IO c) -> IO c
+withBuffer' buf = withForeignPtr (castForeignPtr $ getBufferPtr buf)
+
+-- | Operator for set logger.
 logger :: (FAI p, ContextLogger p) => LoggingT (Accelerate p) ()
 logger = LoggingT $ \contextLogger -> Accelerate $ \c -> return ((), setContextLogger c contextLogger)

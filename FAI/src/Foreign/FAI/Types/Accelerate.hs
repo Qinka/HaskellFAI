@@ -20,15 +20,14 @@ along with HaskellFAI. If not, see <http://www.gnu.org/licenses/>.
 -}
 
 {-|
-Module: Foreign.FAI.Types
-Description: The types and the class of FAI
+Description: The functions and types about ``Accelerate''.
 Copyright: (C) 2018 Johann Lee <me@qinka.pro>
 License: LGPL3
 Maintainer: me@qinka.pro
 Stability: experimental
 Portability: unknown
 
-The types and the class of FAI.
+The functions and types about ``Accelerate''.
 -}
 
 module Foreign.FAI.Types.Accelerate
@@ -36,14 +35,15 @@ module Foreign.FAI.Types.Accelerate
   , ignoreLogger
   ) where
 
-import Foreign.FAI.Types.Context (ContextLogger(..))
-import           Control.Monad.Logger(Loc, LogSource, LogLevel, LogStr, MonadLogger(..), toLogStr)
-import           Control.Monad.IO.Class (MonadIO (..))
-import Control.Monad.Catch (MonadThrow(..), MonadCatch(..))
+import           Control.Monad.Catch       (MonadCatch (..), MonadThrow (..))
+import           Control.Monad.IO.Class    (MonadIO (..))
+import           Control.Monad.Logger      (Loc, LogLevel, LogSource, LogStr,
+                                            MonadLogger (..), toLogStr)
+import           Foreign.FAI.Types.Context (ContextLogger (..))
 
 -- | Accelearate type.
 newtype Accelerate p a = Accelerate
-  { doAccelerate :: p -> IO (a, p)
+  { doAccelerate :: p -> IO (a, p) -- ^ accelerate kernel
   }
 
 instance Functor (Accelerate p) where
@@ -70,6 +70,7 @@ instance MonadIO (Accelerate p) where
 instance ContextLogger p => MonadLogger (Accelerate p) where
   monadLoggerLog l ls ll msg = Accelerate $ \c -> (\rt -> (rt, c)) <$> getContextLogger c l ls ll (toLogStr msg)
 
+-- | The logger which will ignore all the logs.
 ignoreLogger :: Loc -> LogSource -> LogLevel -> LogStr -> IO ()
 ignoreLogger _ _ _ _ = return ()
 

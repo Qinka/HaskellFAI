@@ -37,17 +37,19 @@ module Foreign.FAI.Types.Context
   , Logger
   ) where
 
-import Foreign.ForeignPtr (ForeignPtr)
-import           Control.Monad.Logger(Loc, LogSource, LogLevel, LogStr)
+import           Control.Monad.Logger (Loc, LogLevel, LogSource, LogStr)
+import           Foreign.ForeignPtr   (ForeignPtr)
 
+-- | Logger
 type Logger = Loc -> LogSource -> LogLevel -> LogStr -> IO ()
 
+-- | The methods about context's pointer
 class ContextPointer p where
-  getContextPointer  :: p -> ForeignPtr p
-  setContextPointer  :: p -> ForeignPtr p -> p
-  nullContextIO    :: IO p
+  getContextPointer  :: p -> ForeignPtr p -- ^ Get context's pointer
+  setContextPointer  :: p -> ForeignPtr p -> p -- ^ Set context's pointer
+  nullContextIO      :: IO p -- ^ Create a new context with null pointer
 
-
+-- | The methods about context's logger .
 class ContextLogger p where
-  getContextLogger :: p -> Logger
-  setContextLogger :: p -> Logger -> p
+  getContextLogger :: p -> Logger -- ^ Get the logger
+  setContextLogger :: p -> Logger -> p -- ^ Set the logger

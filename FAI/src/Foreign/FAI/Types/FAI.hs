@@ -20,7 +20,7 @@ along with HaskellFAI. If not, see <http://www.gnu.org/licenses/>.
 -}
 
 {-|
-Module: Foreign.FAI.Types
+Module: Foreign.FAI.Types.FAI
 Description: The types and the class of FAI
 Copyright: (C) 2018 Johann Lee <me@qinka.pro>
 License: LGPL3
@@ -31,8 +31,8 @@ Portability: unknown
 The types and the class of FAI.
 -}
 
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE GADTs                 #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies          #-}
 
 module Foreign.FAI.Types.FAI
@@ -41,12 +41,12 @@ module Foreign.FAI.Types.FAI
   , FinalizerContextPtr
   ) where
 
-import Foreign.Ptr(Ptr)
-import Foreign.ForeignPtr(FinalizerEnvPtr, FinalizerPtr)
-import Foreign.FAI.Types.Context (ContextPointer(..))
-import Foreign.FAI.Types.Buffer(Buffer(..), Pf)
+import           Foreign.FAI.Types.Buffer  (Buffer (..), Pf)
+import           Foreign.FAI.Types.Context (ContextPointer (..))
+import           Foreign.FAI.Types.Shape   (Shape (..))
+import           Foreign.ForeignPtr        (FinalizerEnvPtr, FinalizerPtr)
+import           Foreign.Ptr               (Ptr)
 import           Foreign.Storable
-import Foreign.FAI.Types.Shape(Shape(..))
 
 
 
@@ -54,6 +54,7 @@ import Foreign.FAI.Types.Shape(Shape(..))
 type FinalizerContextPtr p a =
   Either (FinalizerEnvPtr p a) (FinalizerPtr a)
 
+-- | The methods of FAI.
 class ContextPointer p => FAI p where
   faiMemAllocate :: p   -- ^ Context
                  -> Int         -- ^ size

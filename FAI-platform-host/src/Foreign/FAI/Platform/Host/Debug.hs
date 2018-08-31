@@ -47,8 +47,8 @@ import           Foreign.FAI.Platform.Host
 import           Foreign.FAI.Types
 import           Foreign.ForeignPtr
 import           Foreign.Marshal.Array
+import           Foreign.Storable
 import           System.IO.Unsafe
-import Foreign.Storable
 
 -- | Copy the data from pointer to Haskell list.
 peekHostBuffer :: ( Storable c, Pf Host a ~ c
