@@ -20,15 +20,15 @@
 sudo: required
 dist: trusty
 
-
-apt:
-  update: true
-  sources:
-    - hvr-ghc
-  packages:
-    - wget
-    - curl
-    - nvidia-cuda-toolkit
+addons:
+  apt:
+    update: true
+    sources:
+      - hvr-ghc
+    packages:
+      - wget
+      - curl
+      - nvidia-cuda-toolkit
 
 # Matrix of building
 env:
