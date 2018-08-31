@@ -18,12 +18,56 @@
 # along with Haskell-FAI. If not, see <http://www.gnu.org/licenses/>.
 #
 
-##########################################################
-##
-## Build Haskell FAI
-##
-##########################################################
-function build_FAI() {
+## Command
+function common_init() {
+    echo
+    echo Pre-install
+    echo
+
+    echo Fetching the system\' name
+    export OS_CORENAME=$(lsb_release -c | awk '{print $2}')
+    export OS_DISTRIBUTOR=$(lsb_release -i | awk '{print $3}')
+    echo Using $OS_DISTRIBUTOR $OS_CORENAME for building
+
+    export APT=apt-get
+    echo Updating $APT source
+    sudo $APT update
+}
+
+## FAI
+function FAI_init() {
+    sudo $APT install -y ghc-$GHC_VER 
+
+    if [ -n "$LLVM" ]; then
+        echo
+        echo Using llvm-$LLVM
+        echo
+        sudo $APT install -y lldb-$LLVM llvm-$LLVM llvm-$LLVM-dev llvm-$LLVM-runtime
+    fi
+
+    #
+    # I was planning enable the CUDA test, but the Travis-CI do not support such things.
+    # So it's abandoned now.
+    #
+    if [ -n "$CUDA" ]; then
+        echo CUDA should be disable.
+        exit 3
+    fi
+
+    echo Setting up ghc-$GHC_VER
+    export PATH=/opt/ghc/$GHC_VER/bin:$PATH
+    ghc -V
+
+    mkdir -p $HOME/.local/bin
+    export PATH=$HOME/.local/bin:$PATH
+    travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+
+
+    echo Configuring
+    stack config set system-ghc --global true
+}
+
+function FAI_build() {
     echo FAI task
     ## LLVM
     if [ -n "$LLVM" ]; then
@@ -59,59 +103,13 @@ function build_FAI() {
     stack build $FLAGS
 }
 
-##########################################################
-##
-## Build example of blas
-##
-##########################################################
-function build_example_blas() {
-    echo build example of blas
-    cd $TRAVIS_BUILD_DIR/example/example-blas
-    mkdir build
-    cd build
-    export EBLAS_BUILD_DIR=`pwd`
-
-    local TEST_STATUS ACC_CMAKE_FLAGS
-    # test enable
-    if [ -n "$RUN_TEST" ]; then
-        TEST_STATUS=On
-    else
-        TEST_STATUS=Off
-    fi
-
-    case $ACC_BACKEND in
-        OpenMP)
-            ACC_CMAKE_FLAGS="-DENABLE_OPENMP=On"
-            ;;
-        OpenMP-target)
-            ACC_CMAKE_FLAGS="-DENABLE_OPENMP=On -DENABLE_OPENMP_TARGET=On"
-            ;;
-        OpenACC)
-            ACC_CMAKE_FLAGS="-DENABLE_OPENMP=Off -DENBALE_OPENACC=On"
-            ;;
-        *)
-            ACC_CMAKE_FLAGS="-DENABLE_OPENMP=Off"
-            ;;
-    esac
-
-
-    cmake -DBUILD_TESTS=$TEST_STATUS $ACC_CMAKE_FLAGS -DGTEST_ROOT=/usr/src/gtest ..
-    cmake --build .
-
+function FAI_test() {
     cd $TRAVIS_BUILD_DIR
+    echo
+    echo Run testing of FAI
+    stack test $FLAGS
 }
 
-echo
-echo Build
-echo
-
-echo Task is $TASK
-
-case $TASK in
-    FAI) 
-    build_FAI
-    ;;
-    example-blas)
-    build_example_blas
-    ;;
-esac
+function FAI_succ() {
+    echo "Nothing to do"
+}
