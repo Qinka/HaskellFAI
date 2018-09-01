@@ -3,14 +3,14 @@
 
 name:                FAI-platform-host
 version:             0.1.0.0
--- synopsis:            
--- description:         
+synopsis:            Host platform for Haskell FAI
+description:         Host platform for Haskell FAI.
 license:             LGPL-3
 license-file:        LICENSE
 author:              Johann Lee
 maintainer:          me@qinka.pro
--- copyright:           
--- category:            
+copyright:           (C) 2018 Johann Lee <me@qinka.pro>
+category:            Accelerate
 build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
