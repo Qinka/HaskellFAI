@@ -37,6 +37,7 @@ Class of shape.
 module Foreign.FAI.Types.Shape
   ( Shape(..)
   , Z(..)
+  , (:.)(..)
   , DIM0
   , DIM1
   , DIM2

@@ -45,6 +45,7 @@ module Foreign.FAI
   , dupBufferIO
   , logger
   , withBuffer
+  , withBuffer'
   ) where
 
 import           Control.Monad

@@ -50,7 +50,7 @@ import           Foreign.Storable        (Storable (..))
 type family Pf p t :: *
 
 -- | Class Buffer defined what should be able to do with a buffer.
-class Shape (BufferShape b) => Buffer b where
+class Buffer b where
   type BufferPlatform b                                                                     -- ^ The platform of a buffer
   type BufferType     b                                                                     -- ^ The type of a buffer refer to
   type BufferShape    b                                                                     -- ^ The shape of Buffer
