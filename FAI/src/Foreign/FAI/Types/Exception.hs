@@ -40,6 +40,7 @@ module Foreign.FAI.Types.Exception
   , getExceptionCallStack
   , cleanExceptionCallStack
   , NullPtrAllocated(..)
+  , HasCallStack
   ) where
 
 import           Control.Monad.Catch
