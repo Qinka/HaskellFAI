@@ -31,13 +31,21 @@ Portability: unknown
 The Haskell Foreign Accelerate Interace.
 -}
 
+{-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeFamilies          #-}
 
 module Foreign.FAI
   ( module Foreign.FAI.Types
   , accelerate
+  , accelerateEither
+  , withLogger
+  , exitHandler
+  , exitFailureHandler
+  , handleException
   , newBuffer
   , newBufferIO
   , dupBuffer
@@ -49,19 +57,51 @@ module Foreign.FAI
   ) where
 
 import           Control.Monad
-import           Control.Monad.Logger        (LoggingT (..))
+import           Control.Monad.Logger        (LoggingT (..), logError, logInfo)
+import           Data.Text                   (pack)
 import           Foreign.FAI.Internal
 import           Foreign.FAI.Types
 import           Foreign.FAI.Types.Exception
 import           Foreign.ForeignPtr          (castForeignPtr, withForeignPtr)
 import           Foreign.Ptr                 (Ptr, nullPtr)
 import           Foreign.Storable            (Storable (..))
+import           GHC.Stack                   (HasCallStack, prettyCallStack)
+import           System.Exit                 (ExitCode (..), exitWith)
+
+-- | With logger do action
+withLogger :: (HasCallStack, FAI p, ContextLogger p)
+           => (LoggingT (Accelerate p) () -> Accelerate p ())
+           -> Accelerate p a
+           -> Accelerate p a
+withLogger logging = (logging logger >>) . ($logInfo "Enable logger" >>)
+
+-- | Catch the exception, display, and then exit with exit-code
+exitHandler :: (HasCallStack, FAI p, ContextLogger p)
+            => ExitCode -> SomeException -> Accelerate p a
+exitHandler ec (SomeException e) = do
+  exc <- getExceptionCallStack
+  $logError $ pack (displayException e) `mappend` "\n" `mappend` pack (unlines $ map prettyCallStack exc)
+  liftIO $ exitWith ec
+
+  
+-- | Catch the exception, display, and then exit with exit-code: 1
+exitFailureHandler :: (HasCallStack, FAI p, ContextLogger p)
+                   => SomeException -> Accelerate p a
+exitFailureHandler = exitHandler (ExitFailure 1)
+
+-- | Handle the exception(with handler).
+handleException :: (HasCallStack, ContextLogger p)
+                => (SomeException -> Accelerate p a)
+                -> Accelerate p a
+                -> Accelerate p a
+handleException = flip catchAll
 
 infix 3 `accelerate`
-
 -- | run the @Accelerate@.
-accelerate :: p -> Accelerate p a -> IO a
-accelerate cc = (fst <$>) . flip doAccelerate cc
+accelerate  :: p
+            -> Accelerate p a
+            -> IO a
+accelerate cc = (cleanExceptionCallStack >>) . (fst <$>) . flip doAccelerate cc
 
 accelerateEither :: (Exception e)
                  => p -> Accelerate p a -> IO (Either e a)

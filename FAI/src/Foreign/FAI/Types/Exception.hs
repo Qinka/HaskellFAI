@@ -31,12 +31,40 @@ Portability: unknown
 The defined exceptions of FAI.
 -}
 
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ImplicitParams   #-}
+
 module Foreign.FAI.Types.Exception
   ( module Control.Monad.Catch
+  , throw
+  , getExceptionCallStack
+  , cleanExceptionCallStack
   , NullPtrAllocated(..)
   ) where
 
 import           Control.Monad.Catch
+import           Control.Monad.IO.Class (MonadIO, liftIO)
+import           Data.IORef             (IORef, modifyIORef, newIORef,
+                                         readIORef, writeIORef)
+import           GHC.Stack              (CallStack, HasCallStack,
+                                         freezeCallStack)
+import           System.IO.Unsafe       (unsafePerformIO)
+
+{-# NOINLINE ref #-}
+ref :: IORef [CallStack]
+ref = unsafePerformIO $ newIORef []
+
+-- | Throw the exception with the call stack[Thread unsafe]
+throw :: (HasCallStack, MonadThrow m, MonadIO m, Exception e) => e -> m a
+throw = (liftIO (modifyIORef ref (freezeCallStack ?callStack :)) >>) . throwM
+
+-- | Clean the Exception call stack
+cleanExceptionCallStack :: MonadIO m => m ()
+cleanExceptionCallStack = liftIO $ writeIORef ref []
+
+-- | Get the exception call stack
+getExceptionCallStack   :: MonadIO m => m [CallStack]
+getExceptionCallStack   = liftIO $ readIORef ref
 
 -- | Buffer allocated null pointer
 data NullPtrAllocated = NullPtrAllocated
@@ -46,4 +74,3 @@ instance Show NullPtrAllocated where
   show _ = "Error: The buffer allocator allocated a null pointer for the buffer."
 
 instance Exception NullPtrAllocated
-
