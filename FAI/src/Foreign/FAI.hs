@@ -83,7 +83,7 @@ exitHandler ec (SomeException e) = do
   $logError $ pack (displayException e) `mappend` "\n" `mappend` pack (unlines $ map prettyCallStack exc)
   liftIO $ exitWith ec
 
-  
+
 -- | Catch the exception, display, and then exit with exit-code: 1
 exitFailureHandler :: (HasCallStack, FAI p, ContextLogger p)
                    => SomeException -> Accelerate p a
